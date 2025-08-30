@@ -1,0 +1,272 @@
+# Simple FTP Daemon Configuration File
+# This file contains all configuration options for the FTP server
+
+# Global server settings
+server_name = "Simple FTP Daemon"
+server_version = "0.1.0"
+server_banner = "Welcome to Simple FTP Daemon"
+daemon_mode = false
+foreground_mode = true
+working_directory = "/var/ftp"
+user_config_dir = "/etc/simple-ftpd/users"
+system_config_dir = "/etc/simple-ftpd"
+
+# Feature flags
+enable_ssl = true
+enable_virtual_hosts = true
+enable_user_management = true
+enable_rate_limiting = true
+enable_logging = true
+enable_statistics = true
+enable_monitoring = false
+
+# Performance settings
+thread_pool_size = 8
+max_memory_usage = 256MB
+enable_compression = false
+enable_caching = true
+cache_size = 50MB
+
+# Monitoring settings
+enable_metrics = false
+metrics_endpoint = "/metrics"
+metrics_port = 8080
+metrics_interval = 60
+
+# Backup and recovery
+enable_backup = true
+backup_directory = "/var/backup/simple-ftpd"
+backup_interval = 86400
+max_backups = 7
+
+# Development and debugging
+debug_mode = false
+verbose_logging = false
+trace_commands = false
+profile_performance = false
+log_socket_events = "none"
+
+# SSL/TLS Configuration
+[ssl]
+enabled = true
+certificate_file = "/etc/simple-ftpd/ssl/server.crt"
+private_key_file = "/etc/simple-ftpd/ssl/server.key"
+ca_certificate_file = "/etc/simple-ftpd/ssl/ca.crt"
+cipher_suite = "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256"
+require_client_cert = false
+verify_peer = false
+min_tls_version = 1.2
+max_tls_version = 1.3
+
+# Logging Configuration
+[logging]
+log_file = "/var/log/simple-ftpd/simple-ftpd.log"
+log_level = "INFO"
+log_to_console = true
+log_to_file = true
+log_commands = true
+log_transfers = true
+log_errors = true
+log_format = "STANDARD"
+max_log_size = 10MB
+max_log_files = 5
+
+# Security Configuration
+[security]
+chroot_enabled = false
+chroot_directory = "/var/ftp"
+drop_privileges = true
+run_as_user = "ftp"
+run_as_group = "ftp"
+allow_anonymous = false
+allow_guest = false
+require_ssl = false
+allowed_commands = ["USER", "PASS", "QUIT", "PWD", "CWD", "LIST", "RETR", "STOR"]
+denied_commands = ["SITE", "SYST", "HELP"]
+max_login_attempts = 3
+login_timeout = 30
+session_timeout = 3600
+
+# Transfer Configuration
+[transfer]
+max_file_size = 0
+max_transfer_rate = 0
+allow_overwrite = true
+allow_resume = true
+temp_directory = "/tmp/simple-ftpd"
+buffer_size = 8192
+use_sendfile = true
+use_mmap = false
+allowed_extensions = ["txt", "pdf", "doc", "docx", "jpg", "png", "gif"]
+denied_extensions = ["exe", "bat", "sh", "com"]
+
+# Connection Configuration
+[connection]
+bind_address = "0.0.0.0"
+bind_port = 21
+max_connections = 100
+max_connections_per_ip = 10
+connection_timeout = 300
+data_timeout = 300
+idle_timeout = 600
+keep_alive = true
+keep_alive_interval = 60
+keep_alive_probes = 3
+tcp_nodelay = true
+reuse_address = true
+backlog = 50
+
+# Passive Mode Configuration
+[passive]
+enabled = true
+external_ip = ""
+local_ip = ""
+min_port = 1024
+max_port = 65535
+use_external_ip = false
+use_local_ip = false
+allowed_ports = []
+denied_ports = []
+
+# Rate Limiting Configuration
+[rate_limit]
+enabled = true
+max_requests_per_minute = 1000
+max_connections_per_minute = 100
+max_transfers_per_minute = 50
+max_bytes_per_minute = 100MB
+window_size = 60
+per_ip_limiting = true
+per_user_limiting = true
+
+# Virtual Hosts Configuration
+[virtual_hosts]
+# Default virtual host
+[virtual_hosts.default]
+hostname = "default"
+document_root = "/var/ftp"
+welcome_message = "Welcome to Simple FTP Daemon"
+banner_message = "Simple FTP Daemon Ready"
+enabled = true
+default = true
+
+[virtual_hosts.default.ssl]
+enabled = false
+certificate_file = ""
+private_key_file = ""
+
+[virtual_hosts.default.security]
+chroot_enabled = false
+chroot_directory = ""
+drop_privileges = true
+run_as_user = "ftp"
+run_as_group = "ftp"
+allow_anonymous = false
+allow_guest = false
+require_ssl = false
+
+[virtual_hosts.default.transfer]
+max_file_size = 0
+max_transfer_rate = 0
+allow_overwrite = true
+allow_resume = true
+
+# Example virtual host for a specific domain
+[virtual_hosts.example]
+hostname = "ftp.example.com"
+document_root = "/var/ftp/example"
+welcome_message = "Welcome to Example.com FTP Server"
+banner_message = "Example.com FTP Server Ready"
+enabled = true
+default = false
+
+[virtual_hosts.example.ssl]
+enabled = true
+certificate_file = "/etc/simple-ftpd/ssl/example.com.crt"
+private_key_file = "/etc/simple-ftpd/ssl/example.com.key"
+
+[virtual_hosts.example.security]
+chroot_enabled = true
+chroot_directory = "/var/ftp/example"
+drop_privileges = true
+run_as_user = "ftp"
+run_as_group = "ftp"
+allow_anonymous = false
+allow_guest = false
+require_ssl = true
+
+[virtual_hosts.example.transfer]
+max_file_size = 100MB
+max_transfer_rate = 1MB
+allow_overwrite = false
+allow_resume = true
+
+# Users Configuration
+[users]
+# Admin user
+[users.admin]
+username = "admin"
+password_hash = "$2y$10$hashed_password_here"
+home_directory = "/var/ftp/admin"
+shell = "/bin/false"
+group = "ftp"
+enabled = true
+anonymous = false
+guest = false
+permissions = ["READ", "WRITE", "DELETE", "RENAME", "MKDIR", "RMDIR", "LIST", "UPLOAD", "DOWNLOAD", "APPEND", "ADMIN"]
+denied_operations = []
+max_connections = 5
+max_transfer_rate = 0
+max_file_size = 0
+session_timeout = 3600
+
+# Regular user
+[users.user1]
+username = "user1"
+password_hash = "$2y$10$hashed_password_here"
+home_directory = "/var/ftp/user1"
+shell = "/bin/false"
+group = "ftp"
+enabled = true
+anonymous = false
+guest = false
+permissions = ["READ", "LIST", "UPLOAD", "DOWNLOAD"]
+denied_operations = ["DELETE", "RENAME", "MKDIR", "RMDIR"]
+max_connections = 2
+max_transfer_rate = 512KB
+max_file_size = 50MB
+session_timeout = 1800
+
+# Anonymous user
+[users.anonymous]
+username = "anonymous"
+password_hash = ""
+home_directory = "/var/ftp/public"
+shell = "/bin/false"
+group = "ftp"
+enabled = true
+anonymous = true
+guest = false
+permissions = ["READ", "LIST", "DOWNLOAD"]
+denied_operations = ["WRITE", "DELETE", "RENAME", "MKDIR", "RMDIR", "UPLOAD", "APPEND"]
+max_connections = 10
+max_transfer_rate = 256KB
+max_file_size = 10MB
+session_timeout = 900
+
+# Guest user
+[users.guest]
+username = "guest"
+password_hash = ""
+home_directory = "/var/ftp/guest"
+shell = "/bin/false"
+group = "ftp"
+enabled = true
+anonymous = false
+guest = true
+permissions = ["READ", "LIST", "DOWNLOAD"]
+denied_operations = ["WRITE", "DELETE", "RENAME", "MKDIR", "RMDIR", "UPLOAD", "APPEND"]
+max_connections = 1
+max_transfer_rate = 128KB
+max_file_size = 5MB
+session_timeout = 600
