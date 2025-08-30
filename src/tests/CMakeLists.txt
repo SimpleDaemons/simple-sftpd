@@ -41,48 +41,15 @@ if(GTEST_FOUND)
     add_executable(unit_tests
         unit/test_main.cpp
         unit/test_ftp_user.cpp
-        unit/test_ftp_virtual_host.cpp
-        unit/test_ftp_server_config.cpp
-        unit/test_logger.cpp
-        unit/test_platform.cpp
     )
     
     target_link_libraries(unit_tests
-        simple-ftpd-lib
-        ${GTEST_LIBRARIES}
-        ${CMAKE_THREAD_LIBS_INIT}
-    )
-    
-    # Integration tests
-    add_executable(integration_tests
-        integration/test_main.cpp
-        integration/test_ftp_server.cpp
-        integration/test_ftp_connection.cpp
-    )
-    
-    target_link_libraries(integration_tests
-        simple-ftpd-lib
-        ${GTEST_LIBRARIES}
-        ${CMAKE_THREAD_LIBS_INIT}
-    )
-    
-    # Performance tests
-    add_executable(performance_tests
-        performance/test_main.cpp
-        performance/test_transfer_performance.cpp
-        performance/test_connection_performance.cpp
-    )
-    
-    target_link_libraries(performance_tests
-        simple-ftpd-lib
         ${GTEST_LIBRARIES}
         ${CMAKE_THREAD_LIBS_INIT}
     )
     
     # Add tests to CTest
     add_test(NAME UnitTests COMMAND unit_tests)
-    add_test(NAME IntegrationTests COMMAND integration_tests)
-    add_test(NAME PerformanceTests COMMAND performance_tests)
     
     # Set test properties
     set_tests_properties(UnitTests PROPERTIES
@@ -90,18 +57,8 @@ if(GTEST_FOUND)
         LABELS "unit"
     )
     
-    set_tests_properties(IntegrationTests PROPERTIES
-        TIMEOUT 600
-        LABELS "integration"
-    )
-    
-    set_tests_properties(PerformanceTests PROPERTIES
-        TIMEOUT 900
-        LABELS "performance"
-    )
-    
     # Install test executables
-    install(TARGETS unit_tests integration_tests performance_tests
+    install(TARGETS unit_tests
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/tests
     )
     
@@ -114,27 +71,9 @@ else()
     message(STATUS "  Or build from source: https://github.com/google/googletest")
 endif()
 
-# Mock objects for testing
-add_library(test_mocks STATIC
-    mocks/mock_ftp_server.cpp
-    mocks/mock_ftp_connection.cpp
-    mocks/mock_ftp_user.cpp
-    mocks/mock_logger.cpp
-)
-
-target_link_libraries(test_mocks
-    simple-ftpd-lib
-)
-
-# Test utilities
+# Test utilities (only build what exists)
 add_library(test_utils STATIC
     utils/test_helpers.cpp
-    utils/test_data.cpp
-    utils/test_config.cpp
-)
-
-target_link_libraries(test_utils
-    simple-ftpd-lib
 )
 
 # Test configuration
