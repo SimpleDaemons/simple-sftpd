@@ -1,0 +1,173 @@
+# Build directories
+build/
+dist/
+out/
+cmake-build-*/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+
+# Generated package files
+*.tar.gz
+*.tar.bz2
+*.zip
+*.deb
+*.rpm
+*.pkg
+*.dmg
+*.exe
+*.msi
+
+# Object files
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+
+# Executables
+simple-ftpd*
+*.exe
+*.app
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+logs/
+*.pid
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Configuration files with sensitive data
+config/*.conf
+!config/*.conf.example
+config/ssl/
+config/users/
+
+# SSL certificates and keys
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# User data and uploads
+uploads/
+user_data/
+public/
+
+# Backup files
+*.bak
+*.backup
+backup/
+
+# Test coverage
+coverage/
+*.gcov
+*.gcda
+*.gcno
+
+# Valgrind output
+*.vglog
+*.massif
+
+# Dependencies
+vendor/
+third_party/
+external/
+
+# Documentation build
+docs/_build/
+docs/html/
+docs/latex/
+
+# Package management
+node_modules/
+*.lock
+
+# OS specific
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Compiler specific
+*.gch
+*.pch
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Profiling
+*.prof
+*.out
+
+# Memory dumps
+*.core
+*.dump
+
+# Network captures
+*.pcap
+*.cap
+
+# Archive files
+*.7z
+*.rar
+*.tar
+*.gz
+*.bz2
+*.xz
+
+# Backup and swap
+*~
+*.swp
+*.swo
+*.orig
+*.rej
+
+# Local configuration
+local.conf
+local.ini
+local.json
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache files
+.cache/
+*.cache
+
+# Temporary build artifacts
+*.tmp
+*.temp
+temp/
+tmp/
