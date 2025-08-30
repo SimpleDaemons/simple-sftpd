@@ -33,7 +33,7 @@ CTestTestfile.cmake
 *.lib
 
 # Executables
-simple-ftpd*
+ssftpd*
 *.exe
 *.app
 

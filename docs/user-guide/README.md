@@ -1,6 +1,6 @@
 # User Guide
 
-This guide covers all user operations and management tasks for Simple FTP Daemon, from basic server management to advanced user administration.
+This guide covers all user operations and management tasks for Simple-Secure FTP Daemon, from basic server management to advanced user administration.
 
 ## 🎯 What You'll Learn
 
@@ -20,57 +20,57 @@ By the end of this guide, you'll be able to:
 
 ```bash
 # Start in foreground (for testing)
-sudo simple-ftpd start --config /etc/simple-ftpd/simple-ftpd.conf
+sudo ssftpd start --config /etc/ssftpd/ssftpd.conf
 
 # Start as daemon
-sudo simple-ftpd --daemon start --config /etc/simple-ftpd/simple-ftpd.conf
+sudo ssftpd --daemon start --config /etc/ssftpd/ssftpd.conf
 
 # Start with specific configuration
-sudo simple-ftpd start --config /path/to/custom.conf
+sudo ssftpd start --config /path/to/custom.conf
 ```
 
 #### Stopping the Server
 
 ```bash
 # Graceful shutdown
-sudo simple-ftpd stop
+sudo ssftpd stop
 
 # Force stop (if graceful fails)
-sudo simple-ftpd stop --force
+sudo ssftpd stop --force
 
 # Stop specific instance
-sudo simple-ftpd stop --pid-file /var/run/simple-ftpd.pid
+sudo ssftpd stop --pid-file /var/run/ssftpd.pid
 ```
 
 #### Restarting the Server
 
 ```bash
 # Restart with current configuration
-sudo simple-ftpd restart
+sudo ssftpd restart
 
 # Restart with new configuration
-sudo simple-ftpd restart --config /path/to/new.conf
+sudo ssftpd restart --config /path/to/new.conf
 
 # Reload configuration without restart
-sudo simple-ftpd reload
+sudo ssftpd reload
 ```
 
 #### Server Status
 
 ```bash
 # Check server status
-simple-ftpd status
+ssftpd status
 
 # Show detailed status
-simple-ftpd status --verbose
+ssftpd status --verbose
 
 # Show status in JSON format
-simple-ftpd status --format json
+ssftpd status --format json
 
 # Check specific components
-simple-ftpd status --component ssl
-simple-ftpd status --component users
-simple-ftpd status --component virtual-hosts
+ssftpd status --component ssl
+ssftpd status --component users
+ssftpd status --component virtual-hosts
 ```
 
 ### Service Management
@@ -79,61 +79,61 @@ simple-ftpd status --component virtual-hosts
 
 ```bash
 # Enable service at boot
-sudo systemctl enable simple-ftpd
+sudo systemctl enable ssftpd
 
 # Start service
-sudo systemctl start simple-ftpd
+sudo systemctl start ssftpd
 
 # Stop service
-sudo systemctl stop simple-ftpd
+sudo systemctl stop ssftpd
 
 # Restart service
-sudo systemctl restart simple-ftpd
+sudo systemctl restart ssftpd
 
 # Check status
-sudo systemctl status simple-ftpd
+sudo systemctl status ssftpd
 
 # View logs
-sudo journalctl -u simple-ftpd -f
-sudo journalctl -u simple-ftpd --since "1 hour ago"
+sudo journalctl -u ssftpd -f
+sudo journalctl -u ssftpd --since "1 hour ago"
 ```
 
 #### macOS (launchd)
 
 ```bash
 # Load service
-sudo launchctl load /Library/LaunchDaemons/com.blburns.simple-ftpd.plist
+sudo launchctl load /Library/LaunchDaemons/com.blburns.ssftpd.plist
 
 # Start service
-sudo launchctl start com.blburns.simple-ftpd
+sudo launchctl start com.blburns.ssftpd
 
 # Stop service
-sudo launchctl stop com.blburns.simple-ftpd
+sudo launchctl stop com.blburns.ssftpd
 
 # Unload service
-sudo launchctl unload /Library/LaunchDaemons/com.blburns.simple-ftpd.plist
+sudo launchctl unload /Library/LaunchDaemons/com.blburns.ssftpd.plist
 
 # Check status
-sudo launchctl list | grep simple-ftpd
+sudo launchctl list | grep ssftpd
 ```
 
 #### Windows
 
 ```cmd
 # Install service
-sc create simple-ftpd binPath= "C:\Program Files\simple-ftpd\bin\simple-ftpd.exe"
+sc create ssftpd binPath= "C:\Program Files\ssftpd\bin\ssftpd.exe"
 
 # Start service
-sc start simple-ftpd
+sc start ssftpd
 
 # Stop service
-sc stop simple-ftpd
+sc stop ssftpd
 
 # Delete service
-sc delete simple-ftpd
+sc delete ssftpd
 
 # Check status
-sc query simple-ftpd
+sc query ssftpd
 ```
 
 ## 👤 User Management
@@ -144,14 +144,14 @@ sc query simple-ftpd
 
 ```bash
 # Create a regular user
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username john \
   --password secret123 \
   --home /var/ftp/john \
   --permissions READ,WRITE,LIST,UPLOAD,DOWNLOAD
 
 # Create user with specific group
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username developer \
   --password devpass123 \
   --home /var/ftp/developer \
@@ -163,14 +163,14 @@ sudo simple-ftpd user add \
 
 ```bash
 # Create anonymous user for public access
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username anonymous \
   --home /var/ftp/public \
   --anonymous \
   --permissions READ,LIST,DOWNLOAD
 
 # Create guest user with restrictions
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username guest \
   --password guest123 \
   --home /var/ftp/guest \
@@ -184,7 +184,7 @@ sudo simple-ftpd user add \
 
 ```bash
 # User with connection limits
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username limited \
   --password limpass123 \
   --home /var/ftp/limited \
@@ -195,7 +195,7 @@ sudo simple-ftpd user add \
   --session-timeout 1800
 
 # User with path restrictions
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username restricted \
   --password res123 \
   --home /var/ftp/restricted \
@@ -210,12 +210,12 @@ sudo simple-ftpd user add \
 
 ```bash
 # Change user password
-sudo simple-ftpd user password \
+sudo ssftpd user password \
   --username john \
   --password newpassword123
 
 # Change password interactively
-sudo simple-ftpd user password --username john
+sudo ssftpd user password --username john
 # Will prompt for new password
 ```
 
@@ -223,17 +223,17 @@ sudo simple-ftpd user password --username john
 
 ```bash
 # Grant additional permissions
-sudo simple-ftpd user grant \
+sudo ssftpd user grant \
   --username john \
   --permissions DELETE,RENAME
 
 # Revoke permissions
-sudo simple-ftpd user revoke \
+sudo ssftpd user revoke \
   --username john \
   --permissions DELETE
 
 # Set complete permission set
-sudo simple-ftpd user permissions \
+sudo ssftpd user permissions \
   --username john \
   --permissions READ,WRITE,LIST,UPLOAD,DOWNLOAD
 ```
@@ -242,18 +242,18 @@ sudo simple-ftpd user permissions \
 
 ```bash
 # Update home directory
-sudo simple-ftpd user modify \
+sudo ssftpd user modify \
   --username john \
   --home /var/ftp/newhome
 
 # Update connection limits
-sudo simple-ftpd user modify \
+sudo ssftpd user modify \
   --username john \
   --max-connections 5 \
   --max-transfer-rate 1MB
 
 # Update session timeout
-sudo simple-ftpd user modify \
+sudo ssftpd user modify \
   --username john \
   --session-timeout 3600
 ```
@@ -264,67 +264,67 @@ sudo simple-ftpd user modify \
 
 ```bash
 # List all users
-sudo simple-ftpd user list
+sudo ssftpd user list
 
 # List users with details
-sudo simple-ftpd user list --verbose
+sudo ssftpd user list --verbose
 
 # List users in specific format
-sudo simple-ftpd user list --format json
-sudo simple-ftpd user list --format table
+sudo ssftpd user list --format json
+sudo ssftpd user list --format table
 
 # Filter users
-sudo simple-ftpd user list --enabled-only
-sudo simple-ftpd user list --anonymous-only
-sudo simple-ftpd user list --guest-only
+sudo ssftpd user list --enabled-only
+sudo ssftpd user list --anonymous-only
+sudo ssftpd user list --guest-only
 ```
 
 #### User Details
 
 ```bash
 # Show user information
-sudo simple-ftpd user show --username john
+sudo ssftpd user show --username john
 
 # Show user statistics
-sudo simple-ftpd user stats --username john
+sudo ssftpd user stats --username john
 
 # Show user permissions
-sudo simple-ftpd user permissions --username john
+sudo ssftpd user permissions --username john
 
 # Show user connections
-sudo simple-ftpd user connections --username john
+sudo ssftpd user connections --username john
 ```
 
 #### User Status
 
 ```bash
 # Enable user
-sudo simple-ftpd user enable --username john
+sudo ssftpd user enable --username john
 
 # Disable user
-sudo simple-ftpd user disable --username john
+sudo ssftpd user disable --username john
 
 # Lock user account
-sudo simple-ftpd user lock --username john
+sudo ssftpd user lock --username john
 
 # Unlock user account
-sudo simple-ftpd user unlock --username john
+sudo ssftpd user unlock --username john
 ```
 
 ### Removing Users
 
 ```bash
 # Remove user (keeps files)
-sudo simple-ftpd user remove --username john
+sudo ssftpd user remove --username john
 
 # Remove user and files
-sudo simple-ftpd user remove --username john --remove-files
+sudo ssftpd user remove --username john --remove-files
 
 # Remove user with confirmation
-sudo simple-ftpd user remove --username john --confirm
+sudo ssftpd user remove --username john --confirm
 
 # Force remove (if user is connected)
-sudo simple-ftpd user remove --username john --force
+sudo ssftpd user remove --username john --force
 ```
 
 ## 🏠 Virtual Host Management
@@ -335,14 +335,14 @@ sudo simple-ftpd user remove --username john --force
 
 ```bash
 # Create default virtual host
-sudo simple-ftpd virtual add \
+sudo ssftpd virtual add \
   --hostname default \
   --root /var/ftp \
   --welcome "Welcome to Default FTP Server" \
   --banner "Default FTP Server Ready"
 
 # Create domain-specific virtual host
-sudo simple-ftpd virtual add \
+sudo ssftpd virtual add \
   --hostname ftp.example.com \
   --root /var/ftp/example \
   --welcome "Welcome to Example.com FTP Server" \
@@ -353,7 +353,7 @@ sudo simple-ftpd virtual add \
 
 ```bash
 # Create SSL-enabled virtual host
-sudo simple-ftpd virtual add \
+sudo ssftpd virtual add \
   --hostname secure.example.com \
   --root /var/ftp/secure \
   --ssl \
@@ -362,7 +362,7 @@ sudo simple-ftpd virtual add \
   --require-ssl
 
 # Create virtual host with custom SSL settings
-sudo simple-ftpd virtual add \
+sudo ssftpd virtual add \
   --hostname custom.example.com \
   --root /var/ftp/custom \
   --ssl \
@@ -376,7 +376,7 @@ sudo simple-ftpd virtual add \
 
 ```bash
 # Virtual host with security restrictions
-sudo simple-ftpd virtual add \
+sudo ssftpd virtual add \
   --hostname restricted.example.com \
   --root /var/ftp/restricted \
   --chroot \
@@ -386,7 +386,7 @@ sudo simple-ftpd virtual add \
   --run-as-group ftp
 
 # Virtual host with transfer limits
-sudo simple-ftpd virtual add \
+sudo ssftpd virtual add \
   --hostname limited.example.com \
   --root /var/ftp/limited \
   --max-file-size 50MB \
@@ -401,48 +401,48 @@ sudo simple-ftpd virtual add \
 
 ```bash
 # List all virtual hosts
-sudo simple-ftpd virtual list
+sudo ssftpd virtual list
 
 # List with details
-sudo simple-ftpd virtual list --verbose
+sudo ssftpd virtual list --verbose
 
 # List in specific format
-sudo simple-ftpd virtual list --format json
-sudo simple-ftpd virtual list --format table
+sudo ssftpd virtual list --format json
+sudo ssftpd virtual list --format table
 
 # Filter virtual hosts
-sudo simple-ftpd virtual list --enabled-only
-sudo simple-ftpd virtual list --ssl-only
+sudo ssftpd virtual list --enabled-only
+sudo ssftpd virtual list --ssl-only
 ```
 
 #### Virtual Host Information
 
 ```bash
 # Show virtual host details
-sudo simple-ftpd virtual show --hostname ftp.example.com
+sudo ssftpd virtual show --hostname ftp.example.com
 
 # Show virtual host statistics
-sudo simple-ftpd virtual stats --hostname ftp.example.com
+sudo ssftpd virtual stats --hostname ftp.example.com
 
 # Show virtual host configuration
-sudo simple-ftpd virtual config --hostname ftp.example.com
+sudo ssftpd virtual config --hostname ftp.example.com
 ```
 
 #### Modifying Virtual Hosts
 
 ```bash
 # Update welcome message
-sudo simple-ftpd virtual modify \
+sudo ssftpd virtual modify \
   --hostname ftp.example.com \
   --welcome "Updated Welcome Message"
 
 # Update document root
-sudo simple-ftpd virtual modify \
+sudo ssftpd virtual modify \
   --hostname ftp.example.com \
   --root /var/ftp/newroot
 
 # Update SSL settings
-sudo simple-ftpd virtual modify \
+sudo ssftpd virtual modify \
   --hostname ftp.example.com \
   --certificate /path/to/new/cert.crt \
   --private-key /path/to/new/key.key
@@ -452,26 +452,26 @@ sudo simple-ftpd virtual modify \
 
 ```bash
 # Enable virtual host
-sudo simple-ftpd virtual enable --hostname ftp.example.com
+sudo ssftpd virtual enable --hostname ftp.example.com
 
 # Disable virtual host
-sudo simple-ftpd virtual disable --hostname ftp.example.com
+sudo ssftpd virtual disable --hostname ftp.example.com
 
 # Set as default
-sudo simple-ftpd virtual default --hostname ftp.example.com
+sudo ssftpd virtual default --hostname ftp.example.com
 ```
 
 #### Removing Virtual Hosts
 
 ```bash
 # Remove virtual host (keeps files)
-sudo simple-ftpd virtual remove --hostname ftp.example.com
+sudo ssftpd virtual remove --hostname ftp.example.com
 
 # Remove virtual host and files
-sudo simple-ftpd virtual remove --hostname ftp.example.com --remove-files
+sudo ssftpd virtual remove --hostname ftp.example.com --remove-files
 
 # Force remove
-sudo simple-ftpd virtual remove --hostname ftp.example.com --force
+sudo ssftpd virtual remove --hostname ftp.example.com --force
 ```
 
 ## 🔐 SSL Certificate Management
@@ -482,11 +482,11 @@ sudo simple-ftpd virtual remove --hostname ftp.example.com --force
 
 ```bash
 # Generate basic self-signed certificate
-sudo simple-ftpd ssl generate \
+sudo ssftpd ssl generate \
   --hostname ftp.example.com
 
 # Generate with custom details
-sudo simple-ftpd ssl generate \
+sudo ssftpd ssl generate \
   --hostname ftp.example.com \
   --country US \
   --state California \
@@ -496,7 +496,7 @@ sudo simple-ftpd ssl generate \
   --validity 365
 
 # Generate for multiple hostnames
-sudo simple-ftpd ssl generate \
+sudo ssftpd ssl generate \
   --hostname ftp.example.com \
   --alt-names "ftp2.example.com,ftp3.example.com" \
   --country US \
@@ -507,7 +507,7 @@ sudo simple-ftpd ssl generate \
 
 ```bash
 # Generate CSR for CA signing
-sudo simple-ftpd ssl csr \
+sudo ssftpd ssl csr \
   --hostname ftp.example.com \
   --country US \
   --state California \
@@ -523,20 +523,20 @@ sudo simple-ftpd ssl csr \
 
 ```bash
 # Install certificate and private key
-sudo simple-ftpd ssl install \
+sudo ssftpd ssl install \
   --hostname ftp.example.com \
   --certificate /path/to/certificate.crt \
   --private-key /path/to/private.key
 
 # Install with CA certificate
-sudo simple-ftpd ssl install \
+sudo ssftpd ssl install \
   --hostname ftp.example.com \
   --certificate /path/to/certificate.crt \
   --private-key /path/to/private.key \
   --ca-certificate /path/to/ca.crt
 
 # Install for specific virtual host
-sudo simple-ftpd ssl install \
+sudo ssftpd ssl install \
   --hostname ftp.example.com \
   --virtual-host secure.example.com \
   --certificate /path/to/secure.example.com.crt \
@@ -547,13 +547,13 @@ sudo simple-ftpd ssl install \
 
 ```bash
 # Update existing certificate
-sudo simple-ftpd ssl update \
+sudo ssftpd ssl update \
   --hostname ftp.example.com \
   --certificate /path/to/new/certificate.crt \
   --private-key /path/to/new/private.key
 
 # Update CA certificate
-sudo simple-ftpd ssl update \
+sudo ssftpd ssl update \
   --hostname ftp.example.com \
   --ca-certificate /path/to/new/ca.crt
 ```
@@ -564,31 +564,31 @@ sudo simple-ftpd ssl update \
 
 ```bash
 # Show certificate details
-sudo simple-ftpd ssl show --hostname ftp.example.com
+sudo ssftpd ssl show --hostname ftp.example.com
 
 # Show certificate validity
-sudo simple-ftpd ssl validity --hostname ftp.example.com
+sudo ssftpd ssl validity --hostname ftp.example.com
 
 # Show certificate chain
-sudo simple-ftpd ssl chain --hostname ftp.example.com
+sudo ssftpd ssl chain --hostname ftp.example.com
 
 # Show certificate fingerprint
-sudo simple-ftpd ssl fingerprint --hostname ftp.example.com
+sudo ssftpd ssl fingerprint --hostname ftp.example.com
 ```
 
 #### Certificate Renewal
 
 ```bash
 # Check certificate expiration
-sudo simple-ftpd ssl check --hostname ftp.example.com
+sudo ssftpd ssl check --hostname ftp.example.com
 
 # Renew self-signed certificate
-sudo simple-ftpd ssl renew \
+sudo ssftpd ssl renew \
   --hostname ftp.example.com \
   --validity 365
 
 # Renew with new details
-sudo simple-ftpd ssl renew \
+sudo ssftpd ssl renew \
   --hostname ftp.example.com \
   --country US \
   --state California \
@@ -602,15 +602,15 @@ sudo simple-ftpd ssl renew \
 
 ```bash
 # Remove certificate
-sudo simple-ftpd ssl remove --hostname ftp.example.com
+sudo ssftpd ssl remove --hostname ftp.example.com
 
 # Remove from specific virtual host
-sudo simple-ftpd ssl remove \
+sudo ssftpd ssl remove \
   --hostname ftp.example.com \
   --virtual-host secure.example.com
 
 # Force remove
-sudo simple-ftpd ssl remove --hostname ftp.example.com --force
+sudo ssftpd ssl remove --hostname ftp.example.com --force
 ```
 
 ## 📊 Monitoring and Statistics
@@ -621,32 +621,32 @@ sudo simple-ftpd ssl remove --hostname ftp.example.com --force
 
 ```bash
 # Show server statistics
-simple-ftpd stats
+ssftpd stats
 
 # Show statistics in specific format
-simple-ftpd stats --format json
-simple-ftpd stats --format table
+ssftpd stats --format json
+ssftpd stats --format table
 
 # Show specific statistics
-simple-ftpd stats --component connections
-simple-ftpd stats --component transfers
-simple-ftpd stats --component users
+ssftpd stats --component connections
+ssftpd stats --component transfers
+ssftpd stats --component users
 ```
 
 #### Performance Metrics
 
 ```bash
 # Show performance metrics
-simple-ftpd performance
+ssftpd performance
 
 # Show memory usage
-simple-ftpd memory
+ssftpd memory
 
 # Show CPU usage
-simple-ftpd cpu
+ssftpd cpu
 
 # Show network statistics
-simple-ftpd network
+ssftpd network
 ```
 
 ### Connection Monitoring
@@ -655,34 +655,34 @@ simple-ftpd network
 
 ```bash
 # Show active connections
-simple-ftpd connections
+ssftpd connections
 
 # Show connection details
-simple-ftpd connections --verbose
+ssftpd connections --verbose
 
 # Filter connections
-simple-ftpd connections --user john
-simple-ftpd connections --virtual-host ftp.example.com
-simple-ftpd connections --ip 192.168.1.100
+ssftpd connections --user john
+ssftpd connections --virtual-host ftp.example.com
+ssftpd connections --ip 192.168.1.100
 
 # Show connection history
-simple-ftpd connections --history
+ssftpd connections --history
 ```
 
 #### Connection Management
 
 ```bash
 # Disconnect specific connection
-sudo simple-ftpd disconnect --connection-id 12345
+sudo ssftpd disconnect --connection-id 12345
 
 # Disconnect user connections
-sudo simple-ftpd disconnect --user john
+sudo ssftpd disconnect --user john
 
 # Disconnect IP connections
-sudo simple-ftpd disconnect --ip 192.168.1.100
+sudo ssftpd disconnect --ip 192.168.1.100
 
 # Force disconnect
-sudo simple-ftpd disconnect --connection-id 12345 --force
+sudo ssftpd disconnect --connection-id 12345 --force
 ```
 
 ### Log Management
@@ -691,54 +691,54 @@ sudo simple-ftpd disconnect --connection-id 12345 --force
 
 ```bash
 # View main log
-tail -f /var/log/simple-ftpd/simple-ftpd.log
+tail -f /var/log/ssftpd/ssftpd.log
 
 # View access log
-tail -f /var/log/simple-ftpd/access.log
+tail -f /var/log/ssftpd/access.log
 
 # View error log
-tail -f /var/log/simple-ftpd/error.log
+tail -f /var/log/ssftpd/error.log
 
-# View logs with simple-ftpd command
-simple-ftpd logs --follow
-simple-ftpd logs --lines 100
-simple-ftpd logs --level ERROR
+# View logs with ssftpd command
+ssftpd logs --follow
+ssftpd logs --lines 100
+ssftpd logs --level ERROR
 ```
 
 #### Log Analysis
 
 ```bash
 # Search logs
-simple-ftpd logs --search "connection"
-simple-ftpd logs --search "error"
-simple-ftpd logs --search "user john"
+ssftpd logs --search "connection"
+ssftpd logs --search "error"
+ssftpd logs --search "user john"
 
 # Filter by time
-simple-ftpd logs --since "1 hour ago"
-simple-ftpd logs --since "2024-01-15 10:00:00"
-simple-ftpd logs --until "2024-01-15 11:00:00"
+ssftpd logs --since "1 hour ago"
+ssftpd logs --since "2024-01-15 10:00:00"
+ssftpd logs --until "2024-01-15 11:00:00"
 
 # Filter by component
-simple-ftpd logs --component ssl
-simple-ftpd logs --component authentication
-simple-ftpd logs --component transfer
+ssftpd logs --component ssl
+ssftpd logs --component authentication
+ssftpd logs --component transfer
 ```
 
 #### Log Management
 
 ```bash
 # Rotate logs
-sudo simple-ftpd logrotate
+sudo ssftpd logrotate
 
 # Clear logs
-sudo simple-ftpd logclear
+sudo ssftpd logclear
 
 # Archive logs
-sudo simple-ftpd logarchive --output /backup/logs-$(date +%Y%m%d).tar.gz
+sudo ssftpd logarchive --output /backup/logs-$(date +%Y%m%d).tar.gz
 
 # Set log level
-sudo simple-ftpd loglevel --level DEBUG
-sudo simple-ftpd loglevel --level INFO
+sudo ssftpd loglevel --level DEBUG
+sudo ssftpd loglevel --level INFO
 ```
 
 ## 🔧 Maintenance and Troubleshooting
@@ -749,29 +749,29 @@ sudo simple-ftpd loglevel --level INFO
 
 ```bash
 # Test configuration
-simple-ftpd --test-config --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
 
 # Validate configuration
-simple-ftpd --validate --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --validate --config /etc/ssftpd/ssftpd.conf
 
 # Check specific sections
-simple-ftpd config --check ssl
-simple-ftpd config --check users
-simple-ftpd config --check virtual-hosts
+ssftpd config --check ssl
+ssftpd config --check users
+ssftpd config --check virtual-hosts
 ```
 
 #### Configuration Backup
 
 ```bash
 # Backup configuration
-sudo simple-ftpd config --backup --output /backup/config-$(date +%Y%m%d).tar.gz
+sudo ssftpd config --backup --output /backup/config-$(date +%Y%m%d).tar.gz
 
 # Restore configuration
-sudo simple-ftpd config --restore --input /backup/config-20240115.tar.gz
+sudo ssftpd config --restore --input /backup/config-20240115.tar.gz
 
 # Export configuration
-sudo simple-ftpd config --export --format json --output config.json
-sudo simple-ftpd config --export --format ini --output config.ini
+sudo ssftpd config --export --format json --output config.json
+sudo ssftpd config --export --format ini --output config.ini
 ```
 
 ### System Maintenance
@@ -780,32 +780,32 @@ sudo simple-ftpd config --export --format ini --output config.ini
 
 ```bash
 # Optimize user database
-sudo simple-ftpd db --optimize
+sudo ssftpd db --optimize
 
 # Backup user database
-sudo simple-ftpd db --backup --output /backup/users-$(date +%Y%m%d).db
+sudo ssftpd db --backup --output /backup/users-$(date +%Y%m%d).db
 
 # Restore user database
-sudo simple-ftpd db --restore --input /backup/users-20240115.db
+sudo ssftpd db --restore --input /backup/users-20240115.db
 
 # Check database integrity
-sudo simple-ftpd db --check
+sudo ssftpd db --check
 ```
 
 #### File System Maintenance
 
 ```bash
 # Check file permissions
-sudo simple-ftpd fs --check-permissions
+sudo ssftpd fs --check-permissions
 
 # Fix file permissions
-sudo simple-ftpd fs --fix-permissions
+sudo ssftpd fs --fix-permissions
 
 # Clean temporary files
-sudo simple-ftpd fs --clean-temp
+sudo ssftpd fs --clean-temp
 
 # Check disk usage
-sudo simple-ftpd fs --disk-usage
+sudo ssftpd fs --disk-usage
 ```
 
 ### Troubleshooting
@@ -814,32 +814,32 @@ sudo simple-ftpd fs --disk-usage
 
 ```bash
 # Check server health
-simple-ftpd health
+ssftpd health
 
 # Diagnose problems
-simple-ftpd diagnose
+ssftpd diagnose
 
 # Show system information
-simple-ftpd system
+ssftpd system
 
 # Check dependencies
-simple-ftpd deps
+ssftpd deps
 ```
 
 #### Debug Mode
 
 ```bash
 # Enable debug mode
-sudo simple-ftpd debug --enable
+sudo ssftpd debug --enable
 
 # Set debug level
-sudo simple-ftpd debug --level TRACE
+sudo ssftpd debug --level TRACE
 
 # Show debug information
-simple-ftpd debug --info
+ssftpd debug --info
 
 # Disable debug mode
-sudo simple-ftpd debug --disable
+sudo ssftpd debug --disable
 ```
 
 ## 📚 Advanced Operations
@@ -850,23 +850,23 @@ sudo simple-ftpd debug --disable
 
 ```bash
 # Add multiple users from file
-sudo simple-ftpd user batch-add --file users.txt
+sudo ssftpd user batch-add --file users.txt
 
 # Update multiple users
-sudo simple-ftpd user batch-update --file updates.txt
+sudo ssftpd user batch-update --file updates.txt
 
 # Remove multiple users
-sudo simple-ftpd user batch-remove --file users-to-remove.txt
+sudo ssftpd user batch-remove --file users-to-remove.txt
 ```
 
 #### Batch Virtual Host Management
 
 ```bash
 # Add multiple virtual hosts
-sudo simple-ftpd virtual batch-add --file virtual-hosts.txt
+sudo ssftpd virtual batch-add --file virtual-hosts.txt
 
 # Update multiple virtual hosts
-sudo simple-ftpd virtual batch-update --file updates.txt
+sudo ssftpd virtual batch-update --file updates.txt
 ```
 
 ### Automation
@@ -875,26 +875,26 @@ sudo simple-ftpd virtual batch-update --file updates.txt
 
 ```bash
 # Set up automatic certificate renewal
-sudo simple-ftpd ssl --auto-renew --schedule "0 2 * * 0"
+sudo ssftpd ssl --auto-renew --schedule "0 2 * * 0"
 
 # Set up automatic log rotation
-sudo simple-ftpd logrotate --auto --schedule "0 1 * * *"
+sudo ssftpd logrotate --auto --schedule "0 1 * * *"
 
 # Set up automatic backup
-sudo simple-ftpd backup --auto --schedule "0 3 * * 0"
+sudo ssftpd backup --auto --schedule "0 3 * * 0"
 ```
 
 #### Integration
 
 ```bash
 # Export metrics for monitoring
-simple-ftpd metrics --export --format prometheus
+ssftpd metrics --export --format prometheus
 
 # Export logs for log aggregation
-simple-ftpd logs --export --format syslog
+ssftpd logs --export --format syslog
 
 # Export configuration for automation
-simple-ftpd config --export --format ansible
+ssftpd config --export --format ansible
 ```
 
 ## 🚨 Emergency Procedures
@@ -903,26 +903,26 @@ simple-ftpd config --export --format ansible
 
 ```bash
 # Emergency stop server
-sudo simple-ftpd stop --emergency
+sudo ssftpd stop --emergency
 
 # Kill all processes
-sudo pkill -f simple-ftpd
+sudo pkill -f ssftpd
 
 # Force kill
-sudo pkill -9 -f simple-ftpd
+sudo pkill -9 -f ssftpd
 ```
 
 ### Emergency Recovery
 
 ```bash
 # Start in safe mode
-sudo simple-ftpd start --safe-mode --config /etc/simple-ftpd/safe.conf
+sudo ssftpd start --safe-mode --config /etc/ssftpd/safe.conf
 
 # Reset to default configuration
-sudo simple-ftpd config --reset
+sudo ssftpd config --reset
 
 # Emergency user access
-sudo simple-ftpd user emergency --username admin --password emergency123
+sudo ssftpd user emergency --username admin --password emergency123
 ```
 
 ## 📞 Getting Help
@@ -931,15 +931,15 @@ sudo simple-ftpd user emergency --username admin --password emergency123
 
 ```bash
 # General help
-simple-ftpd --help
+ssftpd --help
 
 # Command-specific help
-simple-ftpd user --help
-simple-ftpd virtual --help
-simple-ftpd ssl --help
+ssftpd user --help
+ssftpd virtual --help
+ssftpd ssl --help
 
 # Show all commands
-simple-ftpd --commands
+ssftpd --commands
 ```
 
 ### Documentation

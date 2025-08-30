@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 execute_process(COMMAND uname -m OUTPUT_VARIABLE SYSTEM_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 message(STATUS "System architecture: ${SYSTEM_ARCH}")
 
-project(simple-ftpd-${SYSTEM_ARCH} VERSION 0.1.0 LANGUAGES CXX)
+project(ssftpd-${SYSTEM_ARCH} VERSION 0.1.0 LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -175,38 +175,38 @@ file(GLOB_RECURSE HEADERS
 )
 
 # Create main executable
-add_executable(simple-ftpd-${SYSTEM_ARCH} ${SOURCES})
+add_executable(ssftpd-${SYSTEM_ARCH} ${SOURCES})
 
 # Create shared library
-add_library(simple-ftpd-lib-${SYSTEM_ARCH} SHARED ${SOURCES})
-set_target_properties(simple-ftpd-lib-${SYSTEM_ARCH} PROPERTIES
-    OUTPUT_NAME "simple-ftpd"
+add_library(ssftpd-lib-${SYSTEM_ARCH} SHARED ${SOURCES})
+set_target_properties(ssftpd-lib-${SYSTEM_ARCH} PROPERTIES
+    OUTPUT_NAME "ssftpd"
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
 # Platform-specific target properties
 if(PLATFORM_MACOS)
-    set_target_properties(simple-ftpd-${SYSTEM_ARCH} PROPERTIES
+    set_target_properties(ssftpd-${SYSTEM_ARCH} PROPERTIES
         MACOSX_BUNDLE FALSE
         MACOSX_RPATH "@executable_path/../lib"
     )
-    set_target_properties(simple-ftpd-lib-${SYSTEM_ARCH} PROPERTIES
+    set_target_properties(ssftpd-lib-${SYSTEM_ARCH} PROPERTIES
         MACOSX_RPATH "@loader_path"
     )
 elseif(PLATFORM_WINDOWS)
-    set_target_properties(simple-ftpd-${SYSTEM_ARCH} PROPERTIES
+    set_target_properties(ssftpd-${SYSTEM_ARCH} PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
-    set_target_properties(simple-ftpd-lib-${SYSTEM_ARCH} PROPERTIES
+    set_target_properties(ssftpd-lib-${SYSTEM_ARCH} PROPERTIES
         PREFIX ""
         SUFFIX ".dll"
     )
 endif()
 
 # Link libraries
-target_link_libraries(simple-ftpd-${SYSTEM_ARCH}
-    simple-ftpd-lib-${SYSTEM_ARCH}
+target_link_libraries(ssftpd-${SYSTEM_ARCH}
+    ssftpd-lib-${SYSTEM_ARCH}
     ${OPENSSL_LIBRARIES}
     ${JSONCPP_LIBRARIES}
     ${PLATFORM_LIBRARIES}
@@ -214,12 +214,12 @@ target_link_libraries(simple-ftpd-${SYSTEM_ARCH}
 
 # Add linker flags to suppress dylib warnings on macOS
 if(PLATFORM_MACOS)
-    set_target_properties(simple-ftpd-${SYSTEM_ARCH} PROPERTIES
+    set_target_properties(ssftpd-${SYSTEM_ARCH} PROPERTIES
         LINK_FLAGS "-Wl,-w"
     )
 endif()
 
-target_link_libraries(simple-ftpd-lib-${SYSTEM_ARCH}
+target_link_libraries(ssftpd-lib-${SYSTEM_ARCH}
     ${OPENSSL_LIBRARIES}
     ${JSONCPP_LIBRARIES}
     ${PLATFORM_LIBRARIES}
@@ -227,18 +227,18 @@ target_link_libraries(simple-ftpd-lib-${SYSTEM_ARCH}
 
 # Add linker flags to suppress dylib warnings on macOS
 if(PLATFORM_MACOS)
-    set_target_properties(simple-ftpd-lib-${SYSTEM_ARCH} PROPERTIES
+    set_target_properties(ssftpd-lib-${SYSTEM_ARCH} PROPERTIES
         LINK_FLAGS "-Wl,-w"
     )
 endif()
 
 # Compiler flags
-target_compile_options(simple-ftpd-${SYSTEM_ARCH} PRIVATE
+target_compile_options(ssftpd-${SYSTEM_ARCH} PRIVATE
     -Wall -Wextra -Wpedantic
     -O2 -DNDEBUG
 )
 
-target_compile_options(simple-ftpd-lib-${SYSTEM_ARCH} PRIVATE
+target_compile_options(ssftpd-lib-${SYSTEM_ARCH} PRIVATE
     -Wall -Wextra -Wpedantic
     -O2 -DNDEBUG
     -fPIC
@@ -246,38 +246,38 @@ target_compile_options(simple-ftpd-lib-${SYSTEM_ARCH} PRIVATE
 
 # Platform-specific compile definitions
 if(PLATFORM_MACOS)
-    target_compile_definitions(simple-ftpd-${SYSTEM_ARCH} PRIVATE PLATFORM_MACOS=1)
-    target_compile_definitions(simple-ftpd-lib-${SYSTEM_ARCH} PRIVATE PLATFORM_MACOS=1)
+    target_compile_definitions(ssftpd-${SYSTEM_ARCH} PRIVATE PLATFORM_MACOS=1)
+    target_compile_definitions(ssftpd-lib-${SYSTEM_ARCH} PRIVATE PLATFORM_MACOS=1)
 elseif(PLATFORM_LINUX)
-    target_compile_definitions(simple-ftpd-${SYSTEM_ARCH} PRIVATE PLATFORM_LINUX=1)
-    target_compile_definitions(simple-ftpd-lib-${SYSTEM_ARCH} PRIVATE PLATFORM_LINUX=1)
+    target_compile_definitions(ssftpd-${SYSTEM_ARCH} PRIVATE PLATFORM_LINUX=1)
+    target_compile_definitions(ssftpd-lib-${SYSTEM_ARCH} PRIVATE PLATFORM_LINUX=1)
 elseif(PLATFORM_WINDOWS)
-    target_compile_definitions(simple-ftpd-${SYSTEM_ARCH} PRIVATE PLATFORM_WINDOWS=1)
-    target_compile_definitions(simple-ftpd-lib-${SYSTEM_ARCH} PRIVATE PLATFORM_WINDOWS=1)
+    target_compile_definitions(ssftpd-${SYSTEM_ARCH} PRIVATE PLATFORM_WINDOWS=1)
+    target_compile_definitions(ssftpd-lib-${SYSTEM_ARCH} PRIVATE PLATFORM_WINDOWS=1)
 endif()
 
 # Install targets with platform-specific destinations
 if(PLATFORM_MACOS)
     # macOS install paths
-    install(TARGETS simple-ftpd-${SYSTEM_ARCH} simple-ftpd-lib-${SYSTEM_ARCH}
+    install(TARGETS ssftpd-${SYSTEM_ARCH} ssftpd-lib-${SYSTEM_ARCH}
         RUNTIME DESTINATION /usr/local/bin
         LIBRARY DESTINATION /usr/local/lib
         ARCHIVE DESTINATION /usr/local/lib
     )
     install(DIRECTORY include/ DESTINATION /usr/local/include)
-    install(DIRECTORY config/ DESTINATION /usr/local/etc/simple-ftpd)
-    install(DIRECTORY tools/ DESTINATION /usr/local/share/simple-ftpd/tools)
-    install(DIRECTORY docs/ DESTINATION /usr/local/share/simple-ftpd/docs)
-    install(FILES LICENSE README.md DESTINATION /usr/local/share/simple-ftpd)
+    install(DIRECTORY config/ DESTINATION /usr/local/etc/ssftpd)
+    install(DIRECTORY tools/ DESTINATION /usr/local/share/ssftpd/tools)
+    install(DIRECTORY docs/ DESTINATION /usr/local/share/ssftpd/docs)
+    install(FILES LICENSE README.md DESTINATION /usr/local/share/ssftpd)
     
     # Create additional directories for macOS
     install(CODE "
         # Create additional directories for logs and SSL
-        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory /usr/local/var/log/simple-ftpd
+        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory /usr/local/var/log/ssftpd
             WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
             ERROR_QUIET
         )
-        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory /usr/local/etc/simple-ftpd/ssl
+        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory /usr/local/etc/ssftpd/ssl
             WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
             ERROR_QUIET
         )
@@ -285,29 +285,29 @@ if(PLATFORM_MACOS)
     
 elseif(PLATFORM_WINDOWS)
     # Windows install paths
-    install(TARGETS simple-ftpd-${SYSTEM_ARCH} simple-ftpd-lib-${SYSTEM_ARCH}
-        RUNTIME DESTINATION "C:/Program Files/simple-ftpd/bin"
-        LIBRARY DESTINATION "C:/Program Files/simple-ftpd/lib"
-        ARCHIVE DESTINATION "C:/Program Files/simple-ftpd/lib"
+    install(TARGETS ssftpd-${SYSTEM_ARCH} ssftpd-lib-${SYSTEM_ARCH}
+        RUNTIME DESTINATION "C:/Program Files/ssftpd/bin"
+        LIBRARY DESTINATION "C:/Program Files/ssftpd/lib"
+        ARCHIVE DESTINATION "C:/Program Files/ssftpd/lib"
     )
-    install(DIRECTORY include/ DESTINATION "C:/Program Files/simple-ftpd/include")
-    install(DIRECTORY config/ DESTINATION "C:/Program Files/simple-ftpd/config")
-    install(DIRECTORY tools/ DESTINATION "C:/Program Files/simple-ftpd/tools")
-    install(DIRECTORY docs/ DESTINATION "C:/Program Files/simple-ftpd/docs")
-    install(FILES LICENSE README.md DESTINATION "C:/Program Files/simple-ftpd")
+    install(DIRECTORY include/ DESTINATION "C:/Program Files/ssftpd/include")
+    install(DIRECTORY config/ DESTINATION "C:/Program Files/ssftpd/config")
+    install(DIRECTORY tools/ DESTINATION "C:/Program Files/ssftpd/tools")
+    install(DIRECTORY docs/ DESTINATION "C:/Program Files/ssftpd/docs")
+    install(FILES LICENSE README.md DESTINATION "C:/Program Files/ssftpd")
     
     # Create additional directories for Windows
     install(CODE "
         # Create additional directories for logs and SSL
-        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory \"C:/Program Files/simple-ftpd/logs\"
+        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory \"C:/Program Files/ssftpd/logs\"
             WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
             ERROR_QUIET
         )
-        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory \"C:/Program Files/simple-ftpd/ssl\"
+        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory \"C:/Program Files/ssftpd/ssl\"
             WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
             ERROR_QUIET
         )
-        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory \"C:/Program Files/simple-ftpd/temp\"
+        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory \"C:/Program Files/ssftpd/temp\"
             WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
             ERROR_QUIET
         )
@@ -315,38 +315,38 @@ elseif(PLATFORM_WINDOWS)
     
 else()
     # Linux install paths - Follow FHS standards
-    install(TARGETS simple-ftpd-${SYSTEM_ARCH} simple-ftpd-lib-${SYSTEM_ARCH}
+    install(TARGETS ssftpd-${SYSTEM_ARCH} ssftpd-lib-${SYSTEM_ARCH}
         RUNTIME DESTINATION usr/bin
         LIBRARY DESTINATION usr/lib
         ARCHIVE DESTINATION usr/lib
     )
     install(DIRECTORY include/ DESTINATION usr/include)
-    install(DIRECTORY config/ DESTINATION etc/simple-ftpd)
-    install(DIRECTORY tools/ DESTINATION usr/share/simple-ftpd/tools)
-    install(DIRECTORY docs/ DESTINATION usr/share/simple-ftpd/docs)
-    install(FILES LICENSE README.md DESTINATION usr/share/simple-ftpd)
+    install(DIRECTORY config/ DESTINATION etc/ssftpd)
+    install(DIRECTORY tools/ DESTINATION usr/share/ssftpd/tools)
+    install(DIRECTORY docs/ DESTINATION usr/share/ssftpd/docs)
+    install(FILES LICENSE README.md DESTINATION usr/share/ssftpd)
     
     # Create symlinks for convenience (similar to alternatives)
     install(CODE "
-        # Create symlink for simple-ftpd binary
+        # Create symlink for ssftpd binary
         execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink 
-            /usr/bin/simple-ftpd-${SYSTEM_ARCH} /usr/local/bin/simple-ftpd
+            /usr/bin/ssftpd-${SYSTEM_ARCH} /usr/local/bin/ssftpd
             WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
             ERROR_QUIET
         )
-        # Create symlink for simple-ftpd-lib
+        # Create symlink for ssftpd-lib
         execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink 
-            /usr/lib/libsimple-ftpd-lib-${SYSTEM_ARCH}.so /usr/local/lib/libsimple-ftpd-lib.so
+            /usr/lib/libssftpd-lib-${SYSTEM_ARCH}.so /usr/local/lib/libssftpd-lib.so
             WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
             ERROR_QUIET
         )
         
         # Create additional directories for logs and SSL
-        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory /var/log/simple-ftpd
+        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory /var/log/ssftpd
             WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
             ERROR_QUIET
         )
-        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory /etc/simple-ftpd/ssl
+        execute_process(COMMAND \${CMAKE_COMMAND} -E make_directory /etc/ssftpd/ssl
             WORKING_DIRECTORY \${CMAKE_INSTALL_PREFIX}
             ERROR_QUIET
         )
@@ -367,36 +367,36 @@ endif()
 # Package configuration
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/simple-ftpd-${SYSTEM_ARCH}-config-version.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/ssftpd-${SYSTEM_ARCH}-config-version.cmake"
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/simple-ftpd-config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/simple-ftpd-${SYSTEM_ARCH}-config.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ssftpd-config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/ssftpd-${SYSTEM_ARCH}-config.cmake"
     @ONLY
 )
 
 # Install CMake package configuration files
 if(PLATFORM_MACOS)
     install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/simple-ftpd-${SYSTEM_ARCH}-config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/simple-ftpd-${SYSTEM_ARCH}-config-version.cmake"
-        DESTINATION /usr/local/lib/cmake/simple-ftpd-${SYSTEM_ARCH}
+        "${CMAKE_CURRENT_BINARY_DIR}/ssftpd-${SYSTEM_ARCH}-config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/ssftpd-${SYSTEM_ARCH}-config-version.cmake"
+        DESTINATION /usr/local/lib/cmake/ssftpd-${SYSTEM_ARCH}
     )
 elseif(PLATFORM_WINDOWS)
     install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/simple-ftpd-${SYSTEM_ARCH}-config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/simple-ftpd-${SYSTEM_ARCH}-config-version.cmake"
-        DESTINATION "C:/Program Files/simple-ftpd/lib/cmake/simple-ftpd-${SYSTEM_ARCH}"
+        "${CMAKE_CURRENT_BINARY_DIR}/ssftpd-${SYSTEM_ARCH}-config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/ssftpd-${SYSTEM_ARCH}-config-version.cmake"
+        DESTINATION "C:/Program Files/ssftpd/lib/cmake/ssftpd-${SYSTEM_ARCH}"
     )
 else()
     # Linux - standard FHS location
     install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/simple-ftpd-${SYSTEM_ARCH}-config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/simple-ftpd-${SYSTEM_ARCH}-config-version.cmake"
-        DESTINATION usr/lib/cmake/simple-ftpd-${SYSTEM_ARCH}
+        "${CMAKE_CURRENT_BINARY_DIR}/ssftpd-${SYSTEM_ARCH}-config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/ssftpd-${SYSTEM_ARCH}-config-version.cmake"
+        DESTINATION usr/lib/cmake/ssftpd-${SYSTEM_ARCH}
     )
 endif()
 
@@ -404,24 +404,24 @@ endif()
 if(PLATFORM_MACOS AND BUILD_SHARED_LIBS)
     # Create macOS packages (DMG and PKG)
     set(CPACK_GENERATOR "DragNDrop;productbuild")
-    set(CPACK_PACKAGE_NAME "simple-ftpd")
+    set(CPACK_PACKAGE_NAME "ssftpd")
     set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Simple FTP Daemon for macOS")
-    set(CPACK_PACKAGE_VENDOR "simple-ftpd")
+    set(CPACK_PACKAGE_VENDOR "ssftpd")
     set(CPACK_PACKAGE_CONTACT "SimpleDaemons")
     
     # Set the correct package naming format: {VERSION}-{OS}-{ARCH}
-    set(CPACK_PACKAGE_FILE_NAME "simple-ftpd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
+    set(CPACK_PACKAGE_FILE_NAME "ssftpd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
     
     # DMG specific settings
-    set(CPACK_DMG_VOLUME_NAME "simple-ftpd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
+    set(CPACK_DMG_VOLUME_NAME "ssftpd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
     set(CPACK_DMG_FORMAT "UDZO")
     
     # PKG specific settings (productbuild)
-    set(CPACK_PRODUCTBUILD_PACKAGE_NAME "simple-ftpd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
+    set(CPACK_PRODUCTBUILD_PACKAGE_NAME "ssftpd-${PROJECT_VERSION}-macOS-${SYSTEM_ARCH}")
     set(CPACK_PRODUCTBUILD_PACKAGE_VERSION "${PROJECT_VERSION}")
     set(CPACK_PRODUCTBUILD_PACKAGE_DESCRIPTION "Simple FTP Daemon for macOS - ${SYSTEM_ARCH}")
-    set(CPACK_PRODUCTBUILD_PACKAGE_VENDOR "simple-ftpd")
+    set(CPACK_PRODUCTBUILD_PACKAGE_VENDOR "ssftpd")
     set(CPACK_PRODUCTBUILD_PACKAGE_CONTACT "SimpleDaemons")
     
     include(CPack)
@@ -430,30 +430,30 @@ if(PLATFORM_MACOS AND BUILD_SHARED_LIBS)
 elseif(PLATFORM_LINUX AND BUILD_SHARED_LIBS)
     # Create Linux packages (DEB, RPM, TGZ)
     set(CPACK_GENERATOR "DEB;RPM;TGZ")
-    set(CPACK_PACKAGE_NAME "simple-ftpd")
+    set(CPACK_PACKAGE_NAME "ssftpd")
     set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Simple FTP Daemon for Linux")
-    set(CPACK_PACKAGE_VENDOR "simple-ftpd")
+    set(CPACK_PACKAGE_VENDOR "ssftpd")
     set(CPACK_PACKAGE_CONTACT "SimpleDaemons")
     
     # Set the correct package naming format: {VERSION}-{OS}-{ARCH}
-    set(CPACK_PACKAGE_FILE_NAME "simple-ftpd-${PROJECT_VERSION}-Linux-${SYSTEM_ARCH}")
+    set(CPACK_PACKAGE_FILE_NAME "ssftpd-${PROJECT_VERSION}-Linux-${SYSTEM_ARCH}")
     
     # DEB specific settings
-    set(CPACK_DEBIAN_PACKAGE_NAME "simple-ftpd-${SYSTEM_ARCH}")
+    set(CPACK_DEBIAN_PACKAGE_NAME "ssftpd-${SYSTEM_ARCH}")
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "libssl3, libjsoncpp25")
     set(CPACK_DEBIAN_PACKAGE_SECTION "net")
     set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/simple-ftpd/simple-ftpd")
+    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/ssftpd/ssftpd")
     
     # RPM specific settings
-    set(CPACK_RPM_PACKAGE_NAME "simple-ftpd-${SYSTEM_ARCH}")
+    set(CPACK_RPM_PACKAGE_NAME "ssftpd-${SYSTEM_ARCH}")
     set(CPACK_RPM_PACKAGE_REQUIRES "openssl, jsoncpp")
     set(CPACK_RPM_PACKAGE_GROUP "Applications/Internet")
-    set(CPACK_RPM_PACKAGE_URL "https://github.com/simple-ftpd/simple-ftpd")
+    set(CPACK_RPM_PACKAGE_URL "https://github.com/ssftpd/ssftpd")
     
     # TGZ specific settings (source package - no OS/ARCH needed)
-    set(CPACK_TGZ_PACKAGE_NAME "simple-ftpd-${PROJECT_VERSION}-source")
+    set(CPACK_TGZ_PACKAGE_NAME "ssftpd-${PROJECT_VERSION}-source")
     
     include(CPack)
 
@@ -461,28 +461,28 @@ elseif(PLATFORM_LINUX AND BUILD_SHARED_LIBS)
 elseif(PLATFORM_WINDOWS AND BUILD_SHARED_LIBS)
     # Create Windows installer
     set(CPACK_GENERATOR "NSIS")
-    set(CPACK_PACKAGE_NAME "simple-ftpd")
+    set(CPACK_PACKAGE_NAME "ssftpd")
     set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Simple FTP Daemon for Windows")
-    set(CPACK_PACKAGE_VENDOR "simple-ftpd")
+    set(CPACK_PACKAGE_VENDOR "ssftpd")
     set(CPACK_PACKAGE_CONTACT "SimpleDaemons")
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "simple-ftpd")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "ssftpd")
     
     # Set the correct package naming format: {VERSION}-{OS}-{ARCH}
-    set(CPACK_PACKAGE_FILE_NAME "simple-ftpd-${PROJECT_VERSION}-Windows-${SYSTEM_ARCH}")
+    set(CPACK_PACKAGE_FILE_NAME "ssftpd-${PROJECT_VERSION}-Windows-${SYSTEM_ARCH}")
     
     # NSIS specific settings
-    set(CPACK_NSIS_DISPLAY_NAME "simple-ftpd ${PROJECT_VERSION} (${SYSTEM_ARCH})")
-    set(CPACK_NSIS_PACKAGE_NAME "simple-ftpd-${PROJECT_VERSION}-Windows-${SYSTEM_ARCH}")
+    set(CPACK_NSIS_DISPLAY_NAME "ssftpd ${PROJECT_VERSION} (${SYSTEM_ARCH})")
+    set(CPACK_NSIS_PACKAGE_NAME "ssftpd-${PROJECT_VERSION}-Windows-${SYSTEM_ARCH}")
     set(CPACK_NSIS_CONTACT "SimpleDaemons")
-    set(CPACK_NSIS_URL "https://github.com/simple-ftpd/simple-ftpd")
+    set(CPACK_NSIS_URL "https://github.com/ssftpd/ssftpd")
     set(CPACK_NSIS_ENABLE_DIRECTORY_PAGE ON)
     set(CPACK_NSIS_MODIFY_PATH ON)
-    set(CPACK_NSIS_MENU_LINKS "https://github.com/simple-ftpd/simple-ftpd" "Documentation")
+    set(CPACK_NSIS_MENU_LINKS "https://github.com/ssftpd/ssftpd" "Documentation")
     
     # Windows specific settings - follow Windows conventions
     set(CPACK_NSIS_INSTALL_ROOT "C:\\Program Files")
-    set(CPACK_NSIS_PROGRAM_MENU_DIR "simple-ftpd")
+    set(CPACK_NSIS_PROGRAM_MENU_DIR "ssftpd")
     set(CPACK_NSIS_DESKTOP_SHORTCUT ON)
     set(CPACK_NSIS_START_MENU_SHORTCUT ON)
     

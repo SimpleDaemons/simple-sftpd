@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-USERS_FILE="/etc/simple-ftpd/users.conf"
+USERS_FILE="/etc/ssftpd/users.conf"
 FTP_DIR="/var/ftp"
 FTP_USER="ftp"
 FTP_GROUP="ftp"
@@ -153,7 +153,7 @@ add_user() {
     echo "  Permissions: $permissions"
     echo ""
     echo "Next steps:"
-    echo "1. Restart the FTP server: systemctl restart simple-ftpd"
+    echo "1. Restart the FTP server: systemctl restart ssftpd"
     echo "2. Test the connection: ftp -u $username localhost"
 }
 

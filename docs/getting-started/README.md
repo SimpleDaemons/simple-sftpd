@@ -1,6 +1,6 @@
-# Getting Started with Simple FTP Daemon
+# Getting Started with Simple-Secure FTP Daemon
 
-Welcome to Simple FTP Daemon! This guide will help you get up and running with your first FTP server in minutes.
+Welcome to Simple-Secure FTP Daemon! This guide will help you get up and running with your first FTP server in minutes.
 
 ## 🎯 What You'll Learn
 
@@ -29,22 +29,22 @@ Choose your installation method:
 ```bash
 # Ubuntu/Debian
 sudo apt update
-sudo apt install simple-ftpd
+sudo apt install ssftpd
 
 # CentOS/RHEL
-sudo yum install simple-ftpd
+sudo yum install ssftpd
 # or
-sudo dnf install simple-ftpd
+sudo dnf install ssftpd
 
 # macOS
-brew install simple-ftpd
+brew install ssftpd
 ```
 
 #### Option B: Build from Source
 ```bash
 # Clone the repository
-git clone https://github.com/simple-ftpd/simple-ftpd.git
-cd simple-ftpd
+git clone https://github.com/ssftpd/ssftpd.git
+cd ssftpd
 
 # Install dependencies and build
 make install-dev
@@ -56,10 +56,10 @@ sudo make install
 
 ```bash
 # Copy example configuration
-sudo cp /etc/simple-ftpd/simple-ftpd.conf.example /etc/simple-ftpd/simple-ftpd.conf
+sudo cp /etc/ssftpd/ssftpd.conf.example /etc/ssftpd/ssftpd.conf
 
 # Edit configuration
-sudo nano /etc/simple-ftpd/simple-ftpd.conf
+sudo nano /etc/ssftpd/ssftpd.conf
 ```
 
 **Essential settings to configure:**
@@ -71,7 +71,7 @@ bind_port = 21             # Standard FTP port
 
 # Create directories
 working_directory = "/var/ftp"
-log_file = "/var/log/simple-ftpd/simple-ftpd.log"
+log_file = "/var/log/ssftpd/ssftpd.log"
 
 # Enable basic features
 enable_ssl = false         # Start without SSL for simplicity
@@ -82,19 +82,19 @@ enable_user_management = true
 
 ```bash
 # Create FTP directory structure
-sudo mkdir -p /var/ftp /var/log/simple-ftpd
+sudo mkdir -p /var/ftp /var/log/ssftpd
 sudo chown ftp:ftp /var/ftp
 sudo chmod 755 /var/ftp
 
 # Create user configuration directory
-sudo mkdir -p /etc/simple-ftpd/users
+sudo mkdir -p /etc/ssftpd/users
 ```
 
 ### Step 4: Add Your First User
 
 ```bash
 # Add a user account
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username myuser \
   --password mypassword \
   --home /var/ftp/myuser \
@@ -109,10 +109,10 @@ sudo chown myuser:ftp /var/ftp/myuser
 
 ```bash
 # Test configuration first
-simple-ftpd --test-config --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
 
 # Start in foreground (for testing)
-sudo simple-ftpd start --config /etc/simple-ftpd/simple-ftpd.conf
+sudo ssftpd start --config /etc/ssftpd/ssftpd.conf
 ```
 
 ### Step 6: Test Your Connection
@@ -194,21 +194,21 @@ Available permissions:
 
 ```bash
 # Regular user with full access
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username developer \
   --password devpass123 \
   --home /var/ftp/developer \
   --permissions READ,WRITE,DELETE,LIST,UPLOAD,DOWNLOAD
 
 # Anonymous user (public access)
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username anonymous \
   --home /var/ftp/public \
   --anonymous \
   --permissions READ,LIST,DOWNLOAD
 
 # Restricted user
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username guest \
   --password guest123 \
   --home /var/ftp/guest \
@@ -223,40 +223,40 @@ sudo simple-ftpd user add \
 
 ```bash
 # Enable and start service
-sudo systemctl enable simple-ftpd
-sudo systemctl start simple-ftpd
+sudo systemctl enable ssftpd
+sudo systemctl start ssftpd
 
 # Check status
-sudo systemctl status simple-ftpd
+sudo systemctl status ssftpd
 
 # View logs
-sudo journalctl -u simple-ftpd -f
+sudo journalctl -u ssftpd -f
 ```
 
 ### macOS (launchd)
 
 ```bash
 # Load service
-sudo launchctl load /Library/LaunchDaemons/com.blburns.simple-ftpd.plist
+sudo launchctl load /Library/LaunchDaemons/com.blburns.ssftpd.plist
 
 # Start service
-sudo launchctl start com.blburns.simple-ftpd
+sudo launchctl start com.blburns.ssftpd
 
 # Check status
-sudo launchctl list | grep simple-ftpd
+sudo launchctl list | grep ssftpd
 ```
 
 ### Windows
 
 ```cmd
 # Install service
-sc create simple-ftpd binPath= "C:\Program Files\simple-ftpd\bin\simple-ftpd.exe"
+sc create ssftpd binPath= "C:\Program Files\ssftpd\bin\ssftpd.exe"
 
 # Start service
-sc start simple-ftpd
+sc start ssftpd
 
 # Check status
-sc query simple-ftpd
+sc query ssftpd
 ```
 
 ## 🔒 Basic Security Setup
@@ -274,7 +274,7 @@ sudo firewall-cmd --permanent --add-port=1024-65535/tcp
 sudo firewall-cmd --reload
 
 # macOS
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/bin/simple-ftpd
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/bin/ssftpd
 ```
 
 ### User Isolation
@@ -286,7 +286,7 @@ sudo chown root:root /var/ftp/chroot
 sudo chmod 755 /var/ftp/chroot
 
 # Edit configuration
-sudo nano /etc/simple-ftpd/simple-ftpd.conf
+sudo nano /etc/ssftpd/ssftpd.conf
 
 # Add to [security] section:
 chroot_enabled = true
@@ -299,29 +299,29 @@ chroot_directory = "/var/ftp/chroot"
 
 ```bash
 # Check server status
-simple-ftpd status
+ssftpd status
 
 # View active connections
-simple-ftpd connections
+ssftpd connections
 
 # Show server statistics
-simple-ftpd stats
+ssftpd stats
 
 # View logs
-tail -f /var/log/simple-ftpd/simple-ftpd.log
+tail -f /var/log/ssftpd/ssftpd.log
 ```
 
 ### Log Analysis
 
 ```bash
 # View recent connections
-grep "CONNECT" /var/log/simple-ftpd/simple-ftpd.log
+grep "CONNECT" /var/log/ssftpd/ssftpd.log
 
 # Check for errors
-grep "ERROR" /var/log/simple-ftpd/simple-ftpd.log
+grep "ERROR" /var/log/ssftpd/ssftpd.log
 
 # Monitor uploads/downloads
-grep "TRANSFER" /var/log/simple-ftpd/simple-ftpd.log
+grep "TRANSFER" /var/log/ssftpd/ssftpd.log
 ```
 
 ## 🚨 Troubleshooting
@@ -331,11 +331,11 @@ grep "TRANSFER" /var/log/simple-ftpd/simple-ftpd.log
 #### Server Won't Start
 ```bash
 # Check configuration
-simple-ftpd --test-config --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
 
 # Check permissions
 ls -la /var/ftp
-ls -la /etc/simple-ftpd/
+ls -la /etc/ssftpd/
 
 # Check ports
 sudo netstat -tlnp | grep :21
@@ -348,19 +348,19 @@ sudo ufw status
 sudo firewall-cmd --list-all
 
 # Check service status
-sudo systemctl status simple-ftpd
+sudo systemctl status ssftpd
 ```
 
 #### Permission Denied
 ```bash
 # Check user permissions
-sudo simple-ftpd user list
+sudo ssftpd user list
 
 # Check directory permissions
 ls -la /var/ftp/myuser/
 
 # Verify user home directory
-sudo simple-ftpd user show --username myuser
+sudo ssftpd user show --username myuser
 ```
 
 ## 📚 Next Steps
@@ -376,8 +376,8 @@ Now that you have a basic FTP server running:
 
 - **Documentation**: Browse the full [documentation index](../README.md)
 - **Examples**: Check [configuration examples](../examples/README.md)
-- **Issues**: Report problems on [GitHub Issues](https://github.com/simple-ftpd/simple-ftpd/issues)
-- **Discussions**: Join [GitHub Discussions](https://github.com/simple-ftpd/simple-ftpd/discussions)
+- **Issues**: Report problems on [GitHub Issues](https://github.com/ssftpd/ssftpd/issues)
+- **Discussions**: Join [GitHub Discussions](https://github.com/ssftpd/ssftpd/discussions)
 
 ---
 

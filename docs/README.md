@@ -1,6 +1,6 @@
 # Simple FTP Daemon Documentation
 
-Welcome to the comprehensive documentation for Simple FTP Daemon (simple-ftpd), a secure, configurable, and feature-rich FTP server written in C++.
+Welcome to the comprehensive documentation for Simple FTP Daemon (ssftpd), a secure, configurable, and feature-rich FTP server written in C++.
 
 ## 📚 Documentation Overview
 
@@ -84,7 +84,7 @@ Before diving into the documentation, ensure you have:
 ## 🚨 Important Notes
 
 - **Security**: This documentation includes security best practices. Follow them carefully in production environments.
-- **Version Compatibility**: Documentation is written for simple-ftpd v0.1.0. Check version compatibility for your installation.
+- **Version Compatibility**: Documentation is written for ssftpd v0.1.0. Check version compatibility for your installation.
 - **Platform Differences**: Some features may vary between platforms. Platform-specific notes are clearly marked.
 
 ## 📞 Getting Help
@@ -107,4 +107,4 @@ Documentation improvements are welcome! See the [Contributing Guidelines](develo
 
 ---
 
-**Next Steps**: Choose your path above or start with the [Getting Started Guide](getting-started/README.md) if you're new to simple-ftpd.
+**Next Steps**: Choose your path above or start with the [Getting Started Guide](getting-started/README.md) if you're new to ssftpd.

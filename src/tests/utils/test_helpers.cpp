@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <cstring>
 
-namespace simple_ftpd {
+namespace ssftpd {
 namespace test {
 
 // Generate random string of specified length
@@ -333,4 +333,4 @@ TestVirtualHost generateTestVirtualHost(const std::string& hostname) {
 }
 
 } // namespace test
-} // namespace simple_ftpd
+} // namespace ssftpd

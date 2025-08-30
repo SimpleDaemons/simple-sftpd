@@ -1,18 +1,18 @@
 # Configuration Guide
 
-This guide covers all configuration options available in Simple FTP Daemon, from basic settings to advanced features.
+This guide covers all configuration options available in Simple-Secure FTP Daemon, from basic settings to advanced features.
 
 ## 📁 Configuration Files
 
-Simple FTP Daemon supports multiple configuration formats and locations:
+Simple-Secure FTP Daemon supports multiple configuration formats and locations:
 
 ### File Locations
 
 | Platform | Default Location | Alternative Locations |
 |----------|------------------|----------------------|
-| Linux | `/etc/simple-ftpd/simple-ftpd.conf` | `/usr/local/etc/simple-ftpd/` |
-| macOS | `/usr/local/etc/simple-ftpd/simple-ftpd.conf` | `~/Library/Application Support/simple-ftpd/` |
-| Windows | `C:\Program Files\simple-ftpd\config\` | `%APPDATA%\simple-ftpd\` |
+| Linux | `/etc/ssftpd/ssftpd.conf` | `/usr/local/etc/ssftpd/` |
+| macOS | `/usr/local/etc/ssftpd/ssftpd.conf` | `~/Library/Application Support/ssftpd/` |
+| Windows | `C:\Program Files\ssftpd\config\` | `%APPDATA%\ssftpd\` |
 
 ### Configuration Formats
 
@@ -26,9 +26,9 @@ Simple FTP Daemon supports multiple configuration formats and locations:
 
 ```ini
 # Server identification
-server_name = "Simple FTP Daemon"
+server_name = "Simple-Secure FTP Daemon"
 server_version = "0.1.0"
-server_banner = "Welcome to Simple FTP Daemon"
+server_banner = "Welcome to Simple-Secure FTP Daemon"
 
 # Operation mode
 daemon_mode = false          # Run as daemon (true) or foreground (false)
@@ -36,8 +36,8 @@ foreground_mode = true       # Force foreground mode
 working_directory = "/var/ftp"  # Base directory for FTP operations
 
 # Configuration directories
-user_config_dir = "/etc/simple-ftpd/users"
-system_config_dir = "/etc/simple-ftpd"
+user_config_dir = "/etc/ssftpd/users"
+system_config_dir = "/etc/ssftpd"
 ```
 
 ### Feature Flags
@@ -71,9 +71,9 @@ cache_size = 50MB            # Cache size limit
 ```ini
 [ssl]
 enabled = true               # Enable SSL/TLS
-certificate_file = "/etc/simple-ftpd/ssl/server.crt"
-private_key_file = "/etc/simple-ftpd/ssl/server.key"
-ca_certificate_file = "/etc/simple-ftpd/ssl/ca.crt"
+certificate_file = "/etc/ssftpd/ssl/server.crt"
+private_key_file = "/etc/ssftpd/ssl/server.key"
+ca_certificate_file = "/etc/ssftpd/ssl/ca.crt"
 ```
 
 ### Advanced SSL Options
@@ -96,7 +96,7 @@ max_tls_version = 1.3        # Maximum TLS version
 
 ```bash
 # Generate self-signed certificate
-sudo simple-ftpd ssl generate \
+sudo ssftpd ssl generate \
   --hostname ftp.example.com \
   --country US \
   --state California \
@@ -105,7 +105,7 @@ sudo simple-ftpd ssl generate \
   --email admin@example.com
 
 # Install existing certificates
-sudo simple-ftpd ssl install \
+sudo ssftpd ssl install \
   --hostname ftp.example.com \
   --certificate /path/to/certificate.crt \
   --private-key /path/to/private.key \
@@ -118,7 +118,7 @@ sudo simple-ftpd ssl install \
 
 ```ini
 [logging]
-log_file = "/var/log/simple-ftpd/simple-ftpd.log"
+log_file = "/var/log/ssftpd/ssftpd.log"
 log_level = "INFO"           # TRACE, DEBUG, INFO, WARN, ERROR, FATAL
 log_to_console = true        # Output to console
 log_to_file = true           # Output to file
@@ -261,7 +261,7 @@ max_file_size = 0            # Maximum file size (0 = unlimited)
 max_transfer_rate = 0        # Maximum transfer rate (0 = unlimited)
 allow_overwrite = true       # Allow file overwrites
 allow_resume = true          # Allow transfer resumption
-temp_directory = "/tmp/simple-ftpd"  # Temporary file directory
+temp_directory = "/tmp/ssftpd"  # Temporary file directory
 ```
 
 ### Transfer Optimization
@@ -363,8 +363,8 @@ adaptive_window = 300        # Adaptive window size
 [virtual_hosts.default]
 hostname = "default"         # Virtual host hostname
 document_root = "/var/ftp"   # Document root directory
-welcome_message = "Welcome to Simple FTP Daemon"
-banner_message = "Simple FTP Daemon Ready"
+welcome_message = "Welcome to Simple-Secure FTP Daemon"
+banner_message = "Simple-Secure FTP Daemon Ready"
 enabled = true               # Enable this virtual host
 default = true               # Set as default virtual host
 ```
@@ -502,10 +502,10 @@ max_connections = 200        # Override global setting
 
 ```bash
 # Validate configuration file
-simple-ftpd --test-config --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
 
 # Validate and show detailed results
-simple-ftpd --validate --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --validate --config /etc/ssftpd/ssftpd.conf
 ```
 
 ## 📊 Configuration Examples
@@ -621,20 +621,20 @@ log_socket_events = "all"
 #### SSL Certificate Problems
 ```bash
 # Check certificate validity
-openssl x509 -in /etc/simple-ftpd/ssl/server.crt -text -noout
+openssl x509 -in /etc/ssftpd/ssl/server.crt -text -noout
 
 # Verify certificate chain
-openssl verify /etc/simple-ftpd/ssl/server.crt
+openssl verify /etc/ssftpd/ssl/server.crt
 
 # Check private key permissions
-ls -la /etc/simple-ftpd/ssl/server.key
+ls -la /etc/ssftpd/ssl/server.key
 ```
 
 #### Permission Issues
 ```bash
 # Check directory permissions
 ls -la /var/ftp/
-ls -la /etc/simple-ftpd/
+ls -la /etc/ssftpd/
 
 # Verify user ownership
 id ftp
@@ -658,14 +658,14 @@ sudo firewall-cmd --list-all
 
 ```bash
 # Syntax check
-simple-ftpd --test-config --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
 
 # Full validation
-simple-ftpd --validate --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --validate --config /etc/ssftpd/ssftpd.conf
 
 # Check specific sections
-grep -n "\[ssl\]" /etc/simple-ftpd/simple-ftpd.conf
-grep -n "\[users" /etc/simple-ftpd/simple-ftpd.conf
+grep -n "\[ssl\]" /etc/ssftpd/ssftpd.conf
+grep -n "\[users" /etc/ssftpd/ssftpd.conf
 ```
 
 ## 📚 Next Steps

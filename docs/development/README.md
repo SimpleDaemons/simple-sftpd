@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide is for developers who want to understand the Simple FTP Daemon codebase, build from source, and contribute to the project.
+This guide is for developers who want to understand the Simple-Secure FTP Daemon codebase, build from source, and contribute to the project.
 
 ## 🎯 What You'll Learn
 
@@ -16,7 +16,7 @@ By the end of this guide, you'll be able to:
 
 ### High-Level Architecture
 
-Simple FTP Daemon follows a modular, event-driven architecture designed for high performance and extensibility:
+Simple-Secure FTP Daemon follows a modular, event-driven architecture designed for high performance and extensibility:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -288,8 +288,8 @@ cd vcpkg
 #### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/simple-ftpd/simple-ftpd.git
-cd simple-ftpd
+git clone https://github.com/ssftpd/ssftpd.git
+cd ssftpd
 ```
 
 #### 2. Install Development Dependencies
@@ -332,7 +332,7 @@ make -j$(nproc)
 make build
 
 # Build specific targets
-make simple-ftpd
+make ssftpd
 make tests
 make examples
 ```
@@ -628,7 +628,7 @@ make -j$(nproc)
 
 ```bash
 # Start debugging
-gdb ./simple-ftpd
+gdb ./ssftpd
 
 # Set breakpoints
 (gdb) break main
@@ -653,7 +653,7 @@ gdb ./simple-ftpd
 
 ```bash
 # Start debugging
-lldb ./simple-ftpd
+lldb ./ssftpd
 
 # Set breakpoints
 (lldb) breakpoint set --name main
@@ -796,11 +796,11 @@ refactor(config): simplify configuration parsing logic
 ```bash
 # Fork the repository on GitHub
 # Clone your fork
-git clone https://github.com/yourusername/simple-ftpd.git
-cd simple-ftpd
+git clone https://github.com/yourusername/ssftpd.git
+cd ssftpd
 
 # Add upstream remote
-git remote add upstream https://github.com/simple-ftpd/simple-ftpd.git
+git remote add upstream https://github.com/ssftpd/ssftpd.git
 ```
 
 #### 2. Create Feature Branch
@@ -894,23 +894,23 @@ cmake .. \
 
 # Build and run
 make
-./simple-ftpd --config config.conf
+./ssftpd --config config.conf
 
 # Generate profile data
-gprof ./simple-ftpd gmon.out > profile.txt
+gprof ./ssftpd gmon.out > profile.txt
 ```
 
 #### Using perf (Linux)
 
 ```bash
 # Profile CPU usage
-perf record -g ./simple-ftpd --config config.conf
+perf record -g ./ssftpd --config config.conf
 
 # Analyze results
 perf report
 
 # Profile specific events
-perf record -e cache-misses ./simple-ftpd --config config.conf
+perf record -e cache-misses ./ssftpd --config config.conf
 ```
 
 #### Using Instruments (macOS)
@@ -1051,4 +1051,4 @@ bool checkRateLimit(const std::string& ip)
 4. **Pick an issue to work on**
 5. **Submit your first contribution**
 
-Welcome to the Simple FTP Daemon development community! 🎉
+Welcome to the Simple-Secure FTP Daemon development community! 🎉

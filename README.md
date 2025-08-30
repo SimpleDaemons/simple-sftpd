@@ -1,4 +1,4 @@
-# Simple FTP Daemon (simple-ftpd)
+# Simple-Secure FTP Daemon (ssftpd)
 
 A secure, configurable, and feature-rich FTP server written in C++ for Linux, macOS, and Windows.
 
@@ -60,8 +60,8 @@ A secure, configurable, and feature-rich FTP server written in C++ for Linux, ma
 
 ```bash
 # Clone the repository
-git clone https://github.com/simple-ftpd/simple-ftpd.git
-cd simple-ftpd
+git clone https://github.com/ssftpd/ssftpd.git
+cd ssftpd
 
 # Build the project
 make install-dev  # Install development dependencies
@@ -74,36 +74,36 @@ make install      # Install system-wide
 **Ubuntu/Debian:**
 ```bash
 sudo apt update
-sudo apt install simple-ftpd
+sudo apt install ssftpd
 ```
 
 **CentOS/RHEL:**
 ```bash
-sudo yum install simple-ftpd
+sudo yum install ssftpd
 # or
-sudo dnf install simple-ftpd
+sudo dnf install ssftpd
 ```
 
 **macOS:**
 ```bash
-brew install simple-ftpd
+brew install ssftpd
 ```
 
 ### Configuration
 
 1. **Copy the example configuration:**
 ```bash
-sudo cp /etc/simple-ftpd/simple-ftpd.conf.example /etc/simple-ftpd/simple-ftpd.conf
+sudo cp /etc/ssftpd/ssftpd.conf.example /etc/ssftpd/ssftpd.conf
 ```
 
 2. **Edit the configuration file:**
 ```bash
-sudo nano /etc/simple-ftpd/simple-ftpd.conf
+sudo nano /etc/ssftpd/ssftpd.conf
 ```
 
 3. **Create necessary directories:**
 ```bash
-sudo mkdir -p /var/ftp /var/log/simple-ftpd
+sudo mkdir -p /var/ftp /var/log/ssftpd
 sudo chown ftp:ftp /var/ftp
 ```
 
@@ -113,45 +113,45 @@ sudo chown ftp:ftp /var/ftp
 
 ```bash
 # Start in foreground (for testing)
-sudo simple-ftpd start --config /etc/simple-ftpd/simple-ftpd.conf
+sudo ssftpd start --config /etc/ssftpd/ssftpd.conf
 
 # Start as daemon
-sudo simple-ftpd --daemon start
+sudo ssftpd --daemon start
 
 # Test configuration
-simple-ftpd --test-config --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
 ```
 
 #### Service Management
 
 **Linux (systemd):**
 ```bash
-sudo systemctl enable simple-ftpd
-sudo systemctl start simple-ftpd
-sudo systemctl status simple-ftpd
+sudo systemctl enable ssftpd
+sudo systemctl start ssftpd
+sudo systemctl status ssftpd
 ```
 
 **macOS (launchd):**
 ```bash
-sudo launchctl load /Library/LaunchDaemons/com.blburns.simple-ftpd.plist
-sudo launchctl start com.blburns.simple-ftpd
+sudo launchctl load /Library/LaunchDaemons/com.blburns.ssftpd.plist
+sudo launchctl start com.blburns.ssftpd
 ```
 
 **Windows:**
 ```cmd
-sc create simple-ftpd binPath= "C:\Program Files\simple-ftpd\bin\simple-ftpd.exe"
-sc start simple-ftpd
+sc create ssftpd binPath= "C:\Program Files\ssftpd\bin\ssftpd.exe"
+sc start ssftpd
 ```
 
 ## Configuration
 
 ### Main Configuration File
 
-The main configuration file (`simple-ftpd.conf`) supports both INI and JSON formats. Here's an example INI configuration:
+The main configuration file (`ssftpd.conf`) supports both INI and JSON formats. Here's an example INI configuration:
 
 ```ini
 # Global server settings
-server_name = "Simple FTP Daemon"
+server_name = "Simple-Secure FTP Daemon"
 server_version = "0.1.0"
 enable_ssl = true
 enable_virtual_hosts = true
@@ -159,8 +159,8 @@ enable_virtual_hosts = true
 # SSL Configuration
 [ssl]
 enabled = true
-certificate_file = "/etc/simple-ftpd/ssl/server.crt"
-private_key_file = "/etc/simple-ftpd/ssl/server.key"
+certificate_file = "/etc/ssftpd/ssl/server.crt"
+private_key_file = "/etc/ssftpd/ssl/server.key"
 
 # Connection settings
 [connection]
@@ -188,14 +188,14 @@ permissions = ["READ", "WRITE", "LIST", "UPLOAD", "DOWNLOAD"]
 
 ```bash
 # Add a new user
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username john \
   --password secret \
   --home /var/ftp/john \
   --permissions READ,WRITE,LIST,UPLOAD,DOWNLOAD
 
 # Add anonymous user
-sudo simple-ftpd user add \
+sudo ssftpd user add \
   --username anonymous \
   --home /var/ftp/public \
   --anonymous \
@@ -223,7 +223,7 @@ Available permissions:
 
 ```bash
 # Add a new virtual host
-sudo simple-ftpd virtual add \
+sudo ssftpd virtual add \
   --hostname ftp.example.com \
   --root /var/ftp/example \
   --ssl \
@@ -246,7 +246,7 @@ Each virtual host can have:
 
 ```bash
 # Generate certificate for a domain
-sudo simple-ftpd ssl generate \
+sudo ssftpd ssl generate \
   --hostname ftp.example.com \
   --country US \
   --state California \
@@ -259,7 +259,7 @@ sudo simple-ftpd ssl generate \
 
 ```bash
 # Install existing certificates
-sudo simple-ftpd ssl install \
+sudo ssftpd ssl install \
   --hostname ftp.example.com \
   --certificate /path/to/certificate.crt \
   --private-key /path/to/private.key \
@@ -272,71 +272,71 @@ sudo simple-ftpd ssl install \
 
 ```bash
 # Start the server
-simple-ftpd start [--config FILE] [--daemon] [--foreground]
+ssftpd start [--config FILE] [--daemon] [--foreground]
 
 # Stop the server
-simple-ftpd stop
+ssftpd stop
 
 # Restart the server
-simple-ftpd restart
+ssftpd restart
 
 # Show server status
-simple-ftpd status
+ssftpd status
 
 # Reload configuration
-simple-ftpd reload
+ssftpd reload
 ```
 
 ### User Management Commands
 
 ```bash
 # List all users
-simple-ftpd user list
+ssftpd user list
 
 # Add user
-simple-ftpd user add --username NAME --password PASS --home DIR
+ssftpd user add --username NAME --password PASS --home DIR
 
 # Remove user
-simple-ftpd user remove --username NAME
+ssftpd user remove --username NAME
 
 # Modify user
-simple-ftpd user modify --username NAME --permissions READ,WRITE
+ssftpd user modify --username NAME --permissions READ,WRITE
 
 # Change password
-simple-ftpd user password --username NAME --password NEW_PASS
+ssftpd user password --username NAME --password NEW_PASS
 ```
 
 ### Virtual Host Commands
 
 ```bash
 # List virtual hosts
-simple-ftpd virtual list
+ssftpd virtual list
 
 # Add virtual host
-simple-ftpd virtual add --hostname DOMAIN --root DIR
+ssftpd virtual add --hostname DOMAIN --root DIR
 
 # Remove virtual host
-simple-ftpd virtual remove --hostname DOMAIN
+ssftpd virtual remove --hostname DOMAIN
 
 # Enable/disable virtual host
-simple-ftpd virtual enable --hostname DOMAIN
-simple-ftpd virtual disable --hostname DOMAIN
+ssftpd virtual enable --hostname DOMAIN
+ssftpd virtual disable --hostname DOMAIN
 ```
 
 ### SSL Management Commands
 
 ```bash
 # Generate certificate
-simple-ftpd ssl generate --hostname DOMAIN
+ssftpd ssl generate --hostname DOMAIN
 
 # Install certificate
-simple-ftpd ssl install --hostname DOMAIN --cert FILE --key FILE
+ssftpd ssl install --hostname DOMAIN --cert FILE --key FILE
 
 # Show SSL status
-simple-ftpd ssl status
+ssftpd ssl status
 
 # Renew certificate
-simple-ftpd ssl renew --hostname DOMAIN
+ssftpd ssl renew --hostname DOMAIN
 ```
 
 ## Development
@@ -345,8 +345,8 @@ simple-ftpd ssl renew --hostname DOMAIN
 
 ```bash
 # Clone and setup
-git clone https://github.com/simple-ftpd/simple-ftpd.git
-cd simple-ftpd
+git clone https://github.com/ssftpd/ssftpd.git
+cd ssftpd
 
 # Install dependencies
 make install-dev
@@ -364,8 +364,8 @@ make package    # Create packages for current platform
 ### Project Structure
 
 ```
-simple-ftpd/
-├── include/simple-ftpd/     # Header files
+ssftpd/
+├── include/ssftpd/     # Header files
 │   ├── ftp_server.hpp       # Main server class
 │   ├── ftp_connection.hpp   # Connection handling
 │   ├── ftp_user.hpp         # User management
@@ -419,7 +419,7 @@ make memcheck
 
 1. **Check configuration:**
 ```bash
-simple-ftpd --test-config --config /etc/simple-ftpd/simple-ftpd.conf
+ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
 ```
 
 2. **Check permissions:**
@@ -437,13 +437,13 @@ sudo netstat -tlnp | grep :21
 
 1. **Verify certificate files:**
 ```bash
-openssl x509 -in /etc/simple-ftpd/ssl/server.crt -text -noout
+openssl x509 -in /etc/ssftpd/ssl/server.crt -text -noout
 ```
 
 2. **Check certificate permissions:**
 ```bash
-sudo chmod 600 /etc/simple-ftpd/ssl/server.key
-sudo chown ftp:ftp /etc/simple-ftpd/ssl/server.key
+sudo chmod 600 /etc/ssftpd/ssl/server.key
+sudo chown ftp:ftp /etc/ssftpd/ssl/server.key
 ```
 
 #### Performance Issues
@@ -468,9 +468,9 @@ use_sendfile = true
 
 ### Log Files
 
-- **Main log**: `/var/log/simple-ftpd/simple-ftpd.log`
-- **Access log**: `/var/log/simple-ftpd/access.log`
-- **Error log**: `/var/log/simple-ftpd/error.log`
+- **Main log**: `/var/log/ssftpd/ssftpd.log`
+- **Access log**: `/var/log/ssftpd/access.log`
+- **Error log**: `/var/log/ssftpd/error.log`
 
 ### Debug Mode
 
@@ -561,13 +561,13 @@ cache_size = 100MB
 
 ```bash
 # Show server statistics
-simple-ftpd status
+ssftpd status
 
 # Show performance metrics
-simple-ftpd metrics
+ssftpd metrics
 
 # Show connection information
-simple-ftpd connections
+ssftpd connections
 ```
 
 ### External Monitoring
@@ -584,8 +584,8 @@ This project is licensed under the Apache License, Version 2.0 - see the [LICENS
 ## Support
 
 - **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/simple-ftpd/simple-ftpd/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/simple-ftpd/simple-ftpd/discussions)
+- **Issues**: [GitHub Issues](https://github.com/ssftpd/ssftpd/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/ssftpd/ssftpd/discussions)
 - **Email**: SimpleDaemons
 
 ## Acknowledgments

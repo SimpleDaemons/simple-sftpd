@@ -1,8 +1,8 @@
-# Makefile for simple-ftpd
+# Makefile for ssftpd
 # Simple FTP Daemon - A secure and configurable FTP server
 
 # Variables
-PROJECT_NAME = simple-ftpd
+PROJECT_NAME = ssftpd
 VERSION = 0.1.0
 BUILD_DIR = build
 DIST_DIR = dist
@@ -173,15 +173,15 @@ endif
 install-service:
 ifeq ($(PLATFORM),macos)
 	@echo "Installing macOS service..."
-	sudo cp scripts/com.blburns.simple-ftpd.plist /Library/LaunchDaemons/
-	sudo chown root:wheel /Library/LaunchDaemons/com.blburns.simple-ftpd.plist
-	sudo chmod 644 /Library/LaunchDaemons/com.blburns.simple-ftpd.plist
-	sudo launchctl load /Library/LaunchDaemons/com.blburns.simple-ftpd.plist
+	sudo cp scripts/com.blburns.ssftpd.plist /Library/LaunchDaemons/
+	sudo chown root:wheel /Library/LaunchDaemons/com.blburns.ssftpd.plist
+	sudo chmod 644 /Library/LaunchDaemons/com.blburns.ssftpd.plist
+	sudo launchctl load /Library/LaunchDaemons/com.blburns.ssftpd.plist
 else ifeq ($(PLATFORM),linux)
 	@echo "Installing Linux service..."
-	sudo cp scripts/simple-ftpd.service /etc/systemd/system/
+	sudo cp scripts/ssftpd.service /etc/systemd/system/
 	sudo systemctl daemon-reload
-	sudo systemctl enable simple-ftpd
+	sudo systemctl enable ssftpd
 else
 	@echo "Service installation not configured for this platform"
 endif
@@ -189,13 +189,13 @@ endif
 uninstall-service:
 ifeq ($(PLATFORM),macos)
 	@echo "Uninstalling macOS service..."
-	sudo launchctl unload /Library/LaunchDaemons/com.blburns.simple-ftpd.plist
-	sudo rm -f /Library/LaunchDaemons/com.blburns.simple-ftpd.plist
+	sudo launchctl unload /Library/LaunchDaemons/com.blburns.ssftpd.plist
+	sudo rm -f /Library/LaunchDaemons/com.blburns.ssftpd.plist
 else ifeq ($(PLATFORM),linux)
 	@echo "Uninstalling Linux service..."
-	sudo systemctl stop simple-ftpd
-	sudo systemctl disable simple-ftpd
-	sudo rm -f /etc/systemd/system/simple-ftpd.service
+	sudo systemctl stop ssftpd
+	sudo systemctl disable ssftpd
+	sudo rm -f /etc/systemd/system/ssftpd.service
 	sudo systemctl daemon-reload
 else
 	@echo "Service uninstallation not configured for this platform"

@@ -195,8 +195,8 @@ create_packages() {
     
     # Create source archive
     cd "$PROJECT_ROOT"
-    local source_archive="simple-ftpd-${VERSION}-source.tar.gz"
-    if git archive --format=tar.gz --prefix="simple-ftpd-${VERSION}/" HEAD > "$DIST_DIR/$source_archive"; then
+    local source_archive="ssftpd-${VERSION}-source.tar.gz"
+    if git archive --format=tar.gz --prefix="ssftpd-${VERSION}/" HEAD > "$DIST_DIR/$source_archive"; then
         print_step "Source archive created: $source_archive"
     fi
 }
@@ -210,9 +210,9 @@ install_package() {
         print_step "Package installed successfully"
         
         # Test the installation
-        if command -v simple-ftpd &> /dev/null; then
+        if command -v ssftpd &> /dev/null; then
             print_step "Installation verification successful"
-            simple-ftpd --version
+            ssftpd --version
         else
             print_warning "Installation verification failed - binary not found in PATH"
         fi

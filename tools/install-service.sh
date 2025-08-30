@@ -13,15 +13,15 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-SERVICE_NAME="simple-ftpd"
+SERVICE_NAME="ssftpd"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-CONFIG_DIR="/etc/simple-ftpd"
-CONFIG_FILE="$CONFIG_DIR/simple-ftpd.conf"
-BINARY_PATH="/usr/local/bin/simple-ftpd"
+CONFIG_DIR="/etc/ssftpd"
+CONFIG_FILE="$CONFIG_DIR/ssftpd.conf"
+BINARY_PATH="/usr/local/bin/ssftpd"
 FTP_USER="ftp"
 FTP_GROUP="ftp"
 FTP_DIR="/var/ftp"
-LOG_DIR="/var/log/simple-ftpd"
+LOG_DIR="/var/log/ssftpd"
 
 # Function to print colored output
 print_status() {
@@ -196,13 +196,13 @@ idle_timeout = 600
 
 [ssl]
 enabled = false
-certificate_file = /etc/ssl/simple-ftpd/certs/server.crt
-private_key_file = /etc/ssl/simple-ftpd/private/server.key
+certificate_file = /etc/ssl/ssftpd/certs/server.crt
+private_key_file = /etc/ssl/ssftpd/private/server.key
 require_client_cert = false
 verify_peer = false
 
 [logging]
-log_file = $LOG_DIR/simple-ftpd.log
+log_file = $LOG_DIR/ssftpd.log
 log_level = INFO
 log_to_console = false
 log_to_file = true
@@ -267,7 +267,7 @@ create_service_file() {
     cat > "$SERVICE_FILE" << EOF
 [Unit]
 Description=Simple FTP Daemon
-Documentation=man:simple-ftpd(8)
+Documentation=man:ssftpd(8)
 After=network.target
 Wants=network-online.target
 
@@ -318,8 +318,8 @@ create_control_script() {
 
 # Simple FTP Daemon Control Script
 
-SERVICE_NAME="simple-ftpd"
-CONFIG_FILE="/etc/simple-ftpd/simple-ftpd.conf"
+SERVICE_NAME="ssftpd"
+CONFIG_FILE="/etc/ssftpd/ssftpd.conf"
 
 # Colors for output
 RED='\033[0;31m'

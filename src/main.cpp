@@ -4,11 +4,11 @@
 #include <memory>
 #include <signal.h>
 #include <csignal>
-#include "simple-ftpd/ftp_server.hpp"
-#include "simple-ftpd/ftp_server_config.hpp"
-#include "simple-ftpd/logger.hpp"
+#include "ssftpd/ftp_server.hpp"
+#include "ssftpd/ftp_server_config.hpp"
+#include "ssftpd/logger.hpp"
 
-using namespace simple_ftpd;
+using namespace ssftpd;
 
 // Global variables for signal handling
 std::shared_ptr<FTPServer> g_server;
@@ -36,7 +36,7 @@ void signalHandler(int signal) {
  * @brief Print usage information
  */
 void printUsage() {
-    std::cout << "\nUsage: simple-ftpd [OPTIONS] [COMMAND] [ARGS...]" << std::endl;
+    std::cout << "\nUsage: ssftpd [OPTIONS] [COMMAND] [ARGS...]" << std::endl;
     std::cout << "\nOptions:" << std::endl;
     std::cout << "  --help, -h           Show this help message" << std::endl;
     std::cout << "  --version, -v        Show version information" << std::endl;
@@ -80,18 +80,18 @@ void printUsage() {
     std::cout << "  status               Show SSL status" << std::endl;
     
     std::cout << "\nExamples:" << std::endl;
-    std::cout << "  simple-ftpd start --config /etc/simple-ftpd/config.json" << std::endl;
-    std::cout << "  simple-ftpd user add --username john --password secret --home /home/john" << std::endl;
-    std::cout << "  simple-ftpd virtual add --hostname ftp.example.com --root /var/ftp/example" << std::endl;
-    std::cout << "  simple-ftpd ssl generate --hostname ftp.example.com" << std::endl;
-    std::cout << "  simple-ftpd --daemon start" << std::endl;
+    std::cout << "  ssftpd start --config /etc/ssftpd/config.json" << std::endl;
+    std::cout << "  ssftpd user add --username john --password secret --home /home/john" << std::endl;
+    std::cout << "  ssftpd virtual add --hostname ftp.example.com --root /var/ftp/example" << std::endl;
+    std::cout << "  ssftpd ssl generate --hostname ftp.example.com" << std::endl;
+    std::cout << "  ssftpd --daemon start" << std::endl;
 }
 
 /**
  * @brief Print version information
  */
 void printVersion() {
-    std::cout << "simple-ftpd v0.1.0" << std::endl;
+    std::cout << "ssftpd v0.1.0" << std::endl;
     std::cout << "Simple FTP Daemon for Linux, macOS, and Windows" << std::endl;
     std::cout << "Copyright (c) 2024 SimpleDaemons" << std::endl;
 }
@@ -362,9 +362,9 @@ int main(int argc, char* argv[]) {
     // Set default configuration file if none specified
     if (config_file.empty()) {
         #ifdef _WIN32
-        config_file = "C:\\Program Files\\simple-ftpd\\config\\simple-ftpd.conf";
+        config_file = "C:\\Program Files\\ssftpd\\config\\ssftpd.conf";
         #else
-        config_file = "/etc/simple-ftpd/simple-ftpd.conf";
+        config_file = "/etc/ssftpd/ssftpd.conf";
         #endif
     }
     

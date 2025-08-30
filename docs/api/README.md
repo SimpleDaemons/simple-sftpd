@@ -1,6 +1,6 @@
 # API Reference
 
-This document provides the complete API reference for Simple FTP Daemon, including all classes, methods, and data structures.
+This document provides the complete API reference for Simple-Secure FTP Daemon, including all classes, methods, and data structures.
 
 ## 📚 Core Classes
 
@@ -392,18 +392,18 @@ try {
 
 ### Basic Server Setup
 ```cpp
-#include "simple-ftpd/ftp_server.hpp"
-#include "simple-ftpd/ftp_server_config.hpp"
-#include "simple-ftpd/logger.hpp"
+#include "ssftpd/ftp_server.hpp"
+#include "ssftpd/ftp_server_config.hpp"
+#include "ssftpd/logger.hpp"
 
 int main() {
     // Create configuration
     auto config = std::make_shared<simple_ftpd::FTPServerConfig>();
-    config->loadFromFile("/etc/simple-ftpd/simple-ftpd.conf");
+    config->loadFromFile("/etc/ssftpd/ssftpd.conf");
     
     // Create logger
     auto logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/simple-ftpd/simple-ftpd.log",
+        "/var/log/ssftpd/ssftpd.log",
         simple_ftpd::LogLevel::INFO
     );
     
@@ -423,7 +423,7 @@ int main() {
 
 ### User Management
 ```cpp
-#include "simple-ftpd/ftp_user.hpp"
+#include "ssftpd/ftp_user.hpp"
 
 // Create user
 auto user = std::make_shared<simple_ftpd::FTPUser>("john");
@@ -445,7 +445,7 @@ if (user->verifyPassword("secret123")) {
 
 ### Virtual Host Configuration
 ```cpp
-#include "simple-ftpd/ftp_virtual_host.hpp"
+#include "ssftpd/ftp_virtual_host.hpp"
 
 // Create virtual host
 auto vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("ftp.example.com");

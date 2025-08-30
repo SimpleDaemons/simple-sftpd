@@ -1,6 +1,6 @@
 # Examples
 
-This section provides practical examples and code samples for using Simple FTP Daemon in various scenarios.
+This section provides practical examples and code samples for using Simple-Secure FTP Daemon in various scenarios.
 
 ## 🚀 Quick Start Examples
 
@@ -8,8 +8,8 @@ This section provides practical examples and code samples for using Simple FTP D
 
 #### Minimal Server Configuration
 ```cpp
-#include "simple-ftpd/ftp_server.hpp"
-#include "simple-ftpd/ftp_server_config.hpp"
+#include "ssftpd/ftp_server.hpp"
+#include "ssftpd/ftp_server_config.hpp"
 
 int main() {
     // Create minimal configuration
@@ -37,12 +37,12 @@ int main() {
 
 #### Server with Configuration File
 ```cpp
-#include "simple-ftpd/ftp_server.hpp"
-#include "simple-ftpd/ftp_server_config.hpp"
-#include "simple-ftpd/logger.hpp"
+#include "ssftpd/ftp_server.hpp"
+#include "ssftpd/ftp_server_config.hpp"
+#include "ssftpd/logger.hpp"
 
 int main(int argc, char* argv[]) {
-    std::string config_file = "/etc/simple-ftpd/simple-ftpd.conf";
+    std::string config_file = "/etc/ssftpd/ssftpd.conf";
     
     // Parse command line arguments
     for (int i = 1; i < argc; i++) {
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
     
     // Create logger
     auto logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/simple-ftpd/simple-ftpd.log",
+        "/var/log/ssftpd/ssftpd.log",
         simple_ftpd::LogLevel::INFO
     );
     
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 
 #### Basic User Creation
 ```cpp
-#include "simple-ftpd/ftp_user.hpp"
+#include "ssftpd/ftp_user.hpp"
 
 void createBasicUser() {
     // Create user
@@ -126,7 +126,7 @@ void createBasicUser() {
 
 #### Advanced User with All Permissions
 ```cpp
-#include "simple-ftpd/ftp_user.hpp"
+#include "ssftpd/ftp_user.hpp"
 
 void createAdminUser() {
     auto admin = std::make_shared<simple_ftpd::FTPUser>("admin");
@@ -171,7 +171,7 @@ void createAdminUser() {
 
 #### User with Restricted Access
 ```cpp
-#include "simple-ftpd/ftp_user.hpp"
+#include "ssftpd/ftp_user.hpp"
 
 void createRestrictedUser() {
     auto guest = std::make_shared<simple_ftpd::FTPUser>("guest");
@@ -201,7 +201,7 @@ void createRestrictedUser() {
 
 #### Anonymous User
 ```cpp
-#include "simple-ftpd/ftp_user.hpp"
+#include "ssftpd/ftp_user.hpp"
 
 void createAnonymousUser() {
     auto anon = std::make_shared<simple_ftpd::FTPUser>("anonymous");
@@ -235,7 +235,7 @@ void createAnonymousUser() {
 
 #### Single Domain Virtual Host
 ```cpp
-#include "simple-ftpd/ftp_virtual_host.hpp"
+#include "ssftpd/ftp_virtual_host.hpp"
 
 void createBasicVirtualHost() {
     auto vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("ftp.example.com");
@@ -264,7 +264,7 @@ void createBasicVirtualHost() {
 
 #### Multi-Domain Virtual Hosts
 ```cpp
-#include "simple-ftpd/ftp_virtual_host.hpp"
+#include "ssftpd/ftp_virtual_host.hpp"
 
 void createMultiDomainSetup() {
     // Example.com virtual host
@@ -293,7 +293,7 @@ void createMultiDomainSetup() {
 
 #### SSL-Enabled Virtual Host
 ```cpp
-#include "simple-ftpd/ftp_virtual_host.hpp"
+#include "ssftpd/ftp_virtual_host.hpp"
 
 void createSSLVirtualHost() {
     auto ssl_vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("secure.example.com");
@@ -334,7 +334,7 @@ void createSSLVirtualHost() {
 
 #### Mixed HTTP/FTP Virtual Host
 ```cpp
-#include "simple-ftpd/ftp_virtual_host.hpp"
+#include "ssftpd/ftp_virtual_host.hpp"
 
 void createMixedVirtualHost() {
     auto mixed_vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("files.example.com");
@@ -374,7 +374,7 @@ void createMixedVirtualHost() {
 
 #### Chroot Jail Setup
 ```cpp
-#include "simple-ftpd/ftp_virtual_host.hpp"
+#include "ssftpd/ftp_virtual_host.hpp"
 
 void createSecureChrootJail() {
     auto secure_vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("secure.example.com");
@@ -424,7 +424,7 @@ void createSecureChrootJail() {
 
 #### Rate Limiting and DDoS Protection
 ```cpp
-#include "simple-ftpd/ftp_server_config.hpp"
+#include "ssftpd/ftp_server_config.hpp"
 
 void configureRateLimiting() {
     auto config = std::make_shared<simple_ftpd::FTPServerConfig>();
@@ -466,12 +466,12 @@ void configureRateLimiting() {
 
 #### Structured Logging Setup
 ```cpp
-#include "simple-ftpd/logger.hpp"
+#include "ssftpd/logger.hpp"
 
 void setupAdvancedLogging() {
     // Create main logger
     auto main_logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/simple-ftpd/simple-ftpd.log",
+        "/var/log/ssftpd/ssftpd.log",
         simple_ftpd::LogLevel::INFO,
         true,  // log to console
         true   // log to file
@@ -484,7 +484,7 @@ void setupAdvancedLogging() {
     
     // Create transfer logger
     auto transfer_logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/simple-ftpd/transfers.log",
+        "/var/log/ssftpd/transfers.log",
         simple_ftpd::LogLevel::INFO,
         false, // don't log to console
         true   // log to file
@@ -495,7 +495,7 @@ void setupAdvancedLogging() {
     
     // Create security logger
     auto security_logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/simple-ftpd/security.log",
+        "/var/log/ssftpd/security.log",
         simple_ftpd::LogLevel::WARN,
         false, // don't log to console
         true   // log to file
@@ -511,7 +511,7 @@ void setupAdvancedLogging() {
 
 #### Custom Log Format
 ```cpp
-#include "simple-ftpd/logger.hpp"
+#include "ssftpd/logger.hpp"
 
 void setupCustomLogging() {
     auto logger = std::make_shared<simple_ftpd::Logger>();
@@ -545,8 +545,8 @@ void setupCustomLogging() {
 
 #### Performance Metrics Collection
 ```cpp
-#include "simple-ftpd/logger.hpp"
-#include "simple-ftpd/ftp_server.hpp"
+#include "ssftpd/logger.hpp"
+#include "ssftpd/ftp_server.hpp"
 
 void setupPerformanceMonitoring() {
     auto logger = std::make_shared<simple_ftpd::Logger>();
@@ -585,8 +585,8 @@ void setupPerformanceMonitoring() {
 
 #### Hot Configuration Reload
 ```cpp
-#include "simple-ftpd/ftp_server.hpp"
-#include "simple-ftpd/ftp_server_config.hpp"
+#include "ssftpd/ftp_server.hpp"
+#include "ssftpd/ftp_server_config.hpp"
 #include <filesystem>
 
 void setupHotReload() {
@@ -595,7 +595,7 @@ void setupHotReload() {
     
     // Start configuration file watcher
     std::thread config_watcher([&]() {
-        std::string config_file = "/etc/simple-ftpd/simple-ftpd.conf";
+        std::string config_file = "/etc/ssftpd/ssftpd.conf";
         std::filesystem::file_time_type last_modified = 
             std::filesystem::last_write_time(config_file);
         
@@ -639,7 +639,7 @@ void setupHotReload() {
 
 #### Configuration Validation
 ```cpp
-#include "simple-ftpd/ftp_server_config.hpp"
+#include "ssftpd/ftp_server_config.hpp"
 
 bool validateConfiguration(const std::string& config_file) {
     auto config = std::make_shared<simple_ftpd::FTPServerConfig>();
@@ -689,7 +689,7 @@ bool validateConfiguration(const std::string& config_file) {
 #### User Class Testing
 ```cpp
 #include <gtest/gtest.h>
-#include "simple-ftpd/ftp_user.hpp"
+#include "ssftpd/ftp_user.hpp"
 
 class FTPUserTest : public ::testing::Test {
 protected:
@@ -734,7 +734,7 @@ TEST_F(FTPUserTest, HomeDirectory) {
 #### Virtual Host Testing
 ```cpp
 #include <gtest/gtest.h>
-#include "simple-ftpd/ftp_virtual_host.hpp"
+#include "ssftpd/ftp_virtual_host.hpp"
 
 class FTPVirtualHostTest : public ::testing::Test {
 protected:
@@ -789,8 +789,8 @@ TEST_F(FTPVirtualHostTest, UserAccess) {
 #### Server Integration Test
 ```cpp
 #include <gtest/gtest.h>
-#include "simple-ftpd/ftp_server.hpp"
-#include "simple-ftpd/ftp_server_config.hpp"
+#include "ssftpd/ftp_server.hpp"
+#include "ssftpd/ftp_server_config.hpp"
 
 class FTPServerIntegrationTest : public ::testing::Test {
 protected:
@@ -862,30 +862,30 @@ TEST_F(FTPServerIntegrationTest, VirtualHostManagement) {
 
 #### Systemd Service File
 ```ini
-# /etc/systemd/system/simple-ftpd.service
+# /etc/systemd/system/ssftpd.service
 [Unit]
-Description=Simple FTP Daemon
-Documentation=man:simple-ftpd(8)
+Description=Simple-Secure FTP Daemon
+Documentation=man:ssftpd(8)
 After=network.target
 
 [Service]
 Type=notify
 User=ftp
 Group=ftp
-ExecStart=/usr/bin/simple-ftpd --config /etc/simple-ftpd/simple-ftpd.conf
+ExecStart=/usr/bin/ssftpd --config /etc/ssftpd/ssftpd.conf
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=5
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=simple-ftpd
+SyslogIdentifier=ssftpd
 
 # Security settings
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/var/ftp /var/log/simple-ftpd
+ReadWritePaths=/var/ftp /var/log/ssftpd
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 
 # Resource limits
@@ -899,42 +899,42 @@ WantedBy=multi-user.target
 #### Systemd Service Management
 ```bash
 #!/bin/bash
-# /usr/local/bin/simple-ftpd-ctl
+# /usr/local/bin/ssftpd-ctl
 
-SERVICE_NAME="simple-ftpd"
-CONFIG_FILE="/etc/simple-ftpd/simple-ftpd.conf"
+SERVICE_NAME="ssftpd"
+CONFIG_FILE="/etc/ssftpd/ssftpd.conf"
 
 case "$1" in
     start)
-        echo "Starting Simple FTP Daemon..."
+        echo "Starting Simple-Secure FTP Daemon..."
         systemctl start $SERVICE_NAME
         ;;
     stop)
-        echo "Stopping Simple FTP Daemon..."
+        echo "Stopping Simple-Secure FTP Daemon..."
         systemctl stop $SERVICE_NAME
         ;;
     restart)
-        echo "Restarting Simple FTP Daemon..."
+        echo "Restarting Simple-Secure FTP Daemon..."
         systemctl restart $SERVICE_NAME
         ;;
     reload)
-        echo "Reloading Simple FTP Daemon configuration..."
+        echo "Reloading Simple-Secure FTP Daemon configuration..."
         systemctl reload $SERVICE_NAME
         ;;
     status)
         systemctl status $SERVICE_NAME
         ;;
     enable)
-        echo "Enabling Simple FTP Daemon to start on boot..."
+        echo "Enabling Simple-Secure FTP Daemon to start on boot..."
         systemctl enable $SERVICE_NAME
         ;;
     disable)
-        echo "Disabling Simple FTP Daemon from starting on boot..."
+        echo "Disabling Simple-Secure FTP Daemon from starting on boot..."
         systemctl disable $SERVICE_NAME
         ;;
     config-test)
         echo "Testing configuration file..."
-        /usr/bin/simple-ftpd --config $CONFIG_FILE --test-config
+        /usr/bin/ssftpd --config $CONFIG_FILE --test-config
         ;;
     *)
         echo "Usage: $0 {start|stop|restart|reload|status|enable|disable|config-test}"
@@ -961,10 +961,10 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone and build Simple FTP Daemon
+# Clone and build Simple-Secure FTP Daemon
 WORKDIR /opt
-RUN git clone https://github.com/simple-ftpd/simple-ftpd.git
-WORKDIR /opt/simple-ftpd
+RUN git clone https://github.com/ssftpd/ssftpd.git
+WORKDIR /opt/ssftpd
 RUN mkdir build && cd build \
     && cmake .. \
     && make -j$(nproc) \
@@ -972,12 +972,12 @@ RUN mkdir build && cd build \
 
 # Create FTP user and directories
 RUN useradd -r -s /bin/false ftp \
-    && mkdir -p /var/ftp /var/log/simple-ftpd \
-    && chown ftp:ftp /var/ftp /var/log/simple-ftpd
+    && mkdir -p /var/ftp /var/log/ssftpd \
+    && chown ftp:ftp /var/ftp /var/log/ssftpd
 
 # Copy configuration
-COPY simple-ftpd.conf /etc/simple-ftpd/simple-ftpd.conf
-RUN chown ftp:ftp /etc/simple-ftpd/simple-ftpd.conf
+COPY ssftpd.conf /etc/ssftpd/ssftpd.conf
+RUN chown ftp:ftp /etc/ssftpd/ssftpd.conf
 
 # Expose ports
 EXPOSE 21 49152-65535
@@ -986,7 +986,7 @@ EXPOSE 21 49152-65535
 USER ftp
 
 # Start the server
-CMD ["/usr/local/bin/simple-ftpd", "--config", "/etc/simple-ftpd/simple-ftpd.conf"]
+CMD ["/usr/local/bin/ssftpd", "--config", "/etc/ssftpd/ssftpd.conf"]
 ```
 
 #### Docker Compose
@@ -994,16 +994,16 @@ CMD ["/usr/local/bin/simple-ftpd", "--config", "/etc/simple-ftpd/simple-ftpd.con
 version: '3.8'
 
 services:
-  simple-ftpd:
+  ssftpd:
     build: .
-    container_name: simple-ftpd
+    container_name: ssftpd
     ports:
       - "21:21"
       - "49152-65535:49152-65535"
     volumes:
-      - ./config:/etc/simple-ftpd
+      - ./config:/etc/ssftpd
       - ./ftp-data:/var/ftp
-      - ./logs:/var/log/simple-ftpd
+      - ./logs:/var/log/ssftpd
     environment:
       - TZ=UTC
     restart: unless-stopped
@@ -1019,7 +1019,7 @@ services:
       - ./admin-html:/usr/share/nginx/html
       - ./admin-config:/etc/nginx/conf.d
     depends_on:
-      - simple-ftpd
+      - ssftpd
     restart: unless-stopped
     networks:
       - ftp-network

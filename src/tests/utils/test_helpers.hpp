@@ -7,7 +7,7 @@
 #include <functional>
 #include <filesystem>
 
-namespace simple_ftpd {
+namespace ssftpd {
 namespace test {
 
 // Test data types
@@ -91,6 +91,6 @@ TestUser generateTestUser(const std::string& username);
 TestVirtualHost generateTestVirtualHost(const std::string& hostname);
 
 } // namespace test
-} // namespace simple_ftpd
+} // namespace ssftpd
 
 #endif // SIMPLE_FTPD_TEST_HELPERS_HPP
