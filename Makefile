@@ -1,5 +1,5 @@
 # Makefile for ssftpd
-# Simple FTP Daemon - A secure and configurable FTP server
+# Simple-Secure FTP Daemon - A simple-secure and configurable FTP server
 
 # Variables
 PROJECT_NAME = ssftpd
