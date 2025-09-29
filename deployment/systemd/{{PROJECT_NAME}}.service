@@ -1,0 +1,17 @@
+[Unit]
+Description=Simple Secure FTP Daemon - A secure, configurable, and feature-rich FTP server
+After=network.target
+
+[Service]
+Type=simple
+User=simple-sftpd
+Group=simple-sftpd
+ExecStart=/usr/local/bin/simple-sftpd
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=simple-sftpd
+
+[Install]
+WantedBy=multi-user.target

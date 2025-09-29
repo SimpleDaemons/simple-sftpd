@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Simple FTP Daemon - macOS Build Script
-# This script builds and packages the application for macOS
+# simple-sftpd macOS Build Script
+# This script builds the simple-sftpd application for macOS
 
 set -e
 
@@ -19,306 +19,391 @@ BUILD_DIR="$PROJECT_ROOT/build"
 DIST_DIR="$PROJECT_ROOT/dist"
 VERSION="0.1.0"
 
-# Platform detection
-ARCH=$(uname -m)
-if [[ "$ARCH" == "arm64" ]]; then
-    PLATFORM="macOS-ARM64"
-    CMAKE_ARCH="arm64"
-elif [[ "$ARCH" == "x86_64" ]]; then
-    PLATFORM="macOS-x86_64"
-    CMAKE_ARCH="x86_64"
-else
-    echo -e "${RED}Error: Unsupported architecture: $ARCH${NC}"
-    exit 1
-fi
+# Build options
+BUILD_TYPE="Release"
+BUILD_SHARED_LIBS="OFF"
+BUILD_TESTS="ON"
+ENABLE_SSL="ON"
+ENABLE_JSON="ON"
+ENABLE_STATIC_LINKING="OFF"
+PACKAGE="false"
+INSTALL="false"
+CLEAN="false"
 
-# Functions
-print_header() {
-    echo -e "${BLUE}================================${NC}"
-    echo -e "${BLUE}  Simple FTP Daemon Build${NC}"
-    echo -e "${BLUE}  Platform: $PLATFORM${NC}"
-    echo -e "${BLUE}  Version: $VERSION${NC}"
-    echo -e "${BLUE}================================${NC}"
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
 }
 
-print_step() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
 print_warning() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
+    echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
 print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-check_dependencies() {
-    print_step "Checking build dependencies..."
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to check macOS version
+check_macos_version() {
+    print_status "Checking macOS version..."
     
-    # Check for Homebrew
-    if ! command -v brew &> /dev/null; then
-        print_error "Homebrew is not installed. Please install it first:"
-        echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+    # Get macOS version
+    MACOS_VERSION=$(sw_vers -productVersion)
+    MACOS_MAJOR=$(echo "$MACOS_VERSION" | cut -d. -f1)
+    MACOS_MINOR=$(echo "$MACOS_VERSION" | cut -d. -f2)
+    
+    print_status "macOS version: $MACOS_VERSION"
+    
+    # Check if running on macOS 10.15 or later
+    if [ "$MACOS_MAJOR" -lt 10 ] || ([ "$MACOS_MAJOR" -eq 10 ] && [ "$MACOS_MINOR" -lt 15 ]); then
+        print_warning "macOS 10.15 or later recommended for best compatibility"
+    fi
+}
+
+# Function to check Xcode Command Line Tools
+check_xcode_tools() {
+    print_status "Checking Xcode Command Line Tools..."
+    
+    if ! command_exists xcode-select; then
+        print_error "Xcode Command Line Tools not found"
+        print_status "Please install Xcode Command Line Tools:"
+        print_status "xcode-select --install"
         exit 1
     fi
     
-    # Check for required tools
-    local missing_tools=()
-    
-    if ! command -v cmake &> /dev/null; then
-        missing_tools+=("cmake")
+    # Check if Xcode Command Line Tools are installed
+    if ! xcode-select -p >/dev/null 2>&1; then
+        print_error "Xcode Command Line Tools not properly installed"
+        print_status "Please install Xcode Command Line Tools:"
+        print_status "xcode-select --install"
+        exit 1
     fi
     
-    if ! command -v make &> /dev/null; then
-        missing_tools+=("make")
-    fi
-    
-    if ! command -v git &> /dev/null; then
-        missing_tools+=("git")
-    fi
-    
-    # Check for required libraries
-    if ! brew list openssl &> /dev/null; then
-        missing_tools+=("openssl")
-    fi
-    
-    if ! brew list jsoncpp &> /dev/null; then
-        missing_tools+=("jsoncpp")
-    fi
-    
-    if ! brew list pkg-config &> /dev/null; then
-        missing_tools+=("pkg-config")
-    fi
-    
-    # Install missing tools
-    if [[ ${#missing_tools[@]} -gt 0 ]]; then
-        print_warning "Installing missing dependencies: ${missing_tools[*]}"
-        brew install "${missing_tools[@]}"
-    fi
-    
-    print_step "All dependencies are available"
+    print_success "Xcode Command Line Tools found"
 }
 
+# Function to check Homebrew
+check_homebrew() {
+    print_status "Checking Homebrew installation..."
+    
+    if ! command_exists brew; then
+        print_error "Homebrew not found"
+        print_status "Please install Homebrew from https://brew.sh/"
+        exit 1
+    fi
+    
+    print_success "Homebrew found: $(brew --version | head -n1)"
+}
+
+# Function to install dependencies
+install_dependencies() {
+    print_status "Installing build dependencies using Homebrew..."
+    
+    # Update Homebrew
+    brew update
+    
+    # Install build tools
+    brew install cmake pkg-config git wget curl
+    
+    # Install development libraries
+    brew install openssl jsoncpp
+    
+    # Install optional development tools
+    brew install clang-format cppcheck valgrind gdb lcov
+    
+    print_success "Dependencies installed successfully"
+}
+
+# Function to clean build directory
 clean_build() {
-    print_step "Cleaning previous build artifacts..."
-    
-    if [[ -d "$BUILD_DIR" ]]; then
+    if [ "$CLEAN" = "true" ]; then
+        print_status "Cleaning build directory..."
         rm -rf "$BUILD_DIR"
-    fi
-    
-    if [[ -d "$DIST_DIR" ]]; then
         rm -rf "$DIST_DIR"
-    fi
-    
-    mkdir -p "$BUILD_DIR" "$DIST_DIR"
-}
-
-configure_build() {
-    print_step "Configuring build with CMake..."
-    
-    cd "$BUILD_DIR"
-    
-    cmake .. \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_OSX_ARCHITECTURES="$CMAKE_ARCH" \
-        -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 \
-        -DBUILD_SHARED_LIBS=ON \
-        -DBUILD_TESTS=ON \
-        -DBUILD_EXAMPLES=OFF \
-        -DENABLE_LOGGING=ON \
-        -DENABLE_SSL=ON \
-        -DUSE_SYSTEM_LIBS=ON
-    
-    if [[ $? -ne 0 ]]; then
-        print_error "CMake configuration failed"
-        exit 1
+        print_success "Build directory cleaned"
     fi
 }
 
+# Function to build project
 build_project() {
-    print_step "Building project..."
+    print_status "Building simple-sftpd..."
     
+    # Create build directory
+    mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
     
-    # Get number of CPU cores for parallel build
-    local cpu_cores=$(sysctl -n hw.ncpu)
+    # Configure CMake
+    cmake .. \
+        -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+        -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
+        -DENABLE_TESTS="$BUILD_TESTS" \
+        -DENABLE_SSL="$ENABLE_SSL" \
+        -DENABLE_JSON="$ENABLE_JSON" \
+        -DENABLE_STATIC_LINKING="$ENABLE_STATIC_LINKING" \
+        -DENABLE_PACKAGING=ON
     
-    make -j"$cpu_cores"
+    # Build project
+    make -j$(sysctl -n hw.ncpu)
     
-    if [[ $? -ne 0 ]]; then
-        print_error "Build failed"
-        exit 1
-    fi
-    
-    print_step "Build completed successfully"
+    print_success "Build completed successfully"
 }
 
+# Function to run tests
 run_tests() {
-    print_step "Running tests..."
-    
-    cd "$BUILD_DIR"
-    
-    if make test; then
-        print_step "All tests passed"
-    else
-        print_warning "Some tests failed, but continuing with packaging"
-    fi
-}
-
-create_packages() {
-    print_step "Creating macOS packages..."
-    
-    cd "$BUILD_DIR"
-    
-    # Create DMG package
-    if cpack -G DragNDrop; then
-        local dmg_file=$(find . -name "*.dmg" -type f | head -1)
-        if [[ -n "$dmg_file" ]]; then
-            mv "$dmg_file" "$DIST_DIR/"
-            print_step "DMG package created: $(basename "$dmg_file")"
-        fi
-    else
-        print_warning "Failed to create DMG package"
-    fi
-    
-    # Create PKG package
-    if cpack -G productbuild; then
-        local pkg_file=$(find . -name "*.pkg" -type f | head -1)
-        if [[ -n "$pkg_file" ]]; then
-            mv "$pkg_file" "$DIST_DIR/"
-            print_step "PKG package created: $(basename "$pkg_file")"
-        fi
-    else
-        print_warning "Failed to create PKG package"
-    fi
-    
-    # Create source archive
-    cd "$PROJECT_ROOT"
-    local source_archive="ssftpd-${VERSION}-source.tar.gz"
-    if git archive --format=tar.gz --prefix="ssftpd-${VERSION}/" HEAD > "$DIST_DIR/$source_archive"; then
-        print_step "Source archive created: $source_archive"
-    fi
-}
-
-install_package() {
-    print_step "Installing package for testing..."
-    
-    cd "$BUILD_DIR"
-    
-    if sudo make install; then
-        print_step "Package installed successfully"
+    if [ "$BUILD_TESTS" = "ON" ]; then
+        print_status "Running tests..."
+        cd "$BUILD_DIR"
         
-        # Test the installation
-        if command -v ssftpd &> /dev/null; then
-            print_step "Installation verification successful"
-            ssftpd --version
+        if make test; then
+            print_success "All tests passed"
         else
-            print_warning "Installation verification failed - binary not found in PATH"
+            print_warning "Some tests failed, but continuing..."
         fi
-    else
-        print_error "Package installation failed"
-        exit 1
     fi
 }
 
-create_checksums() {
-    print_step "Creating checksums for packages..."
-    
-    cd "$DIST_DIR"
-    
-    for file in *; do
-        if [[ -f "$file" ]]; then
-            shasum -a 256 "$file" > "$file.sha256"
-            print_step "Created checksum for: $file"
+# Function to install project
+install_project() {
+    if [ "$INSTALL" = "true" ]; then
+        print_status "Installing simple-sftpd..."
+        cd "$BUILD_DIR"
+        
+        make install
+        
+        # Test installation
+        if command_exists simple-sftpd; then
+            print_success "Installation successful"
+            simple-sftpd --version
+        else
+            print_error "Installation failed - binary not found in PATH"
+            exit 1
         fi
-    done
+    fi
 }
 
-print_summary() {
-    echo
-    echo -e "${BLUE}================================${NC}"
-    echo -e "${BLUE}  Build Summary${NC}"
-    echo -e "${BLUE}================================${NC}"
-    echo -e "Platform: ${GREEN}$PLATFORM${NC}"
-    echo -e "Version: ${GREEN}$VERSION${NC}"
-    echo -e "Build Directory: ${GREEN}$BUILD_DIR${NC}"
-    echo -e "Distribution Directory: ${GREEN}$DIST_DIR${NC}"
-    echo
-    
-    if [[ -d "$DIST_DIR" ]]; then
-        echo -e "${GREEN}Created packages:${NC}"
-        for file in "$DIST_DIR"/*; do
-            if [[ -f "$file" ]]; then
-                local size=$(du -h "$file" | cut -f1)
-                echo -e "  $(basename "$file") (${size})"
-            fi
-        done
+# Function to create packages
+create_packages() {
+    if [ "$PACKAGE" = "true" ]; then
+        print_status "Creating macOS packages..."
+        cd "$BUILD_DIR"
+        
+        # Create distribution directory
+        mkdir -p "$DIST_DIR"
+        
+        # Create packages using CPack
+        cpack
+        
+        # Move packages to dist directory
+        mv *.dmg *.pkg "$DIST_DIR/" 2>/dev/null || true
+        
+        print_success "Packages created in $DIST_DIR"
+        ls -la "$DIST_DIR"
     fi
-    
-    echo
-    echo -e "${GREEN}Build completed successfully!${NC}"
-    echo -e "Packages are available in: ${GREEN}$DIST_DIR${NC}"
 }
 
-# Main build process
-main() {
-    print_header
-    
-    # Check if we're on macOS
-    if [[ "$(uname)" != "Darwin" ]]; then
-        print_error "This script is designed for macOS only"
-        exit 1
+# Function to create static binary package
+create_static_package() {
+    if [ "$ENABLE_STATIC_LINKING" = "ON" ]; then
+        print_status "Creating static binary package..."
+        
+        # Create distribution directory
+        mkdir -p "$DIST_DIR"
+        
+        # Create static binary directory
+        STATIC_DIR="$DIST_DIR/simple-sftpd-$VERSION-static-macos"
+        mkdir -p "$STATIC_DIR"
+        
+        # Copy binary and files
+        cp "$BUILD_DIR/simple-sftpd" "$STATIC_DIR/"
+        cp "$PROJECT_ROOT/README.md" "$STATIC_DIR/"
+        cp "$PROJECT_ROOT/LICENSE" "$STATIC_DIR/"
+        cp -r "$PROJECT_ROOT/config" "$STATIC_DIR/" 2>/dev/null || true
+        
+        # Create tarball
+        cd "$DIST_DIR"
+        tar -czf "simple-sftpd-$VERSION-static-macos.tar.gz" "simple-sftpd-$VERSION-static-macos"
+        rm -rf "simple-sftpd-$VERSION-static-macos"
+        
+        print_success "Static binary package created: simple-sftpd-$VERSION-static-macos.tar.gz"
     fi
-    
-    # Parse command line arguments
-    local install_pkg=false
-    local skip_tests=false
-    
+}
+
+# Function to show usage
+show_usage() {
+    cat << EOF
+simple-sftpd - macOS Build Script
+
+Usage: $0 [OPTIONS]
+
+Options:
+    -h, --help              Show this help message
+    -d, --deps              Install dependencies only
+    -b, --build             Build project only
+    -t, --test              Run tests only
+    -i, --install           Install project only
+    -p, --package           Create packages only
+    -a, --all               Full build and install (default)
+    --static                Build static binary
+    --debug                 Build in debug mode
+    --clean                 Clean build directory before building
+    --no-tests              Disable tests
+    --no-ssl                Disable SSL support
+    --no-json               Disable JSON support
+
+Examples:
+    $0                      # Full build and install
+    $0 --deps               # Install dependencies only
+    $0 --build --test       # Build and test
+    $0 --static --package   # Build static binary and create packages
+    $0 --clean --all        # Clean build and full install
+
+EOF
+}
+
+# Function to parse command line arguments
+parse_arguments() {
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --install)
-                install_pkg=true
-                shift
-                ;;
-            --skip-tests)
-                skip_tests=true
-                shift
-                ;;
-            --help|-h)
-                echo "Usage: $0 [OPTIONS]"
-                echo "Options:"
-                echo "  --install      Install package after building"
-                echo "  --skip-tests   Skip running tests"
-                echo "  --help, -h     Show this help message"
+            -h|--help)
+                show_usage
                 exit 0
+                ;;
+            -d|--deps)
+                DEPENDENCIES_ONLY=true
+                shift
+                ;;
+            -b|--build)
+                BUILD_ONLY=true
+                shift
+                ;;
+            -t|--test)
+                TEST_ONLY=true
+                shift
+                ;;
+            -i|--install)
+                INSTALL_ONLY=true
+                shift
+                ;;
+            -p|--package)
+                PACKAGE_ONLY=true
+                shift
+                ;;
+            -a|--all)
+                ALL=true
+                shift
+                ;;
+            --static)
+                ENABLE_STATIC_LINKING="ON"
+                shift
+                ;;
+            --debug)
+                BUILD_TYPE="Debug"
+                shift
+                ;;
+            --clean)
+                CLEAN="true"
+                shift
+                ;;
+            --no-tests)
+                BUILD_TESTS="OFF"
+                shift
+                ;;
+            --no-ssl)
+                ENABLE_SSL="OFF"
+                shift
+                ;;
+            --no-json)
+                ENABLE_JSON="OFF"
+                shift
                 ;;
             *)
                 print_error "Unknown option: $1"
-                echo "Use --help for usage information"
+                show_usage
                 exit 1
                 ;;
         esac
     done
     
-    # Execute build steps
-    check_dependencies
+    # Set default action if none specified
+    if [ -z "$DEPENDENCIES_ONLY" ] && [ -z "$BUILD_ONLY" ] && [ -z "$TEST_ONLY" ] && 
+       [ -z "$INSTALL_ONLY" ] && [ -z "$PACKAGE_ONLY" ] && [ -z "$ALL" ]; then
+        ALL=true
+    fi
+}
+
+# Main execution
+main() {
+    print_status "Starting simple-sftpd build process..."
+    
+    # Parse command line arguments
+    parse_arguments "$@"
+    
+    # Check system requirements
+    check_macos_version
+    check_xcode_tools
+    check_homebrew
+    
+    # Install dependencies
+    if [ "$DEPENDENCIES_ONLY" = "true" ] || [ "$ALL" = "true" ]; then
+        install_dependencies
+        if [ "$DEPENDENCIES_ONLY" = "true" ]; then
+            print_success "Dependencies installed successfully"
+            exit 0
+        fi
+    fi
+    
+    # Clean build directory
     clean_build
-    configure_build
-    build_project
     
-    if [[ "$skip_tests" != "true" ]]; then
+    # Build project
+    if [ "$BUILD_ONLY" = "true" ] || [ "$ALL" = "true" ]; then
+        build_project
+        if [ "$BUILD_ONLY" = "true" ]; then
+            print_success "Build completed successfully"
+            exit 0
+        fi
+    fi
+    
+    # Run tests
+    if [ "$TEST_ONLY" = "true" ] || [ "$ALL" = "true" ]; then
         run_tests
+        if [ "$TEST_ONLY" = "true" ]; then
+            print_success "Tests completed"
+            exit 0
+        fi
     fi
     
-    create_packages
-    
-    if [[ "$install_pkg" == "true" ]]; then
-        install_package
+    # Install project
+    if [ "$INSTALL_ONLY" = "true" ] || [ "$ALL" = "true" ]; then
+        INSTALL="true"
+        install_project
+        if [ "$INSTALL_ONLY" = "true" ]; then
+            print_success "Installation completed successfully"
+            exit 0
+        fi
     fi
     
-    create_checksums
-    print_summary
+    # Create packages
+    if [ "$PACKAGE_ONLY" = "true" ] || [ "$ALL" = "true" ]; then
+        PACKAGE="true"
+        create_packages
+        create_static_package
+        if [ "$PACKAGE_ONLY" = "true" ]; then
+            print_success "Packages created successfully"
+            exit 0
+        fi
+    fi
+    
+    print_success "simple-sftpd build process completed successfully!"
 }
 
 # Run main function with all arguments

@@ -1,248 +1,136 @@
-# Docker Deployment Guide
+# simple-sftpd Docker Deployment
 
-This guide covers deploying ssftpd using Docker containers.
+This directory contains Docker deployment examples for simple-sftpd.
 
 ## Quick Start
 
-### 1. Clone the Repository
+1. **Build the Docker image:**
+   ```bash
+   docker build -t simple-sftpd:latest .
+   ```
 
-```bash
-git clone <repository-url>
-cd simple-sftpd
-```
+2. **Run with Docker Compose:**
+   ```bash
+   docker-compose up -d
+   ```
 
-### 2. Create Configuration Directory
-
-```bash
-mkdir -p deployment/examples/docker/config
-mkdir -p deployment/examples/docker/logs
-mkdir -p deployment/examples/docker/data
-cp config/examples/simple/ssftpd.conf.example deployment/examples/docker/config/ssftpd.conf
-```
-
-### 3. Build and Run
-
-```bash
-cd deployment/examples/docker
-docker-compose up -d
-```
-
-### 4. Verify Deployment
-
-```bash
-# Check container status
-docker-compose ps
-
-# Check logs
-docker-compose logs -f ssftpd
-
-# Test FTP service
-nc -z localhost 21
-```
+3. **Check status:**
+   ```bash
+   docker-compose ps
+   docker-compose logs simple-sftpd
+   ```
 
 ## Configuration
 
 ### Environment Variables
 
-The following environment variables can be set in the docker-compose.yml:
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SIMPLE-SFTPD_CONFIG` | `/etc/simple-sftpd/simple-sftpd.conf` | Configuration file path |
+| `SIMPLE-SFTPD_LOG_LEVEL` | `info` | Log level (debug, info, warn, error) |
+| `SIMPLE-SFTPD_BIND_ADDRESS` | `0.0.0.0` | Bind address |
+| `SIMPLE-SFTPD_BIND_PORT` | `21` | Bind port |
 
-- `FTP_ROOT_DIR`: FTP root directory (default: /var/ftp)
-- `FTP_CONFIG_FILE`: Configuration file path (default: /etc/ssftpd/ssftpd.conf)
-- `LOG_LEVEL`: Log level (default: INFO)
+### Volumes
 
-### Volume Mounts
+| Volume | Description |
+|--------|-------------|
+| `./config:/etc/simple-sftpd:ro` | Configuration files (read-only) |
+| `./data:/var/lib/simple-sftpd` | Data directory |
+| `./logs:/var/log/simple-sftpd` | Log files |
 
-- `./config:/etc/ssftpd:ro`: Configuration files (read-only)
-- `./logs:/var/log/ssftpd`: Log files
-- `./data:/var/ftp`: FTP data directory
-
-## Production Deployment
-
-### 1. Create Production Configuration
-
-```bash
-# Copy production config
-cp config/examples/production/enterprise.conf deployment/examples/docker/config/ssftpd.conf
-
-# Edit configuration
-nano deployment/examples/docker/config/ssftpd.conf
-```
-
-### 2. Set Resource Limits
-
-```yaml
-services:
-  ssftpd:
-    # ... existing configuration ...
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '1.0'
-        reservations:
-          memory: 256M
-          cpus: '0.5'
-```
-
-### 3. Enable Logging Driver
-
-```yaml
-services:
-  ssftpd:
-    # ... existing configuration ...
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-```
-
-## Monitoring
-
-### Health Checks
-
-The container includes a health check that verifies FTP service availability:
+## Docker Compose Commands
 
 ```bash
-# Check health status
-docker inspect --format='{{.State.Health.Status}}' ssftpd
+# Start services
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# View logs
+docker-compose logs -f simple-sftpd
+
+# Restart service
+docker-compose restart simple-sftpd
+
+# Update and restart
+docker-compose pull
+docker-compose up -d
+
+# Remove everything
+docker-compose down -v
 ```
 
-### Log Monitoring
+## Health Checks
 
-```bash
-# Follow logs in real-time
-docker-compose logs -f ssftpd
+The container includes health checks that verify the service is responding:
 
-# Search logs for errors
-docker-compose logs ssftpd | grep ERROR
+- **Check command:** `nc -z localhost 21`
+- **Interval:** 30 seconds
+- **Timeout:** 10 seconds
+- **Retries:** 3
+- **Start period:** 40 seconds
 
-# Export logs
-docker-compose logs ssftpd > ftp-logs.txt
-```
+## Networking
 
-## Troubleshooting
-
-### Common Issues
-
-1. **Port Already in Use**
-   ```bash
-   # Check what's using port 21
-   sudo lsof -i :21
-
-   # Stop conflicting service
-   sudo systemctl stop vsftpd
-   ```
-
-2. **Permission Issues**
-   ```bash
-   # Fix log directory permissions
-   sudo chown -R 1000:1000 deployment/examples/docker/logs
-   sudo chown -R 1000:1000 deployment/examples/docker/data
-   ```
-
-3. **Configuration Errors**
-   ```bash
-   # Validate configuration
-   docker-compose exec ssftpd ssftpd --test-config
-   ```
-
-### Debug Mode
-
-```bash
-# Run with debug logging
-docker-compose run --rm ssftpd ssftpd --verbose --foreground
-```
-
-## Scaling
-
-### Multiple Instances
-
-```yaml
-services:
-  ssftpd:
-    # ... existing configuration ...
-    deploy:
-      replicas: 3
-      endpoint_mode: dnsrr
-```
-
-### Load Balancing
-
-Use an external load balancer (HAProxy, nginx) to distribute FTP connections across multiple containers.
+The service uses a custom bridge network (`simple-sftpd-network`) with subnet `172.22.0.0/16`.
 
 ## Security Considerations
 
-- The container runs as a non-root user (ssftpd)
-- Configuration files are mounted as read-only
-- FTP ports (21, 990) and passive mode range (1024-65535) are exposed
-- Network isolation using custom bridge network
-- SSL/TLS support for secure file transfers
+1. **Run as non-root user** (configured in Dockerfile)
+2. **Read-only configuration** volume
+3. **Network isolation** with custom bridge
+4. **Resource limits** (configure as needed)
 
-## Backup and Recovery
+## Troubleshooting
 
-### Backup Configuration
-
+### Container won't start
 ```bash
-# Backup configuration
-docker cp ssftpd:/etc/ssftpd/ssftpd.conf ./backup/
+# Check logs
+docker-compose logs simple-sftpd
 
-# Backup FTP data
-docker cp ssftpd:/var/ftp ./backup/
+# Check configuration
+docker-compose exec simple-sftpd cat /etc/simple-sftpd/simple-sftpd.conf
 ```
 
-### Restore Configuration
-
+### Port conflicts
 ```bash
-# Restore configuration
-docker cp ./backup/ssftpd.conf ssftpd:/etc/ssftpd/
-docker cp ./backup/ftp ssftpd:/var/
+# Check what's using the port
+netstat -tlnp | grep 21
 
-# Restart service
-docker-compose restart ssftpd
+# Change port in docker-compose.yml
+ports:
+  - "8080:21/tcp"
 ```
 
-## Performance Tuning
-
-### Container Optimization
-
-```yaml
-services:
-  ssftpd:
-    # ... existing configuration ...
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-    sysctls:
-      - net.core.rmem_max=26214400
-      - net.core.wmem_max=26214400
+### Permission issues
+```bash
+# Fix volume permissions
+sudo chown -R 1000:1000 ./data ./logs
 ```
 
-### Host System Tuning
+## Production Deployment
 
+For production deployments, consider:
+
+1. **Use specific image tags** instead of `latest`
+2. **Set resource limits** in docker-compose.yml
+3. **Configure log rotation** for log volumes
+4. **Use secrets management** for sensitive configuration
+5. **Set up monitoring** and alerting
+6. **Configure backup** for data volumes
+
+## Examples
+
+### Development
 ```bash
-# Increase TCP buffer sizes
-echo 'net.core.rmem_max=26214400' >> /etc/sysctl.conf
-echo 'net.core.wmem_max=26214400' >> /etc/sysctl.conf
-sysctl -p
+# Override configuration for development
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
-## FTP Client Testing
-
-### Basic FTP Test
-
+### Production
 ```bash
-# Test FTP connection
-ftp localhost 21
-
-# Test FTPS connection (if SSL enabled)
-lftp -e "set ssl:verify-certificate no; open -p 990 localhost; ls; quit"
-```
-
-### Passive Mode Testing
-
-```bash
-# Test passive mode with specific port range
-ftp -p localhost 21
+# Use production configuration
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```

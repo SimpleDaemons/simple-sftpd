@@ -4,6 +4,10 @@
 #include <memory>
 #include <signal.h>
 #include <csignal>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "ssftpd/ftp_server.hpp"
 #include "ssftpd/ftp_server_config.hpp"
 #include "ssftpd/logger.hpp"
