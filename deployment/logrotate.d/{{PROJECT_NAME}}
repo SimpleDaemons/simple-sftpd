@@ -1,0 +1,14 @@
+/var/log/simple-sftpd/*.log {
+    daily
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    create 644 _simple-sftpd _simple-sftpd
+    postrotate
+        /bin/systemctl reload simple-sftpd > /dev/null 2>&1 || true
+    endscript
+    sharedscripts
+    su _simple-sftpd _simple-sftpd
+}

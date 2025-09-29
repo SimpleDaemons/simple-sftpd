@@ -1,283 +1,341 @@
-# Deployment Guide
+# simple-sftpd Deployment
 
-This directory contains everything needed to deploy the Simple TFTP Daemon in production environments, from simple single-instance setups to complex multi-instance enterprise deployments.
+This directory contains deployment configurations and examples for simple-sftpd.
 
 ## Directory Structure
 
 ```
 deployment/
-├── README.md                 # This file - deployment overview
-├── systemd/                  # systemd service files
-│   ├── simple-tftpd.service # Main service file
-│   ├── simple-tftpd@.service # Template for multiple instances
-│   └── simple-tftpd.target  # Target for managing instances
-├── init.d/                   # Traditional init.d scripts
-│   └── simple-tftpd         # init.d service script
-├── configs/                  # Configuration files
-│   ├── simple-tftpd.conf    # Main configuration
-│   └── instances/           # Instance-specific configs
-│       ├── firmware.conf    # Firmware distribution
-│       ├── pxe.conf         # PXE boot services
-│       └── secure.conf      # Secure restricted access
-├── examples/                 # Deployment examples
-│   ├── simple/              # Basic single-instance setup
-│   └── advanced/            # Multi-instance enterprise setup
-├── scripts/                  # Deployment scripts
-│   └── install.sh           # Automated installation script
-└── templates/                # Configuration templates
+├── systemd/                    # Linux systemd service files
+│   └── simple-sftpd.service
+├── launchd/                    # macOS launchd service files
+│   └── com.simple-sftpd.simple-sftpd.plist
+├── logrotate.d/                # Linux log rotation configuration
+│   └── simple-sftpd
+├── windows/                    # Windows service management
+│   └── simple-sftpd.service.bat
+└── examples/                   # Deployment examples
+    └── docker/                 # Docker deployment examples
+        ├── docker-compose.yml
+        └── README.md
 ```
 
-## Quick Start
+## Platform-Specific Deployment
 
-### Automated Installation
+### Linux (systemd)
+
+1. **Install the service file:**
+   ```bash
+   sudo cp deployment/systemd/simple-sftpd.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   ```
+
+2. **Create user and group:**
+   ```bash
+   sudo useradd --system --no-create-home --shell /bin/false simple-sftpd
+   ```
+
+3. **Enable and start the service:**
+   ```bash
+   sudo systemctl enable simple-sftpd
+   sudo systemctl start simple-sftpd
+   ```
+
+4. **Check status:**
+   ```bash
+   sudo systemctl status simple-sftpd
+   sudo journalctl -u simple-sftpd -f
+   ```
+
+### macOS (launchd)
+
+1. **Install the plist file:**
+   ```bash
+   sudo cp deployment/launchd/com.simple-sftpd.simple-sftpd.plist /Library/LaunchDaemons/
+   sudo chown root:wheel /Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist
+   ```
+
+2. **Load and start the service:**
+   ```bash
+   sudo launchctl load /Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist
+   sudo launchctl start com.simple-sftpd.simple-sftpd
+   ```
+
+3. **Check status:**
+   ```bash
+   sudo launchctl list | grep simple-sftpd
+   tail -f /var/log/simple-sftpd.log
+   ```
+
+### Windows
+
+1. **Run as Administrator:**
+   ```cmd
+   # Install service
+   deployment\windows\simple-sftpd.service.bat install
+   
+   # Start service
+   deployment\windows\simple-sftpd.service.bat start
+   
+   # Check status
+   deployment\windows\simple-sftpd.service.bat status
+   ```
+
+2. **Service management:**
+   ```cmd
+   # Stop service
+   deployment\windows\simple-sftpd.service.bat stop
+   
+   # Restart service
+   deployment\windows\simple-sftpd.service.bat restart
+   
+   # Uninstall service
+   deployment\windows\simple-sftpd.service.bat uninstall
+   ```
+
+## Log Rotation (Linux)
+
+1. **Install logrotate configuration:**
+   ```bash
+   sudo cp deployment/logrotate.d/simple-sftpd /etc/logrotate.d/
+   ```
+
+2. **Test logrotate configuration:**
+   ```bash
+   sudo logrotate -d /etc/logrotate.d/simple-sftpd
+   ```
+
+3. **Force log rotation:**
+   ```bash
+   sudo logrotate -f /etc/logrotate.d/simple-sftpd
+   ```
+
+## Docker Deployment
+
+See [examples/docker/README.md](examples/docker/README.md) for detailed Docker deployment instructions.
+
+### Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/simple-tftpd.git
-cd simple-tftpd
+# Build and run with Docker Compose
+cd deployment/examples/docker
+docker-compose up -d
 
-# Run the installation script
-sudo ./deployment/scripts/install.sh
+# Check status
+docker-compose ps
+docker-compose logs simple-sftpd
 ```
 
-### Manual Installation
+## Configuration
 
-1. **Install the binary**: `make install`
-2. **Copy service files**: Copy from `deployment/systemd/` or `deployment/init.d/`
-3. **Copy configurations**: Copy from `deployment/configs/`
-4. **Create directories**: Set up TFTP root and log directories
-5. **Start services**: Enable and start the service
+### Service Configuration
 
-## Deployment Options
+Each platform has specific configuration requirements:
 
-### 1. Simple Single-Instance
+- **Linux**: Edit `/etc/systemd/system/simple-sftpd.service`
+- **macOS**: Edit `/Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist`
+- **Windows**: Edit the service binary path in the batch file
 
-Perfect for basic TFTP needs:
+### Application Configuration
 
-- Single TFTP server on port 69
-- Basic security and performance settings
-- Easy to configure and maintain
-
-**Files needed**:
-- `deployment/systemd/simple-tftpd.service`
-- `deployment/configs/simple-tftpd.conf`
-
-**Setup**: See `examples/simple/README.md`
-
-### 2. Multi-Instance Deployment
-
-For enterprise environments with multiple TFTP services:
-
-- Multiple instances on different IPs/ports
-- Purpose-specific configurations (firmware, PXE, secure)
-- Centralized management with systemd targets
-
-**Files needed**:
-- `deployment/systemd/simple-tftpd@.service`
-- `deployment/systemd/simple-tftpd.target`
-- `deployment/configs/instances/*.conf`
-
-**Setup**: See `examples/advanced/README.md`
-
-### 3. Enterprise Deployment
-
-For large-scale production environments:
-
-- High-availability with load balancers
-- Network segmentation and security
-- Monitoring and centralized logging
-- Backup and disaster recovery
-
-**Additional components**:
-- HAProxy/Keepalived for load balancing
-- Prometheus/Grafana for monitoring
-- rsyslog for centralized logging
-- SELinux/AppArmor for security
-
-## Service Management
-
-### systemd (Recommended)
-
-```bash
-# Single instance
-sudo systemctl start simple-tftpd
-sudo systemctl enable simple-tftpd
-sudo systemctl status simple-tftpd
-
-# Multiple instances
-sudo systemctl start simple-tftpd.target
-sudo systemctl start simple-tftpd@firmware
-sudo systemctl start simple-tftpd@pxe
-```
-
-### init.d (Legacy)
-
-```bash
-# Service management
-sudo /etc/init.d/simple-tftpd start
-sudo /etc/init.d/simple-tftpd stop
-sudo /etc/init.d/simple-tftpd restart
-sudo /etc/init.d/simple-tftpd status
-```
-
-## Configuration Management
-
-### Main Configuration
-
-The main configuration file (`simple-tftpd.conf`) controls:
-
-- Network binding (IP, port, IPv6)
-- File system access (root directory, allowed paths)
-- Security settings (read/write, file types, size limits)
-- Performance tuning (block size, timeouts, connections)
-- Logging configuration (level, files, rotation)
-
-### Instance Configurations
-
-Instance-specific configurations allow:
-
-- Different IP addresses and ports
-- Separate root directories
-- Purpose-specific security policies
-- Custom performance settings
-- Individual logging
-
-### Environment Variables
-
-Override configuration values:
-
-```bash
-export SIMPLE_TFTPD_NETWORK_LISTEN_ADDRESS=192.168.1.100
-export SIMPLE_TFTPD_NETWORK_LISTEN_PORT=6969
-export SIMPLE_TFTPD_FILESYSTEM_ROOT_DIRECTORY=/var/tftp/custom
-```
+Place your application configuration in:
+- **Linux/macOS**: `/etc/simple-sftpd/simple-sftpd.conf`
+- **Windows**: `%PROGRAMFILES%\simple-sftpd\simple-sftpd.conf`
 
 ## Security Considerations
 
-### Network Security
+### User and Permissions
 
-- Bind to specific interfaces, not 0.0.0.0
-- Use firewall rules to restrict access
-- Consider network segmentation for different instance types
+1. **Create dedicated user:**
+   ```bash
+   # Linux
+   sudo useradd --system --no-create-home --shell /bin/false simple-sftpd
+   
+   # macOS
+   sudo dscl . -create /Users/_simple-sftpd UserShell /usr/bin/false
+   sudo dscl . -create /Users/_simple-sftpd UniqueID 200
+   sudo dscl . -create /Users/_simple-sftpd PrimaryGroupID 200
+   sudo dscl . -create /Groups/_simple-sftpd GroupID 200
+   ```
 
-### File System Security
+2. **Set proper permissions:**
+   ```bash
+   # Configuration files
+   sudo chown root:simple-sftpd /etc/simple-sftpd/simple-sftpd.conf
+   sudo chmod 640 /etc/simple-sftpd/simple-sftpd.conf
+   
+   # Log files
+   sudo chown simple-sftpd:simple-sftpd /var/log/simple-sftpd/
+   sudo chmod 755 /var/log/simple-sftpd/
+   ```
 
-- Restrict allowed directories
-- Set appropriate file permissions
-- Use allowed/blocked file extensions
-- Enable overwrite protection
+### Firewall Configuration
 
-### Service Security
+Configure firewall rules as needed:
 
-- Run as dedicated user (tftp)
-- Use systemd security features
-- Implement SELinux/AppArmor policies
-- Regular security updates
+```bash
+# Linux (ufw)
+sudo ufw allow 21/tcp
 
-## Performance Tuning
+# Linux (firewalld)
+sudo firewall-cmd --permanent --add-port=21/tcp
+sudo firewall-cmd --reload
 
-### System Level
+# macOS
+sudo pfctl -f /etc/pf.conf
+```
 
-- Increase UDP buffer sizes
-- Optimize file descriptor limits
-- Tune network parameters
+## Monitoring
 
-### Application Level
+### Health Checks
 
-- Adjust block sizes for network conditions
-- Set appropriate timeouts
-- Configure connection limits
-- Monitor resource usage
+1. **Service status:**
+   ```bash
+   # Linux
+   sudo systemctl is-active simple-sftpd
+   
+   # macOS
+   sudo launchctl list | grep simple-sftpd
+   
+   # Windows
+   sc query simple-sftpd
+   ```
 
-## Monitoring and Logging
+2. **Port availability:**
+   ```bash
+   netstat -tlnp | grep 21
+   ss -tlnp | grep 21
+   ```
 
-### Service Monitoring
+3. **Process monitoring:**
+   ```bash
+   ps aux | grep simple-sftpd
+   top -p $(pgrep simple-sftpd)
+   ```
 
-- Check service status regularly
-- Monitor log files for errors
-- Track performance metrics
-- Set up alerting for failures
+### Log Monitoring
 
-### Centralized Logging
+1. **Real-time logs:**
+   ```bash
+   # Linux
+   sudo journalctl -u simple-sftpd -f
+   
+   # macOS
+   tail -f /var/log/simple-sftpd.log
+   
+   # Windows
+   # Use Event Viewer or PowerShell Get-WinEvent
+   ```
 
-- Forward logs to central server
-- Implement log rotation
-- Monitor log file sizes
-- Archive old logs
-
-## Backup and Recovery
-
-### Configuration Backup
-
-- Backup configuration files
-- Backup TFTP root directories
-- Document customizations
-- Test restore procedures
-
-### Disaster Recovery
-
-- Document recovery procedures
-- Test backup restoration
-- Maintain recovery documentation
-- Regular recovery drills
+2. **Log analysis:**
+   ```bash
+   # Search for errors
+   sudo journalctl -u simple-sftpd --since "1 hour ago" | grep -i error
+   
+   # Count log entries
+   sudo journalctl -u simple-sftpd --since "1 day ago" | wc -l
+   ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Service won't start**: Check configuration, permissions, and logs
-2. **Permission denied**: Verify user/group ownership and file permissions
-3. **Port conflicts**: Check for existing TFTP services
-4. **Network issues**: Verify firewall rules and network configuration
+1. **Service won't start:**
+   - Check configuration file syntax
+   - Verify user permissions
+   - Check port availability
+   - Review service logs
+
+2. **Permission denied:**
+   - Ensure service user exists
+   - Check file permissions
+   - Verify directory ownership
+
+3. **Port already in use:**
+   - Check what's using the port: `netstat -tlnp | grep 21`
+   - Stop conflicting service or change port
+
+4. **Service stops unexpectedly:**
+   - Check application logs
+   - Verify resource limits
+   - Review system logs
 
 ### Debug Mode
 
+Run the service in debug mode for troubleshooting:
+
 ```bash
-# Enable debug logging
-sudo simple-tftpd --verbose start
+# Linux/macOS
+sudo -u simple-sftpd /usr/local/bin/simple-sftpd --debug
 
-# Check service logs
-sudo journalctl -u simple-tftpd -f
-
-# Test configuration
-sudo simple-tftpd test --config /etc/simple-tftpd/simple-tftpd.conf
+# Windows
+simple-sftpd.exe --debug
 ```
 
-## Support and Resources
+### Log Levels
 
-### Documentation
+Adjust log level for more verbose output:
 
-- **[Installation Guide](../../docs/installation/README.md)** - Complete installation instructions
-- **[User Guide](../../docs/user-guide/README.md)** - Usage and management
-- **[Configuration Reference](../../docs/configuration/README.md)** - All configuration options
-- **[Development Guide](../../docs/development/README.md)** - Contributing to the project
+```bash
+# Set log level in configuration
+log_level = debug
 
-### Getting Help
+# Or via environment variable
+export SIMPLE-SFTPD_LOG_LEVEL=debug
+```
 
-- Check this deployment guide first
-- Review example configurations
-- Check service logs for errors
-- Search existing GitHub issues
-- Create new issue with detailed information
+## Backup and Recovery
 
-## Next Steps
+### Configuration Backup
 
-After deployment:
+```bash
+# Backup configuration
+sudo tar -czf simple-sftpd-config-backup-$(date +%Y%m%d).tar.gz /etc/simple-sftpd/
 
-1. **Test the service** with TFTP clients
-2. **Configure monitoring** and alerting
-3. **Set up backups** and recovery procedures
-4. **Document customizations** and procedures
-5. **Plan for scaling** as needs grow
+# Backup logs
+sudo tar -czf simple-sftpd-logs-backup-$(date +%Y%m%d).tar.gz /var/log/simple-sftpd/
+```
 
-## Contributing
+### Service Recovery
 
-We welcome contributions to improve deployment:
+```bash
+# Stop service
+sudo systemctl stop simple-sftpd
 
-- Share deployment experiences
-- Submit configuration examples
-- Improve installation scripts
-- Add new deployment scenarios
-- Enhance security configurations
+# Restore configuration
+sudo tar -xzf simple-sftpd-config-backup-YYYYMMDD.tar.gz -C /
 
-The deployment system is designed to be simple yet powerful, allowing administrators to start with basic configurations and scale to enterprise deployments as needed.
+# Start service
+sudo systemctl start simple-sftpd
+```
+
+## Updates
+
+### Service Update Process
+
+1. **Stop service:**
+   ```bash
+   sudo systemctl stop simple-sftpd
+   ```
+
+2. **Backup current version:**
+   ```bash
+   sudo cp /usr/local/bin/simple-sftpd /usr/local/bin/simple-sftpd.backup
+   ```
+
+3. **Install new version:**
+   ```bash
+   sudo cp simple-sftpd /usr/local/bin/
+   sudo chmod +x /usr/local/bin/simple-sftpd
+   ```
+
+4. **Start service:**
+   ```bash
+   sudo systemctl start simple-sftpd
+   ```
+
+5. **Verify update:**
+   ```bash
+   sudo systemctl status simple-sftpd
+   simple-sftpd --version
+   ```
