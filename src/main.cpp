@@ -8,9 +8,17 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <fstream>
+#include <filesystem>
+#include <thread>
+#include <chrono>
+#include <atomic>
 #include "simple-sftpd/ftp_server.hpp"
 #include "simple-sftpd/ftp_server_config.hpp"
 #include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/ftp_user_manager.hpp"
+#include "simple-sftpd/ftp_user.hpp"
 
 using namespace simple_sftpd;
 
@@ -18,6 +26,68 @@ using namespace simple_sftpd;
 std::shared_ptr<FTPServer> g_server;
 std::shared_ptr<Logger> g_logger;
 std::atomic<bool> g_shutdown_requested(false);
+
+// Forward declarations
+bool startServer(const std::string& config_file, bool daemon_mode);
+
+// PID file path
+std::string getPidFile() {
+    #ifdef _WIN32
+    return "C:\\Program Files\\simple-sftpd\\run\\simple-sftpd.pid";
+    #else
+    return "/var/run/simple-sftpd.pid";
+    #endif
+}
+
+/**
+ * @brief Write PID to file
+ */
+void writePidFile() {
+    std::string pid_file = getPidFile();
+    std::ofstream file(pid_file);
+    if (file.is_open()) {
+        file << getpid() << std::endl;
+        file.close();
+    }
+}
+
+/**
+ * @brief Read PID from file
+ */
+pid_t readPidFile() {
+    std::string pid_file = getPidFile();
+    std::ifstream file(pid_file);
+    if (file.is_open()) {
+        pid_t pid;
+        file >> pid;
+        file.close();
+        return pid;
+    }
+    return -1;
+}
+
+/**
+ * @brief Remove PID file
+ */
+void removePidFile() {
+    std::string pid_file = getPidFile();
+    if (std::filesystem::exists(pid_file)) {
+        std::filesystem::remove(pid_file);
+    }
+}
+
+/**
+ * @brief Check if process is running
+ */
+bool isProcessRunning(pid_t pid) {
+    if (pid <= 0) return false;
+    #ifndef _WIN32
+    return (kill(pid, 0) == 0);
+    #else
+    // Windows implementation would use OpenProcess
+    return false;
+    #endif
+}
 
 /**
  * @brief Signal handler for graceful shutdown
@@ -29,11 +99,14 @@ void signalHandler(int signal) {
         std::exit(1);
     }
 
-    g_logger->info("Received signal " + std::to_string(signal) + ", initiating graceful shutdown");
+    if (g_logger) {
+        g_logger->info("Received signal " + std::to_string(signal) + ", initiating graceful shutdown");
+    }
 
     if (g_server) {
         g_server->stop();
     }
+    removePidFile();
 }
 
 /**
@@ -153,15 +226,17 @@ bool parseArguments(int argc, char* argv[],
         } else if (arg == "--validate") {
             command = "validate";
         } else if (arg[0] != '-') {
-            // This is a command
+            // This is a command or argument
             if (command.empty()) {
                 command = arg;
             } else {
                 args.push_back(arg);
             }
         } else {
-            std::cerr << "Error: Unknown option: " << arg << std::endl;
-            return false;
+            // This is an option for the command, add it to args
+            if (!command.empty()) {
+                args.push_back(arg);
+            }
         }
     }
 
@@ -172,13 +247,10 @@ bool parseArguments(int argc, char* argv[],
  * @brief Setup signal handlers
  */
 void setupSignalHandlers() {
-    signal(SIGINT, signalHandler);   // Ctrl+C
-    signal(SIGTERM, signalHandler);  // Termination request
-    signal(SIGHUP, signalHandler);   // Hangup (reload config)
-
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
     #ifndef _WIN32
-    signal(SIGUSR1, signalHandler);  // User defined signal 1
-    signal(SIGUSR2, signalHandler);  // User defined signal 2
+    signal(SIGHUP, signalHandler);
     #endif
 }
 
@@ -188,7 +260,7 @@ void setupSignalHandlers() {
  */
 bool daemonize() {
     #ifdef _WIN32
-    // Windows doesn't support daemonization
+    // Windows daemonization would be different
     return false;
     #else
     // Fork the process
@@ -287,14 +359,268 @@ bool validateConfiguration(const std::string& config_file) {
 }
 
 /**
+ * @brief Stop the FTP server
+ * @return true if stopped successfully, false otherwise
+ */
+bool stopServer() {
+    pid_t pid = readPidFile();
+    if (pid <= 0) {
+        std::cout << "Server is not running (no PID file found)" << std::endl;
+        return false;
+    }
+
+    if (!isProcessRunning(pid)) {
+        std::cout << "Server process not found (PID: " << pid << ")" << std::endl;
+        removePidFile();
+        return false;
+    }
+
+    std::cout << "Stopping server (PID: " << pid << ")..." << std::endl;
+    #ifndef _WIN32
+    if (kill(pid, SIGTERM) == 0) {
+        // Wait for process to terminate
+        int count = 0;
+        while (isProcessRunning(pid) && count < 30) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            count++;
+        }
+        if (isProcessRunning(pid)) {
+            std::cout << "Server did not stop gracefully, sending SIGKILL..." << std::endl;
+            kill(pid, SIGKILL);
+        }
+        removePidFile();
+        std::cout << "Server stopped successfully" << std::endl;
+        return true;
+    }
+    #endif
+    return false;
+}
+
+/**
+ * @brief Restart the FTP server
+ * @param config_file Configuration file path
+ * @param daemon_mode Run as daemon
+ * @return true if restarted successfully, false otherwise
+ */
+bool restartServer(const std::string& config_file, bool daemon_mode) {
+    std::cout << "Restarting server..." << std::endl;
+    if (stopServer()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        return startServer(config_file, daemon_mode);
+    }
+    return false;
+}
+
+/**
+ * @brief Show server status
+ * @param config_file Configuration file path
+ */
+void showStatus(const std::string& config_file) {
+    pid_t pid = readPidFile();
+    
+    std::cout << "Server Status:" << std::endl;
+    std::cout << "  PID File: " << getPidFile() << std::endl;
+    
+    if (pid > 0 && isProcessRunning(pid)) {
+        std::cout << "  Status: Running" << std::endl;
+        std::cout << "  PID: " << pid << std::endl;
+        
+        // Try to load config and show info
+        auto config = std::make_shared<FTPServerConfig>();
+        if (config->loadFromFile(config_file)) {
+            std::cout << "  Listen Address: " << config->connection.bind_address << std::endl;
+            std::cout << "  Listen Port: " << config->connection.bind_port << std::endl;
+            std::cout << "  Max Connections: " << config->connection.max_connections << std::endl;
+        }
+    } else {
+        std::cout << "  Status: Stopped" << std::endl;
+        if (pid > 0) {
+            removePidFile();
+        }
+    }
+}
+
+/**
+ * @brief Reload configuration
+ * @return true if reloaded successfully, false otherwise
+ */
+bool reloadConfiguration() {
+    pid_t pid = readPidFile();
+    if (pid <= 0 || !isProcessRunning(pid)) {
+        std::cout << "Server is not running" << std::endl;
+        return false;
+    }
+
+    std::cout << "Reloading configuration (PID: " << pid << ")..." << std::endl;
+    #ifndef _WIN32
+    if (kill(pid, SIGHUP) == 0) {
+        std::cout << "Configuration reload signal sent" << std::endl;
+        std::cout << "Note: Full configuration reload requires server restart in v0.1.0" << std::endl;
+        return true;
+    }
+    #endif
+    return false;
+}
+
+/**
+ * @brief Handle user management commands
+ * @param args Command arguments
+ * @param config_file Configuration file path
+ * @return true if successful, false otherwise
+ */
+bool handleUserCommand(const std::vector<std::string>& args, const std::string& config_file) {
+    if (args.empty()) {
+        std::cerr << "Error: user command requires a subcommand (add, remove, modify, list, password)" << std::endl;
+        return false;
+    }
+
+    std::string subcommand = args[0];
+    
+    // Initialize logger and user manager
+    auto logger = std::make_shared<Logger>("", LogLevel::INFO, true, false, LogFormat::STANDARD);
+    auto user_manager = std::make_shared<FTPUserManager>(logger);
+
+    if (subcommand == "add") {
+        std::string username, password, home_dir;
+        for (size_t i = 1; i < args.size(); ++i) {
+            if (i + 1 < args.size()) {
+                if (args[i] == "--username" || args[i] == "-u") {
+                    username = args[++i];
+                } else if (args[i] == "--password" || args[i] == "-p") {
+                    password = args[++i];
+                } else if (args[i] == "--home" || args[i] == "-h") {
+                    home_dir = args[++i];
+                }
+            }
+        }
+        
+        if (username.empty() || password.empty() || home_dir.empty()) {
+            std::cerr << "Error: user add requires --username, --password, and --home" << std::endl;
+            return false;
+        }
+        
+        auto user = std::make_shared<FTPUser>(username, password, home_dir);
+        if (user_manager->addUser(user)) {
+            std::cout << "User '" << username << "' added successfully" << std::endl;
+            std::cout << "Note: User is stored in memory only. Persistent storage coming in v0.2.0" << std::endl;
+            return true;
+        }
+        return false;
+        
+    } else if (subcommand == "remove") {
+        std::string username;
+        for (size_t i = 1; i < args.size(); ++i) {
+            if (args[i] == "--username" || args[i] == "-u") {
+                if (i + 1 < args.size()) {
+                    username = args[++i];
+                }
+            }
+        }
+        
+        if (username.empty()) {
+            std::cerr << "Error: user remove requires --username" << std::endl;
+            return false;
+        }
+        
+        if (user_manager->removeUser(username)) {
+            std::cout << "User '" << username << "' removed successfully" << std::endl;
+            return true;
+        } else {
+            std::cerr << "Error: User '" << username << "' not found" << std::endl;
+            return false;
+        }
+        
+    } else if (subcommand == "list") {
+        auto usernames = user_manager->listUsers();
+        if (usernames.empty()) {
+            std::cout << "No users found" << std::endl;
+        } else {
+            std::cout << "Users:" << std::endl;
+            for (const auto& name : usernames) {
+                auto user = user_manager->getUser(name);
+                if (user) {
+                    std::cout << "  " << name << " (home: " << user->getHomeDirectory() << ")" << std::endl;
+                }
+            }
+        }
+        return true;
+        
+    } else if (subcommand == "modify" || subcommand == "password") {
+        std::cout << "User modification not yet fully implemented in v0.1.0" << std::endl;
+        std::cout << "Use 'user remove' and 'user add' to change user properties" << std::endl;
+        return false;
+        
+    } else {
+        std::cerr << "Error: Unknown user subcommand: " << subcommand << std::endl;
+        return false;
+    }
+}
+
+/**
+ * @brief Handle virtual host management commands
+ * @param args Command arguments
+ * @return true if successful, false otherwise
+ */
+bool handleVirtualCommand(const std::vector<std::string>& args) {
+    if (args.empty()) {
+        std::cerr << "Error: virtual command requires a subcommand" << std::endl;
+        return false;
+    }
+
+    std::string subcommand = args[0];
+    
+    if (subcommand == "list") {
+        std::cout << "Virtual hosts:" << std::endl;
+        std::cout << "  (Virtual hosting not yet implemented in v0.1.0)" << std::endl;
+        return true;
+    } else {
+        std::cout << "Virtual host management not yet fully implemented in v0.1.0" << std::endl;
+        std::cout << "This feature is planned for v0.3.0" << std::endl;
+        return false;
+    }
+}
+
+/**
+ * @brief Handle SSL management commands
+ * @param args Command arguments
+ * @return true if successful, false otherwise
+ */
+bool handleSslCommand(const std::vector<std::string>& args) {
+    if (args.empty()) {
+        std::cerr << "Error: ssl command requires a subcommand" << std::endl;
+        return false;
+    }
+
+    std::string subcommand = args[0];
+    
+    if (subcommand == "status") {
+        std::cout << "SSL Status:" << std::endl;
+        std::cout << "  SSL/TLS support: Not yet implemented (planned for v0.2.0)" << std::endl;
+        std::cout << "  Use tools/setup-ssl.sh for certificate generation" << std::endl;
+        return true;
+    } else if (subcommand == "generate") {
+        std::cout << "SSL certificate generation:" << std::endl;
+        std::cout << "  Please use: tools/setup-ssl.sh --hostname <hostname>" << std::endl;
+        std::cout << "  Full SSL management coming in v0.2.0" << std::endl;
+        return false;
+    } else {
+        std::cout << "SSL management not yet fully implemented in v0.1.0" << std::endl;
+        std::cout << "This feature is planned for v0.2.0" << std::endl;
+        return false;
+    }
+}
+
+/**
+        return false;
+    }
+}
+
  * @brief Start the FTP server
  * @param config_file Configuration file path
  * @param daemon_mode Run as daemon
  * @return true if started successfully, false otherwise
  */
 bool startServer(const std::string& config_file, bool daemon_mode) {
-    (void)daemon_mode; // Suppress unused parameter warning
-
     try {
         // Load configuration
         auto config = std::make_shared<FTPServerConfig>();
@@ -343,6 +669,9 @@ bool startServer(const std::string& config_file, bool daemon_mode) {
             return false;
         }
 
+        // Write PID file
+        writePidFile();
+
         g_logger->info("FTP server started successfully");
         g_logger->info("Listening on " + config->connection.bind_address + ":" + std::to_string(config->connection.bind_port));
 
@@ -352,9 +681,11 @@ bool startServer(const std::string& config_file, bool daemon_mode) {
         }
 
         g_logger->info("FTP server shutdown complete");
+        removePidFile();
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Error starting FTP server: " << e.what() << std::endl;
+        removePidFile();
         return false;
     }
 }
@@ -375,7 +706,7 @@ int main(int argc, char* argv[]) {
     bool verbose = false;
 
     if (!parseArguments(argc, argv, config_file, command, args, daemon_mode, foreground_mode, verbose)) {
-        return 1;
+        return 0; // Help or version was printed
     }
 
     // Set default configuration file if none specified
@@ -396,25 +727,65 @@ int main(int argc, char* argv[]) {
         return validateConfiguration(config_file) ? 0 : 1;
     }
 
-    // Setup signal handlers
-    setupSignalHandlers();
+    // Handle server management commands
+    if (command == "stop") {
+        return stopServer() ? 0 : 1;
+    }
+
+    if (command == "status") {
+        showStatus(config_file);
+        return 0;
+    }
+
+    if (command == "restart") {
+        setupSignalHandlers();
+        return restartServer(config_file, daemon_mode) ? 0 : 1;
+    }
+
+    if (command == "reload") {
+        return reloadConfiguration() ? 0 : 1;
+    }
+
+    if (command == "test") {
+        return testConfiguration(config_file) ? 0 : 1;
+    }
+
+    // Handle user management
+    if (command == "user") {
+        return handleUserCommand(args, config_file) ? 0 : 1;
+    }
+
+    // Handle virtual host management
+    if (command == "virtual") {
+        return handleVirtualCommand(args) ? 0 : 1;
+    }
+
+    // Handle SSL management
+    if (command == "ssl") {
+        return handleSslCommand(args) ? 0 : 1;
+    }
+
+    // Setup signal handlers for server commands
+    if (command.empty() || command == "start") {
+        setupSignalHandlers();
+    }
 
     // Handle daemon mode
-    if (daemon_mode && !foreground_mode) {
+    if (daemon_mode && !foreground_mode && (command.empty() || command == "start")) {
         if (!daemonize()) {
             std::cerr << "Error: Failed to daemonize process" << std::endl;
             return 1;
         }
     }
 
-    // Start server if no specific command
+    // Start server if no specific command or start command
     if (command.empty() || command == "start") {
         if (!startServer(config_file, daemon_mode)) {
             return 1;
         }
     } else {
-        // Handle other commands (user management, virtual hosts, etc.)
-        std::cout << "Command '" << command << "' not yet implemented" << std::endl;
+        std::cerr << "Error: Unknown command '" << command << "'" << std::endl;
+        std::cerr << "Use 'simple-sftpd --help' for usage information" << std::endl;
         return 1;
     }
 
