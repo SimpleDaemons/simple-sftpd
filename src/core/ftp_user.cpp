@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include "ssftpd/ftp_user.hpp"
+#include "simple-sftpd/ftp_user.hpp"
 
-namespace ssftpd {
+namespace simple_sftpd {
 
 FTPUser::FTPUser(const std::string& username, const std::string& password, const std::string& home_dir)
     : username_(username), password_(password), home_directory_(home_dir) {
@@ -31,4 +31,4 @@ bool FTPUser::hasPermission(const std::string& path) const {
     return true; // Stub implementation - allow all permissions
 }
 
-} // namespace ssftpd
+} // namespace simple_sftpd

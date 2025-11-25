@@ -8,8 +8,8 @@ server_banner = "Welcome to Simple-Secure FTP Daemon"
 daemon_mode = false
 foreground_mode = true
 working_directory = "/var/ftp"
-user_config_dir = "/etc/ssftpd/users"
-system_config_dir = "/etc/ssftpd"
+user_config_dir = "/etc/simple-sftpd/users"
+system_config_dir = "/etc/simple-sftpd"
 
 # Feature flags
 enable_ssl = true
@@ -35,7 +35,7 @@ metrics_interval = 60
 
 # Backup and recovery
 enable_backup = true
-backup_directory = "/var/backup/ssftpd"
+backup_directory = "/var/backup/simple-sftpd"
 backup_interval = 86400
 max_backups = 7
 
@@ -49,9 +49,9 @@ log_socket_events = "none"
 # SSL/TLS Configuration
 [ssl]
 enabled = true
-certificate_file = "/etc/ssftpd/ssl/server.crt"
-private_key_file = "/etc/ssftpd/ssl/server.key"
-ca_certificate_file = "/etc/ssftpd/ssl/ca.crt"
+certificate_file = "/etc/simple-sftpd/ssl/server.crt"
+private_key_file = "/etc/simple-sftpd/ssl/server.key"
+ca_certificate_file = "/etc/simple-sftpd/ssl/ca.crt"
 cipher_suite = "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256"
 require_client_cert = false
 verify_peer = false
@@ -60,7 +60,7 @@ max_tls_version = 1.3
 
 # Logging Configuration
 [logging]
-log_file = "/var/log/ssftpd/ssftpd.log"
+log_file = "/var/log/simple-sftpd/simple-sftpd.log"
 log_level = "INFO"
 log_to_console = true
 log_to_file = true
@@ -93,7 +93,7 @@ max_file_size = 0
 max_transfer_rate = 0
 allow_overwrite = true
 allow_resume = true
-temp_directory = "/tmp/ssftpd"
+temp_directory = "/tmp/simple-sftpd"
 buffer_size = 8192
 use_sendfile = true
 use_mmap = false
@@ -182,8 +182,8 @@ default = false
 
 [virtual_hosts.example.ssl]
 enabled = true
-certificate_file = "/etc/ssftpd/ssl/example.com.crt"
-private_key_file = "/etc/ssftpd/ssl/example.com.key"
+certificate_file = "/etc/simple-sftpd/ssl/example.com.crt"
+private_key_file = "/etc/simple-sftpd/ssl/example.com.key"
 
 [virtual_hosts.example.security]
 chroot_enabled = true

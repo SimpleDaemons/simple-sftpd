@@ -1,10 +1,10 @@
 # Docker Deployment Guide
 
-This guide covers deploying ssftpd using Docker containers for development, testing, and production environments.
+This guide covers deploying simple-sftpd using Docker containers for development, testing, and production environments.
 
 ## Overview
 
-The Docker integration for ssftpd provides:
+The Docker integration for simple-sftpd provides:
 
 - **Multi-stage builds** for different Linux distributions (Ubuntu, CentOS, Alpine)
 - **Multi-architecture support** (x86_64, ARM64, ARMv7)
@@ -34,7 +34,7 @@ mkdir -p deployment/examples/docker/logs
 mkdir -p deployment/examples/docker/data
 
 # Copy example configuration
-cp config/examples/simple/ssftpd.conf.example deployment/examples/docker/config/ssftpd.conf
+cp config/examples/simple/simple-sftpd.conf.example deployment/examples/docker/config/simple-sftpd.conf
 ```
 
 ### 2. Deploy with Docker Compose
@@ -50,7 +50,7 @@ docker-compose up -d
 docker-compose ps
 
 # View logs
-docker-compose logs -f ssftpd
+docker-compose logs -f simple-sftpd
 ```
 
 ### 3. Test the Service
@@ -63,7 +63,7 @@ nc -z localhost 21
 nc -z localhost 990
 
 # Check health status
-docker inspect --format='{{.State.Health.Status}}' ssftpd
+docker inspect --format='{{.State.Health.Status}}' simple-sftpd
 ```
 
 ## Build Options
@@ -120,15 +120,15 @@ The following environment variables can be configured:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `FTP_ROOT_DIR` | FTP root directory | `/var/ftp` |
-| `FTP_CONFIG_FILE` | Configuration file path | `/etc/ssftpd/ssftpd.conf` |
+| `FTP_CONFIG_FILE` | Configuration file path | `/etc/simple-sftpd/simple-sftpd.conf` |
 | `LOG_LEVEL` | Log level (DEBUG, INFO, WARN, ERROR) | `INFO` |
 
 ### Volume Mounts
 
 | Host Path | Container Path | Description |
 |-----------|----------------|-------------|
-| `./config` | `/etc/ssftpd` | Configuration files (read-only) |
-| `./logs` | `/var/log/ssftpd` | Log files |
+| `./config` | `/etc/simple-sftpd` | Configuration files (read-only) |
+| `./logs` | `/var/log/simple-sftpd` | Log files |
 | `./data` | `/var/ftp` | FTP data directory |
 
 ### Port Configuration
@@ -145,7 +145,7 @@ The following environment variables can be configured:
 
 ```yaml
 services:
-  ssftpd:
+  simple-sftpd:
     # ... existing configuration ...
     security_opt:
       - no-new-privileges:true
@@ -159,7 +159,7 @@ services:
 
 ```yaml
 services:
-  ssftpd:
+  simple-sftpd:
     # ... existing configuration ...
     deploy:
       resources:
@@ -175,21 +175,21 @@ services:
 
 ```yaml
 services:
-  ssftpd:
+  simple-sftpd:
     # ... existing configuration ...
     volumes:
-      - ./ssl:/etc/ssl/ssftpd:ro
+      - ./ssl:/etc/ssl/simple-sftpd:ro
     environment:
       - SSL_ENABLED=true
-      - SSL_CERT_FILE=/etc/ssl/ssftpd/server.crt
-      - SSL_KEY_FILE=/etc/ssl/ssftpd/server.key
+      - SSL_CERT_FILE=/etc/ssl/simple-sftpd/server.crt
+      - SSL_KEY_FILE=/etc/ssl/simple-sftpd/server.key
 ```
 
 ### 4. Logging Configuration
 
 ```yaml
 services:
-  ssftpd:
+  simple-sftpd:
     # ... existing configuration ...
     logging:
       driver: "json-file"
@@ -235,7 +235,7 @@ docker-compose exec dev bash -c "cd /app && mkdir -p build && cd build && cmake 
 
 ```yaml
 services:
-  ssftpd:
+  simple-sftpd:
     # ... existing configuration ...
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "21"]
@@ -249,16 +249,16 @@ services:
 
 ```bash
 # Check container health
-docker inspect --format='{{.State.Health.Status}}' ssftpd
+docker inspect --format='{{.State.Health.Status}}' simple-sftpd
 
 # View health check logs
-docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' ssftpd
+docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' simple-sftpd
 
 # Monitor resource usage
-docker stats ssftpd
+docker stats simple-sftpd
 
 # View container logs
-docker-compose logs -f ssftpd
+docker-compose logs -f simple-sftpd
 ```
 
 ## Scaling and Load Balancing
@@ -267,7 +267,7 @@ docker-compose logs -f ssftpd
 
 ```yaml
 services:
-  ssftpd:
+  simple-sftpd:
     # ... existing configuration ...
     deploy:
       replicas: 3
@@ -286,7 +286,7 @@ services:
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     depends_on:
-      - ssftpd
+      - simple-sftpd
 ```
 
 ## Backup and Recovery
@@ -295,19 +295,19 @@ services:
 
 ```bash
 #!/bin/bash
-# backup-ssftpd.sh
+# backup-simple-sftpd.sh
 
 BACKUP_DIR="./backup/$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 
 # Backup configuration
-docker cp ssftpd:/etc/ssftpd/ "$BACKUP_DIR/"
+docker cp simple-sftpd:/etc/simple-sftpd/ "$BACKUP_DIR/"
 
 # Backup FTP data
-docker cp ssftpd:/var/ftp/ "$BACKUP_DIR/"
+docker cp simple-sftpd:/var/ftp/ "$BACKUP_DIR/"
 
 # Backup logs
-docker cp ssftpd:/var/log/ssftpd/ "$BACKUP_DIR/"
+docker cp simple-sftpd:/var/log/simple-sftpd/ "$BACKUP_DIR/"
 
 echo "Backup completed: $BACKUP_DIR"
 ```
@@ -316,7 +316,7 @@ echo "Backup completed: $BACKUP_DIR"
 
 ```bash
 #!/bin/bash
-# restore-ssftpd.sh
+# restore-simple-sftpd.sh
 
 BACKUP_DIR="$1"
 if [ -z "$BACKUP_DIR" ]; then
@@ -328,13 +328,13 @@ fi
 docker-compose down
 
 # Restore configuration
-docker cp "$BACKUP_DIR/ssftpd/" ssftpd:/etc/
+docker cp "$BACKUP_DIR/simple-sftpd/" simple-sftpd:/etc/
 
 # Restore FTP data
-docker cp "$BACKUP_DIR/ftp/" ssftpd:/var/
+docker cp "$BACKUP_DIR/ftp/" simple-sftpd:/var/
 
 # Restore logs
-docker cp "$BACKUP_DIR/ssftpd/" ssftpd:/var/log/
+docker cp "$BACKUP_DIR/simple-sftpd/" simple-sftpd:/var/log/
 
 # Start service
 docker-compose up -d
@@ -372,13 +372,13 @@ echo "Restore completed from: $BACKUP_DIR"
 
 ```bash
 # Run with debug logging
-docker-compose run --rm ssftpd ssftpd --verbose --foreground
+docker-compose run --rm simple-sftpd simple-sftpd --verbose --foreground
 
 # Access container shell
-docker-compose exec ssftpd bash
+docker-compose exec simple-sftpd bash
 
 # Check configuration
-docker-compose exec ssftpd ssftpd --test-config
+docker-compose exec simple-sftpd simple-sftpd --test-config
 ```
 
 ## Performance Tuning
@@ -387,7 +387,7 @@ docker-compose exec ssftpd ssftpd --test-config
 
 ```yaml
 services:
-  ssftpd:
+  simple-sftpd:
     # ... existing configuration ...
     ulimits:
       nofile:

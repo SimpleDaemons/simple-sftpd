@@ -62,14 +62,14 @@ sudo dnf install rpm-build rpmdevtools
 rpmdev-setuptree
 
 # Copy source to RPM build directory
-cp ssftpd-0.1.0.tar.gz ~/rpmbuild/SOURCES/
-cp packaging/rpm/ssftpd.spec ~/rpmbuild/SPECS/
+cp simple-sftpd-0.1.0.tar.gz ~/rpmbuild/SOURCES/
+cp packaging/rpm/simple-sftpd.spec ~/rpmbuild/SPECS/
 ```
 
 #### 2. Build RPM Package
 ```bash
 # Build the package
-rpmbuild -ba ~/rpmbuild/SPECS/ssftpd.spec
+rpmbuild -ba ~/rpmbuild/SPECS/simple-sftpd.spec
 
 # The package will be created in ~/rpmbuild/RPMS/
 ```
@@ -77,10 +77,10 @@ rpmbuild -ba ~/rpmbuild/SPECS/ssftpd.spec
 #### 3. Install RPM Package
 ```bash
 # Install the package
-sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/ssftpd-0.1.0-1.el8.x86_64.rpm
+sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/simple-sftpd-0.1.0-1.el8.x86_64.rpm
 
 # Or upgrade existing installation
-sudo rpm -Uvh ~/rpmbuild/RPMS/x86_64/ssftpd-0.1.0-1.el8.x86_64.rpm
+sudo rpm -Uvh ~/rpmbuild/RPMS/x86_64/simple-sftpd-0.1.0-1.el8.x86_64.rpm
 ```
 
 ### Building DEB Packages
@@ -88,8 +88,8 @@ sudo rpm -Uvh ~/rpmbuild/RPMS/x86_64/ssftpd-0.1.0-1.el8.x86_64.rpm
 #### 1. Setup DEB Build Environment
 ```bash
 # Create package directory
-mkdir ssftpd-0.1.0
-cd ssftpd-0.1.0
+mkdir simple-sftpd-0.1.0
+cd simple-sftpd-0.1.0
 
 # Copy source files
 cp -r ../src ../include ../cmake ../deployment ../etc ../docs ./
@@ -110,7 +110,7 @@ debuild -b -us -uc
 #### 3. Install DEB Package
 ```bash
 # Install the package
-sudo dpkg -i ../ssftpd_0.1.0_amd64.deb
+sudo dpkg -i ../simple-sftpd_0.1.0_amd64.deb
 
 # Fix dependencies if needed
 sudo apt-get install -f
@@ -124,9 +124,9 @@ sudo apt-get install -f
 # Or build natively on Windows
 
 # Ensure all required files are present:
-# - ssftpd.exe
-# - ssftpd-site.exe
-# - ssftpd-module.exe
+# - simple-sftpd.exe
+# - simple-sftpd-site.exe
+# - simple-sftpd-module.exe
 # - *.dll files
 # - deployment/ directory
 # - etc/windows/ directory
@@ -140,7 +140,7 @@ sudo apt-get install -f
 # Run NSIS compiler
 makensis packaging/windows/installer.nsi
 
-# The installer will be created as ssftpd-0.1.0-windows-x64.exe
+# The installer will be created as simple-sftpd-0.1.0-windows-x64.exe
 ```
 
 #### 3. Install on Windows
@@ -152,43 +152,43 @@ makensis packaging/windows/installer.nsi
 
 ### RPM Package Structure
 ```
-ssftpd-0.1.0-1.el8.x86_64.rpm
-├── /usr/sbin/ssftpd
-├── /usr/sbin/ssftpd-site
-├── /usr/sbin/ssftpd-module
-├── /usr/lib64/libssftpd.so
-├── /usr/include/ssftpd/
-├── /etc/ssftpd/
-├── /etc/systemd/system/ssftpd.service
-├── /etc/rc.d/init.d/ssftpd
+simple-sftpd-0.1.0-1.el8.x86_64.rpm
+├── /usr/sbin/simple-sftpd
+├── /usr/sbin/simple-sftpd-site
+├── /usr/sbin/simple-sftpd-module
+├── /usr/lib64/libsimple-sftpd.so
+├── /usr/include/simple-sftpd/
+├── /etc/simple-sftpd/
+├── /etc/systemd/system/simple-sftpd.service
+├── /etc/rc.d/init.d/simple-sftpd
 ├── /var/ftp/
-├── /var/log/ssftpd/
-└── /var/lib/ssftpd/
+├── /var/log/simple-sftpd/
+└── /var/lib/simple-sftpd/
 ```
 
 ### DEB Package Structure
 ```
-ssftpd_0.1.0_amd64.deb
-├── /usr/sbin/ssftpd
-├── /usr/sbin/ssftpd-site
-├── /usr/sbin/ssftpd-module
-├── /usr/lib/x86_64-linux-gnu/libssftpd.so
-├── /usr/include/ssftpd/
-├── /etc/ssftpd/
-├── /etc/systemd/system/ssftpd.service
-├── /etc/init.d/ssftpd
+simple-sftpd_0.1.0_amd64.deb
+├── /usr/sbin/simple-sftpd
+├── /usr/sbin/simple-sftpd-site
+├── /usr/sbin/simple-sftpd-module
+├── /usr/lib/x86_64-linux-gnu/libsimple-sftpd.so
+├── /usr/include/simple-sftpd/
+├── /etc/simple-sftpd/
+├── /etc/systemd/system/simple-sftpd.service
+├── /etc/init.d/simple-sftpd
 ├── /var/ftp/
-├── /var/log/ssftpd/
-└── /var/lib/ssftpd/
+├── /var/log/simple-sftpd/
+└── /var/lib/simple-sftpd/
 ```
 
 ### Windows Installer Structure
 ```
-ssftpd-0.1.0-windows-x64.exe
-├── C:\Program Files\ssftpd\
-│   ├── ssftpd.exe
-│   ├── ssftpd-site.exe
-│   ├── ssftpd-module.exe
+simple-sftpd-0.1.0-windows-x64.exe
+├── C:\Program Files\simple-sftpd\
+│   ├── simple-sftpd.exe
+│   ├── simple-sftpd-site.exe
+│   ├── simple-sftpd-module.exe
 │   ├── *.dll
 │   ├── etc\deployment\
 │   ├── etc\windows\
@@ -196,7 +196,7 @@ ssftpd-0.1.0-windows-x64.exe
 │   ├── logs\
 │   ├── var\
 │   └── ssl\
-└── Windows Service: ssftpd
+└── Windows Service: simple-sftpd
 ```
 
 ## 🔧 Package Configuration
@@ -206,38 +206,38 @@ ssftpd-0.1.0-windows-x64.exe
 #### systemd (Modern Linux)
 ```bash
 # Enable and start service
-sudo systemctl enable ssftpd
-sudo systemctl start ssftpd
+sudo systemctl enable simple-sftpd
+sudo systemctl start simple-sftpd
 
 # Check status
-sudo systemctl status ssftpd
+sudo systemctl status simple-sftpd
 
 # Reload configuration
-sudo systemctl reload ssftpd
+sudo systemctl reload simple-sftpd
 ```
 
 #### SysV init (Traditional Linux)
 ```bash
 # Start service
-sudo /etc/init.d/ssftpd start
+sudo /etc/init.d/simple-sftpd start
 
 # Check status
-sudo /etc/init.d/ssftpd status
+sudo /etc/init.d/simple-sftpd status
 
 # Reload configuration
-sudo /etc/init.d/ssftpd reload
+sudo /etc/init.d/simple-sftpd reload
 ```
 
 #### Windows Service
 ```bash
 # Start service
-net start ssftpd
+net start simple-sftpd
 
 # Stop service
-net stop ssftpd
+net stop simple-sftpd
 
 # Check status
-sc query ssftpd
+sc query simple-sftpd
 ```
 
 ### Configuration Management
@@ -245,25 +245,25 @@ sc query ssftpd
 #### Enable/Disable Sites
 ```bash
 # Enable site
-sudo ssftpd-site enable example.com
+sudo simple-sftpd-site enable example.com
 
 # Disable site
-sudo ssftpd-site disable example.com
+sudo simple-sftpd-site disable example.com
 
 # List sites
-ssftpd-site list
+simple-sftpd-site list
 ```
 
 #### Enable/Disable Modules
 ```bash
 # Enable module
-sudo ssftpd-module enable ssl
+sudo simple-sftpd-module enable ssl
 
 # Disable module
-sudo ssftpd-module disable rate_limit
+sudo simple-sftpd-module disable rate_limit
 
 # List modules
-ssftpd-module list
+simple-sftpd-module list
 ```
 
 ## 🚀 Quick Package Installation
@@ -271,27 +271,27 @@ ssftpd-module list
 ### Ubuntu/Debian
 ```bash
 # Add repository (when available)
-# sudo apt-add-repository ppa:ssftpd/stable
+# sudo apt-add-repository ppa:simple-sftpd/stable
 # sudo apt update
 
 # Install package
-sudo apt install ssftpd
+sudo apt install simple-sftpd
 
 # Start service
-sudo systemctl start ssftpd
-sudo systemctl enable ssftpd
+sudo systemctl start simple-sftpd
+sudo systemctl enable simple-sftpd
 ```
 
 ### CentOS/RHEL/Fedora
 ```bash
 # Install package
-sudo yum install ssftpd
+sudo yum install simple-sftpd
 # or
-sudo dnf install ssftpd
+sudo dnf install simple-sftpd
 
 # Start service
-sudo systemctl start ssftpd
-sudo systemctl enable ssftpd
+sudo systemctl start simple-sftpd
+sudo systemctl enable simple-sftpd
 ```
 
 ### Windows
@@ -305,10 +305,10 @@ sudo systemctl enable ssftpd
 ### Verify Package Contents
 ```bash
 # RPM
-rpm -qlp ssftpd-0.1.0-1.el8.x86_64.rpm
+rpm -qlp simple-sftpd-0.1.0-1.el8.x86_64.rpm
 
 # DEB
-dpkg -c ssftpd_0.1.0_amd64.deb
+dpkg -c simple-sftpd_0.1.0_amd64.deb
 
 # Windows
 # Use NSIS installer to view contents
@@ -317,10 +317,10 @@ dpkg -c ssftpd_0.1.0_amd64.deb
 ### Verify Installation
 ```bash
 # Check if service is running
-sudo systemctl status ssftpd
+sudo systemctl status simple-sftpd
 
 # Check configuration
-ssftpd --test-config --config /etc/ssftpd/deployment/ssftpd.conf
+simple-sftpd --test-config --config /etc/simple-sftpd/deployment/simple-sftpd.conf
 
 # Check ports
 sudo netstat -tlnp | grep :21
@@ -345,15 +345,15 @@ dpkg -I package.deb
 #### Service Won't Start
 ```bash
 # Check logs
-sudo journalctl -u ssftpd -f  # systemd
-sudo tail -f /var/log/ssftpd/ssftpd.log
+sudo journalctl -u simple-sftpd -f  # systemd
+sudo tail -f /var/log/simple-sftpd/simple-sftpd.log
 
 # Check configuration
-ssftpd --test-config --config /etc/ssftpd/deployment/ssftpd.conf
+simple-sftpd --test-config --config /etc/simple-sftpd/deployment/simple-sftpd.conf
 
 # Check permissions
-sudo ls -la /etc/ssftpd/
-sudo ls -la /var/log/ssftpd/
+sudo ls -la /etc/simple-sftpd/
+sudo ls -la /var/log/simple-sftpd/
 ```
 
 #### Port Conflicts
@@ -380,9 +380,9 @@ sudo systemctl stop pure-ftpd
 - [CentOS Packaging Guidelines](https://wiki.centos.org/HowTos/PackageManagement/)
 
 ### Community Support
-- [GitHub Issues](https://github.com/ssftpd/ssftpd/issues)
-- [Community Forum](https://community.ssftpd.org)
-- [Discord Server](https://discord.gg/ssftpd)
+- [GitHub Issues](https://github.com/simple-sftpd/simple-sftpd/issues)
+- [Community Forum](https://community.simple-sftpd.org)
+- [Discord Server](https://discord.gg/simple-sftpd)
 
 ---
 
@@ -391,4 +391,4 @@ sudo systemctl stop pure-ftpd
 2. Install the required build tools
 3. Build and test the package
 4. Install and verify the package
-5. Configure and customize ssftpd for your needs
+5. Configure and customize simple-sftpd for your needs

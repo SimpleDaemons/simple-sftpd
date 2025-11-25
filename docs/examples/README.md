@@ -8,12 +8,12 @@ This section provides practical examples and code samples for using Simple-Secur
 
 #### Minimal Server Configuration
 ```cpp
-#include "ssftpd/ftp_server.hpp"
-#include "ssftpd/ftp_server_config.hpp"
+#include "simple-sftpd/ftp_server.hpp"
+#include "simple-sftpd/ftp_server_config.hpp"
 
 int main() {
     // Create minimal configuration
-    auto config = std::make_shared<simple_ftpd::FTPServerConfig>();
+    auto config = std::make_shared<simple_sftpd::FTPServerConfig>();
     
     // Set basic settings
     config->connection.bind_address = "0.0.0.0";
@@ -21,7 +21,7 @@ int main() {
     config->connection.max_connections = 50;
     
     // Create and start server
-    simple_ftpd::FTPServer server(config);
+    simple_sftpd::FTPServer server(config);
     if (server.start()) {
         std::cout << "FTP Server started on port 21" << std::endl;
         
@@ -37,12 +37,12 @@ int main() {
 
 #### Server with Configuration File
 ```cpp
-#include "ssftpd/ftp_server.hpp"
-#include "ssftpd/ftp_server_config.hpp"
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/ftp_server.hpp"
+#include "simple-sftpd/ftp_server_config.hpp"
+#include "simple-sftpd/logger.hpp"
 
 int main(int argc, char* argv[]) {
-    std::string config_file = "/etc/ssftpd/ssftpd.conf";
+    std::string config_file = "/etc/simple-sftpd/simple-sftpd.conf";
     
     // Parse command line arguments
     for (int i = 1; i < argc; i++) {
@@ -52,13 +52,13 @@ int main(int argc, char* argv[]) {
     }
     
     // Create logger
-    auto logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/ssftpd/ssftpd.log",
-        simple_ftpd::LogLevel::INFO
+    auto logger = std::make_shared<simple_sftpd::Logger>(
+        "/var/log/simple-sftpd/simple-sftpd.log",
+        simple_sftpd::LogLevel::INFO
     );
     
     // Load configuration
-    auto config = std::make_shared<simple_ftpd::FTPServerConfig>();
+    auto config = std::make_shared<simple_sftpd::FTPServerConfig>();
     if (!config->loadFromFile(config_file)) {
         logger->error("Failed to load configuration from: " + config_file);
         return 1;
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
     }
     
     // Create and start server
-    simple_ftpd::FTPServer server(config);
+    simple_sftpd::FTPServer server(config);
     if (server.start()) {
         logger->info("FTP Server started successfully");
         
@@ -99,11 +99,11 @@ int main(int argc, char* argv[]) {
 
 #### Basic User Creation
 ```cpp
-#include "ssftpd/ftp_user.hpp"
+#include "simple-sftpd/ftp_user.hpp"
 
 void createBasicUser() {
     // Create user
-    auto user = std::make_shared<simple_ftpd::FTPUser>("john");
+    auto user = std::make_shared<simple_sftpd::FTPUser>("john");
     
     // Set password
     user->setPassword("secret123");
@@ -112,12 +112,12 @@ void createBasicUser() {
     user->setHomeDirectory("/var/ftp/john");
     
     // Grant basic permissions
-    user->grantPermission(simple_ftpd::UserPermission::READ);
-    user->grantPermission(simple_ftpd::UserPermission::LIST);
-    user->grantPermission(simple_ftpd::UserPermission::DOWNLOAD);
+    user->grantPermission(simple_sftpd::UserPermission::READ);
+    user->grantPermission(simple_sftpd::UserPermission::LIST);
+    user->grantPermission(simple_sftpd::UserPermission::DOWNLOAD);
     
     // Set user status
-    user->setStatus(simple_ftpd::UserStatus::ACTIVE);
+    user->setStatus(simple_sftpd::UserStatus::ACTIVE);
     
     // Add to server
     server.addUser(user);
@@ -126,10 +126,10 @@ void createBasicUser() {
 
 #### Advanced User with All Permissions
 ```cpp
-#include "ssftpd/ftp_user.hpp"
+#include "simple-sftpd/ftp_user.hpp"
 
 void createAdminUser() {
-    auto admin = std::make_shared<simple_ftpd::FTPUser>("admin");
+    auto admin = std::make_shared<simple_sftpd::FTPUser>("admin");
     
     // Set secure password
     admin->setPassword("SuperSecurePassword123!");
@@ -138,22 +138,22 @@ void createAdminUser() {
     admin->setHomeDirectory("/var/ftp/admin");
     
     // Grant all permissions
-    std::vector<simple_ftpd::UserPermission> all_permissions = {
-        simple_ftpd::UserPermission::READ,
-        simple_ftpd::UserPermission::WRITE,
-        simple_ftpd::UserPermission::DELETE,
-        simple_ftpd::UserPermission::RENAME,
-        simple_ftpd::UserPermission::MKDIR,
-        simple_ftpd::UserPermission::RMDIR,
-        simple_ftpd::UserPermission::LIST,
-        simple_ftpd::UserPermission::UPLOAD,
-        simple_ftpd::UserPermission::DOWNLOAD,
-        simple_ftpd::UserPermission::APPEND,
-        simple_ftpd::UserPermission::CHMOD,
-        simple_ftpd::UserPermission::CHOWN,
-        simple_ftpd::UserPermission::SYMLINK,
-        simple_ftpd::UserPermission::EXECUTE,
-        simple_ftpd::UserPermission::ADMIN
+    std::vector<simple_sftpd::UserPermission> all_permissions = {
+        simple_sftpd::UserPermission::READ,
+        simple_sftpd::UserPermission::WRITE,
+        simple_sftpd::UserPermission::DELETE,
+        simple_sftpd::UserPermission::RENAME,
+        simple_sftpd::UserPermission::MKDIR,
+        simple_sftpd::UserPermission::RMDIR,
+        simple_sftpd::UserPermission::LIST,
+        simple_sftpd::UserPermission::UPLOAD,
+        simple_sftpd::UserPermission::DOWNLOAD,
+        simple_sftpd::UserPermission::APPEND,
+        simple_sftpd::UserPermission::CHMOD,
+        simple_sftpd::UserPermission::CHOWN,
+        simple_sftpd::UserPermission::SYMLINK,
+        simple_sftpd::UserPermission::EXECUTE,
+        simple_sftpd::UserPermission::ADMIN
     };
     
     for (const auto& permission : all_permissions) {
@@ -161,7 +161,7 @@ void createAdminUser() {
     }
     
     // Set user properties
-    admin->setStatus(simple_ftpd::UserStatus::ACTIVE);
+    admin->setStatus(simple_sftpd::UserStatus::ACTIVE);
     admin->setMaxConnections(10);
     admin->setTransferRateLimit(1024 * 1024); // 1 MB/s
     
@@ -171,10 +171,10 @@ void createAdminUser() {
 
 #### User with Restricted Access
 ```cpp
-#include "ssftpd/ftp_user.hpp"
+#include "simple-sftpd/ftp_user.hpp"
 
 void createRestrictedUser() {
-    auto guest = std::make_shared<simple_ftpd::FTPUser>("guest");
+    auto guest = std::make_shared<simple_sftpd::FTPUser>("guest");
     
     // Set password
     guest->setPassword("guest123");
@@ -183,9 +183,9 @@ void createRestrictedUser() {
     guest->setHomeDirectory("/var/ftp/guest");
     
     // Grant minimal permissions
-    guest->grantPermission(simple_ftpd::UserPermission::READ);
-    guest->grantPermission(simple_ftpd::UserPermission::LIST);
-    guest->grantPermission(simple_ftpd::UserPermission::DOWNLOAD);
+    guest->grantPermission(simple_sftpd::UserPermission::READ);
+    guest->grantPermission(simple_sftpd::UserPermission::LIST);
+    guest->grantPermission(simple_sftpd::UserPermission::DOWNLOAD);
     
     // Set restrictions
     guest->setMaxConnections(1);
@@ -193,7 +193,7 @@ void createRestrictedUser() {
     guest->setMaxFileSize(10 * 1024 * 1024); // 10 MB max file size
     
     // Set user status
-    guest->setStatus(simple_ftpd::UserStatus::ACTIVE);
+    guest->setStatus(simple_sftpd::UserStatus::ACTIVE);
     
     server.addUser(guest);
 }
@@ -201,10 +201,10 @@ void createRestrictedUser() {
 
 #### Anonymous User
 ```cpp
-#include "ssftpd/ftp_user.hpp"
+#include "simple-sftpd/ftp_user.hpp"
 
 void createAnonymousUser() {
-    auto anon = std::make_shared<simple_ftpd::FTPUser>("anonymous");
+    auto anon = std::make_shared<simple_sftpd::FTPUser>("anonymous");
     
     // Set empty password for anonymous access
     anon->setPassword("");
@@ -213,9 +213,9 @@ void createAnonymousUser() {
     anon->setHomeDirectory("/var/ftp/public");
     
     // Grant read-only access
-    anon->grantPermission(simple_ftpd::UserPermission::READ);
-    anon->grantPermission(simple_ftpd::UserPermission::LIST);
-    anon->grantPermission(simple_ftpd::UserPermission::DOWNLOAD);
+    anon->grantPermission(simple_sftpd::UserPermission::READ);
+    anon->grantPermission(simple_sftpd::UserPermission::LIST);
+    anon->grantPermission(simple_sftpd::UserPermission::DOWNLOAD);
     
     // Set restrictions
     anon->setMaxConnections(5);
@@ -223,7 +223,7 @@ void createAnonymousUser() {
     anon->setMaxFileSize(5 * 1024 * 1024); // 5 MB max file size
     
     // Set user status
-    anon->setStatus(simple_ftpd::UserStatus::ACTIVE);
+    anon->setStatus(simple_sftpd::UserStatus::ACTIVE);
     
     server.addUser(anon);
 }
@@ -235,10 +235,10 @@ void createAnonymousUser() {
 
 #### Single Domain Virtual Host
 ```cpp
-#include "ssftpd/ftp_virtual_host.hpp"
+#include "simple-sftpd/ftp_virtual_host.hpp"
 
 void createBasicVirtualHost() {
-    auto vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("ftp.example.com");
+    auto vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("ftp.example.com");
     
     // Set document root
     vhost->setDocumentRoot("/var/ftp/example");
@@ -248,7 +248,7 @@ void createBasicVirtualHost() {
     vhost->setBannerMessage("Example.com FTP Server Ready");
     
     // Configure basic security
-    simple_ftpd::SecurityConfig security;
+    simple_sftpd::SecurityConfig security;
     security.chroot_enabled = true;
     security.chroot_directory = "/var/ftp/example";
     security.drop_privileges = true;
@@ -264,21 +264,21 @@ void createBasicVirtualHost() {
 
 #### Multi-Domain Virtual Hosts
 ```cpp
-#include "ssftpd/ftp_virtual_host.hpp"
+#include "simple-sftpd/ftp_virtual_host.hpp"
 
 void createMultiDomainSetup() {
     // Example.com virtual host
-    auto example_vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("ftp.example.com");
+    auto example_vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("ftp.example.com");
     example_vhost->setDocumentRoot("/var/ftp/example");
     example_vhost->setWelcomeMessage("Welcome to Example.com FTP");
     
     // Test.com virtual host
-    auto test_vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("ftp.test.com");
+    auto test_vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("ftp.test.com");
     test_vhost->setDocumentRoot("/var/ftp/test");
     test_vhost->setWelcomeMessage("Welcome to Test.com FTP");
     
     // Demo.com virtual host
-    auto demo_vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("ftp.demo.com");
+    auto demo_vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("ftp.demo.com");
     demo_vhost->setDocumentRoot("/var/ftp/demo");
     demo_vhost->setWelcomeMessage("Welcome to Demo.com FTP");
     
@@ -293,16 +293,16 @@ void createMultiDomainSetup() {
 
 #### SSL-Enabled Virtual Host
 ```cpp
-#include "ssftpd/ftp_virtual_host.hpp"
+#include "simple-sftpd/ftp_virtual_host.hpp"
 
 void createSSLVirtualHost() {
-    auto ssl_vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("secure.example.com");
+    auto ssl_vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("secure.example.com");
     
     // Set document root
     ssl_vhost->setDocumentRoot("/var/ftp/secure");
     
     // Configure SSL
-    simple_ftpd::SSLConfig ssl_config;
+    simple_sftpd::SSLConfig ssl_config;
     ssl_config.enabled = true;
     ssl_config.certificate_file = "/etc/ssl/certs/example.com.crt";
     ssl_config.private_key_file = "/etc/ssl/private/example.com.key";
@@ -316,7 +316,7 @@ void createSSLVirtualHost() {
     ssl_vhost->setSSLConfig(ssl_config);
     
     // Configure security
-    simple_ftpd::SecurityConfig security;
+    simple_sftpd::SecurityConfig security;
     security.chroot_enabled = true;
     security.chroot_directory = "/var/ftp/secure";
     security.drop_privileges = true;
@@ -334,16 +334,16 @@ void createSSLVirtualHost() {
 
 #### Mixed HTTP/FTP Virtual Host
 ```cpp
-#include "ssftpd/ftp_virtual_host.hpp"
+#include "simple-sftpd/ftp_virtual_host.hpp"
 
 void createMixedVirtualHost() {
-    auto mixed_vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("files.example.com");
+    auto mixed_vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("files.example.com");
     
     // Set document root
     mixed_vhost->setDocumentRoot("/var/www/example.com/files");
     
     // Configure SSL (optional for this host)
-    simple_ftpd::SSLConfig ssl_config;
+    simple_sftpd::SSLConfig ssl_config;
     ssl_config.enabled = true;
     ssl_config.certificate_file = "/etc/ssl/certs/example.com.crt";
     ssl_config.private_key_file = "/etc/ssl/private/example.com.key";
@@ -352,7 +352,7 @@ void createMixedVirtualHost() {
     mixed_vhost->setSSLConfig(ssl_config);
     
     // Configure security
-    simple_ftpd::SecurityConfig security;
+    simple_sftpd::SecurityConfig security;
     security.chroot_enabled = false; // Allow access to web files
     security.drop_privileges = true;
     security.run_as_user = "www-data";
@@ -374,16 +374,16 @@ void createMixedVirtualHost() {
 
 #### Chroot Jail Setup
 ```cpp
-#include "ssftpd/ftp_virtual_host.hpp"
+#include "simple-sftpd/ftp_virtual_host.hpp"
 
 void createSecureChrootJail() {
-    auto secure_vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("secure.example.com");
+    auto secure_vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("secure.example.com");
     
     // Set document root
     secure_vhost->setDocumentRoot("/var/ftp/secure");
     
     // Configure strict security
-    simple_ftpd::SecurityConfig security;
+    simple_sftpd::SecurityConfig security;
     security.chroot_enabled = true;
     security.chroot_directory = "/var/ftp/secure";
     security.drop_privileges = true;
@@ -409,7 +409,7 @@ void createSecureChrootJail() {
     secure_vhost->setSecurityConfig(security);
     
     // Configure SSL
-    simple_ftpd::SSLConfig ssl_config;
+    simple_sftpd::SSLConfig ssl_config;
     ssl_config.enabled = true;
     ssl_config.certificate_file = "/etc/ssl/certs/secure.example.com.crt";
     ssl_config.private_key_file = "/etc/ssl/private/secure.example.com.key";
@@ -424,10 +424,10 @@ void createSecureChrootJail() {
 
 #### Rate Limiting and DDoS Protection
 ```cpp
-#include "ssftpd/ftp_server_config.hpp"
+#include "simple-sftpd/ftp_server_config.hpp"
 
 void configureRateLimiting() {
-    auto config = std::make_shared<simple_ftpd::FTPServerConfig>();
+    auto config = std::make_shared<simple_sftpd::FTPServerConfig>();
     
     // Connection rate limiting
     config->connection.max_connections = 100;
@@ -466,42 +466,42 @@ void configureRateLimiting() {
 
 #### Structured Logging Setup
 ```cpp
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/logger.hpp"
 
 void setupAdvancedLogging() {
     // Create main logger
-    auto main_logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/ssftpd/ssftpd.log",
-        simple_ftpd::LogLevel::INFO,
+    auto main_logger = std::make_shared<simple_sftpd::Logger>(
+        "/var/log/simple-sftpd/simple-sftpd.log",
+        simple_sftpd::LogLevel::INFO,
         true,  // log to console
         true   // log to file
     );
     
     // Configure log format
-    main_logger->setLogFormat(simple_ftpd::LogFormat::EXTENDED);
+    main_logger->setLogFormat(simple_sftpd::LogFormat::EXTENDED);
     main_logger->setMaxLogSize(50 * 1024 * 1024); // 50 MB
     main_logger->setMaxLogFiles(10);
     
     // Create transfer logger
-    auto transfer_logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/ssftpd/transfers.log",
-        simple_ftpd::LogLevel::INFO,
+    auto transfer_logger = std::make_shared<simple_sftpd::Logger>(
+        "/var/log/simple-sftpd/transfers.log",
+        simple_sftpd::LogLevel::INFO,
         false, // don't log to console
         true   // log to file
     );
     
-    transfer_logger->setLogFormat(simple_ftpd::LogFormat::JSON);
+    transfer_logger->setLogFormat(simple_sftpd::LogFormat::JSON);
     transfer_logger->setMaxLogSize(100 * 1024 * 1024); // 100 MB
     
     // Create security logger
-    auto security_logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/ssftpd/security.log",
-        simple_ftpd::LogLevel::WARN,
+    auto security_logger = std::make_shared<simple_sftpd::Logger>(
+        "/var/log/simple-sftpd/security.log",
+        simple_sftpd::LogLevel::WARN,
         false, // don't log to console
         true   // log to file
     );
     
-    security_logger->setLogFormat(simple_ftpd::LogFormat::EXTENDED);
+    security_logger->setLogFormat(simple_sftpd::LogFormat::EXTENDED);
     
     // Enable performance monitoring
     main_logger->setPerformanceMonitoring(true);
@@ -511,18 +511,18 @@ void setupAdvancedLogging() {
 
 #### Custom Log Format
 ```cpp
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/logger.hpp"
 
 void setupCustomLogging() {
-    auto logger = std::make_shared<simple_ftpd::Logger>();
+    auto logger = std::make_shared<simple_sftpd::Logger>();
     
     // Set custom log format
     std::string custom_format = "[{timestamp}] [{level}] [{thread}] [{file}:{line}] {message}";
     logger->setCustomFormat(custom_format);
-    logger->setLogFormat(simple_ftpd::LogFormat::CUSTOM);
+    logger->setLogFormat(simple_sftpd::LogFormat::CUSTOM);
     
     // Set log level
-    logger->setLogLevel(simple_ftpd::LogLevel::DEBUG);
+    logger->setLogLevel(simple_sftpd::LogLevel::DEBUG);
     
     // Enable asynchronous logging
     logger->setAsyncLogging(true);
@@ -545,11 +545,11 @@ void setupCustomLogging() {
 
 #### Performance Metrics Collection
 ```cpp
-#include "ssftpd/logger.hpp"
-#include "ssftpd/ftp_server.hpp"
+#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/ftp_server.hpp"
 
 void setupPerformanceMonitoring() {
-    auto logger = std::make_shared<simple_ftpd::Logger>();
+    auto logger = std::make_shared<simple_sftpd::Logger>();
     
     // Enable performance monitoring
     logger->setPerformanceMonitoring(true);
@@ -585,17 +585,17 @@ void setupPerformanceMonitoring() {
 
 #### Hot Configuration Reload
 ```cpp
-#include "ssftpd/ftp_server.hpp"
-#include "ssftpd/ftp_server_config.hpp"
+#include "simple-sftpd/ftp_server.hpp"
+#include "simple-sftpd/ftp_server_config.hpp"
 #include <filesystem>
 
 void setupHotReload() {
-    auto config = std::make_shared<simple_ftpd::FTPServerConfig>();
-    auto server = std::make_shared<simple_ftpd::FTPServer>(config);
+    auto config = std::make_shared<simple_sftpd::FTPServerConfig>();
+    auto server = std::make_shared<simple_sftpd::FTPServer>(config);
     
     // Start configuration file watcher
     std::thread config_watcher([&]() {
-        std::string config_file = "/etc/ssftpd/ssftpd.conf";
+        std::string config_file = "/etc/simple-sftpd/simple-sftpd.conf";
         std::filesystem::file_time_type last_modified = 
             std::filesystem::last_write_time(config_file);
         
@@ -639,10 +639,10 @@ void setupHotReload() {
 
 #### Configuration Validation
 ```cpp
-#include "ssftpd/ftp_server_config.hpp"
+#include "simple-sftpd/ftp_server_config.hpp"
 
 bool validateConfiguration(const std::string& config_file) {
-    auto config = std::make_shared<simple_ftpd::FTPServerConfig>();
+    auto config = std::make_shared<simple_sftpd::FTPServerConfig>();
     
     // Load configuration
     if (!config->loadFromFile(config_file)) {
@@ -689,20 +689,20 @@ bool validateConfiguration(const std::string& config_file) {
 #### User Class Testing
 ```cpp
 #include <gtest/gtest.h>
-#include "ssftpd/ftp_user.hpp"
+#include "simple-sftpd/ftp_user.hpp"
 
 class FTPUserTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        user = std::make_shared<simple_ftpd::FTPUser>("testuser");
+        user = std::make_shared<simple_sftpd::FTPUser>("testuser");
     }
     
-    std::shared_ptr<simple_ftpd::FTPUser> user;
+    std::shared_ptr<simple_sftpd::FTPUser> user;
 };
 
 TEST_F(FTPUserTest, Constructor) {
     EXPECT_EQ(user->getUsername(), "testuser");
-    EXPECT_EQ(user->getStatus(), simple_ftpd::UserStatus::ACTIVE);
+    EXPECT_EQ(user->getStatus(), simple_sftpd::UserStatus::ACTIVE);
     EXPECT_TRUE(user->isEnabled());
 }
 
@@ -713,15 +713,15 @@ TEST_F(FTPUserTest, PasswordVerification) {
 }
 
 TEST_F(FTPUserTest, PermissionManagement) {
-    user->grantPermission(simple_ftpd::UserPermission::READ);
-    user->grantPermission(simple_ftpd::UserPermission::WRITE);
+    user->grantPermission(simple_sftpd::UserPermission::READ);
+    user->grantPermission(simple_sftpd::UserPermission::WRITE);
     
-    EXPECT_TRUE(user->hasPermission(simple_ftpd::UserPermission::READ));
-    EXPECT_TRUE(user->hasPermission(simple_ftpd::UserPermission::WRITE));
-    EXPECT_FALSE(user->hasPermission(simple_ftpd::UserPermission::DELETE));
+    EXPECT_TRUE(user->hasPermission(simple_sftpd::UserPermission::READ));
+    EXPECT_TRUE(user->hasPermission(simple_sftpd::UserPermission::WRITE));
+    EXPECT_FALSE(user->hasPermission(simple_sftpd::UserPermission::DELETE));
     
-    user->revokePermission(simple_ftpd::UserPermission::WRITE);
-    EXPECT_FALSE(user->hasPermission(simple_ftpd::UserPermission::WRITE));
+    user->revokePermission(simple_sftpd::UserPermission::WRITE);
+    EXPECT_FALSE(user->hasPermission(simple_sftpd::UserPermission::WRITE));
 }
 
 TEST_F(FTPUserTest, HomeDirectory) {
@@ -734,15 +734,15 @@ TEST_F(FTPUserTest, HomeDirectory) {
 #### Virtual Host Testing
 ```cpp
 #include <gtest/gtest.h>
-#include "ssftpd/ftp_virtual_host.hpp"
+#include "simple-sftpd/ftp_virtual_host.hpp"
 
 class FTPVirtualHostTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("test.example.com");
+        vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("test.example.com");
     }
     
-    std::shared_ptr<simple_ftpd::FTPVirtualHost> vhost;
+    std::shared_ptr<simple_sftpd::FTPVirtualHost> vhost;
 };
 
 TEST_F(FTPVirtualHostTest, Constructor) {
@@ -757,7 +757,7 @@ TEST_F(FTPVirtualHostTest, DocumentRoot) {
 }
 
 TEST_F(FTPVirtualHostTest, SSLConfiguration) {
-    simple_ftpd::SSLConfig ssl_config;
+    simple_sftpd::SSLConfig ssl_config;
     ssl_config.enabled = true;
     ssl_config.certificate_file = "/path/to/cert.crt";
     
@@ -769,7 +769,7 @@ TEST_F(FTPVirtualHostTest, SSLConfiguration) {
 }
 
 TEST_F(FTPVirtualHostTest, UserAccess) {
-    auto user = std::make_shared<simple_ftpd::FTPUser>("testuser");
+    auto user = std::make_shared<simple_sftpd::FTPUser>("testuser");
     
     // Initially no users allowed
     EXPECT_FALSE(vhost->isUserAllowed("testuser"));
@@ -789,17 +789,17 @@ TEST_F(FTPVirtualHostTest, UserAccess) {
 #### Server Integration Test
 ```cpp
 #include <gtest/gtest.h>
-#include "ssftpd/ftp_server.hpp"
-#include "ssftpd/ftp_server_config.hpp"
+#include "simple-sftpd/ftp_server.hpp"
+#include "simple-sftpd/ftp_server_config.hpp"
 
 class FTPServerIntegrationTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        config = std::make_shared<simple_ftpd::FTPServerConfig>();
+        config = std::make_shared<simple_sftpd::FTPServerConfig>();
         config->connection.bind_port = 0; // Use random port
         config->connection.max_connections = 10;
         
-        server = std::make_shared<simple_ftpd::FTPServer>(config);
+        server = std::make_shared<simple_sftpd::FTPServer>(config);
     }
     
     void TearDown() override {
@@ -808,8 +808,8 @@ protected:
         }
     }
     
-    std::shared_ptr<simple_ftpd::FTPServerConfig> config;
-    std::shared_ptr<simple_ftpd::FTPServer> server;
+    std::shared_ptr<simple_sftpd::FTPServerConfig> config;
+    std::shared_ptr<simple_sftpd::FTPServer> server;
 };
 
 TEST_F(FTPServerIntegrationTest, ServerStartStop) {
@@ -823,7 +823,7 @@ TEST_F(FTPServerIntegrationTest, ServerStartStop) {
 }
 
 TEST_F(FTPServerIntegrationTest, UserManagement) {
-    auto user = std::make_shared<simple_ftpd::FTPUser>("testuser");
+    auto user = std::make_shared<simple_sftpd::FTPUser>("testuser");
     user->setPassword("testpass");
     user->setHomeDirectory("/var/ftp/testuser");
     
@@ -840,7 +840,7 @@ TEST_F(FTPServerIntegrationTest, UserManagement) {
 }
 
 TEST_F(FTPServerIntegrationTest, VirtualHostManagement) {
-    auto vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("test.example.com");
+    auto vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("test.example.com");
     vhost->setDocumentRoot("/var/ftp/test");
     
     server->addVirtualHost(vhost);
@@ -862,30 +862,30 @@ TEST_F(FTPServerIntegrationTest, VirtualHostManagement) {
 
 #### Systemd Service File
 ```ini
-# /etc/systemd/system/ssftpd.service
+# /etc/systemd/system/simple-sftpd.service
 [Unit]
 Description=Simple-Secure FTP Daemon
-Documentation=man:ssftpd(8)
+Documentation=man:simple-sftpd(8)
 After=network.target
 
 [Service]
 Type=notify
 User=ftp
 Group=ftp
-ExecStart=/usr/bin/ssftpd --config /etc/ssftpd/ssftpd.conf
+ExecStart=/usr/bin/simple-sftpd --config /etc/simple-sftpd/simple-sftpd.conf
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=5
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=ssftpd
+SyslogIdentifier=simple-sftpd
 
 # Security settings
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/var/ftp /var/log/ssftpd
+ReadWritePaths=/var/ftp /var/log/simple-sftpd
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 
 # Resource limits
@@ -899,10 +899,10 @@ WantedBy=multi-user.target
 #### Systemd Service Management
 ```bash
 #!/bin/bash
-# /usr/local/bin/ssftpd-ctl
+# /usr/local/bin/simple-sftpd-ctl
 
-SERVICE_NAME="ssftpd"
-CONFIG_FILE="/etc/ssftpd/ssftpd.conf"
+SERVICE_NAME="simple-sftpd"
+CONFIG_FILE="/etc/simple-sftpd/simple-sftpd.conf"
 
 case "$1" in
     start)
@@ -934,7 +934,7 @@ case "$1" in
         ;;
     config-test)
         echo "Testing configuration file..."
-        /usr/bin/ssftpd --config $CONFIG_FILE --test-config
+        /usr/bin/simple-sftpd --config $CONFIG_FILE --test-config
         ;;
     *)
         echo "Usage: $0 {start|stop|restart|reload|status|enable|disable|config-test}"
@@ -963,8 +963,8 @@ RUN apt-get update && apt-get install -y \
 
 # Clone and build Simple-Secure FTP Daemon
 WORKDIR /opt
-RUN git clone https://github.com/ssftpd/ssftpd.git
-WORKDIR /opt/ssftpd
+RUN git clone https://github.com/simple-sftpd/simple-sftpd.git
+WORKDIR /opt/simple-sftpd
 RUN mkdir build && cd build \
     && cmake .. \
     && make -j$(nproc) \
@@ -972,12 +972,12 @@ RUN mkdir build && cd build \
 
 # Create FTP user and directories
 RUN useradd -r -s /bin/false ftp \
-    && mkdir -p /var/ftp /var/log/ssftpd \
-    && chown ftp:ftp /var/ftp /var/log/ssftpd
+    && mkdir -p /var/ftp /var/log/simple-sftpd \
+    && chown ftp:ftp /var/ftp /var/log/simple-sftpd
 
 # Copy configuration
-COPY ssftpd.conf /etc/ssftpd/ssftpd.conf
-RUN chown ftp:ftp /etc/ssftpd/ssftpd.conf
+COPY simple-sftpd.conf /etc/simple-sftpd/simple-sftpd.conf
+RUN chown ftp:ftp /etc/simple-sftpd/simple-sftpd.conf
 
 # Expose ports
 EXPOSE 21 49152-65535
@@ -986,7 +986,7 @@ EXPOSE 21 49152-65535
 USER ftp
 
 # Start the server
-CMD ["/usr/local/bin/ssftpd", "--config", "/etc/ssftpd/ssftpd.conf"]
+CMD ["/usr/local/bin/simple-sftpd", "--config", "/etc/simple-sftpd/simple-sftpd.conf"]
 ```
 
 #### Docker Compose
@@ -994,16 +994,16 @@ CMD ["/usr/local/bin/ssftpd", "--config", "/etc/ssftpd/ssftpd.conf"]
 version: '3.8'
 
 services:
-  ssftpd:
+  simple-sftpd:
     build: .
-    container_name: ssftpd
+    container_name: simple-sftpd
     ports:
       - "21:21"
       - "49152-65535:49152-65535"
     volumes:
-      - ./config:/etc/ssftpd
+      - ./config:/etc/simple-sftpd
       - ./ftp-data:/var/ftp
-      - ./logs:/var/log/ssftpd
+      - ./logs:/var/log/simple-sftpd
     environment:
       - TZ=UTC
     restart: unless-stopped
@@ -1019,7 +1019,7 @@ services:
       - ./admin-html:/usr/share/nginx/html
       - ./admin-config:/etc/nginx/conf.d
     depends_on:
-      - ssftpd
+      - simple-sftpd
     restart: unless-stopped
     networks:
       - ftp-network

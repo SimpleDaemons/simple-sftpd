@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include "ssftpd/ftp_server.hpp"
-#include "ssftpd/logger.hpp"
-#include "ssftpd/ftp_connection_manager.hpp"
+#include "simple-sftpd/ftp_server.hpp"
+#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/ftp_connection_manager.hpp"
 
-namespace ssftpd {
+namespace simple_sftpd {
 
 FTPServer::FTPServer(std::shared_ptr<FTPServerConfig> config)
     : config_(config), running_(false), server_socket_(-1) {
@@ -65,4 +65,4 @@ void FTPServer::handleConnection(int client_socket) {
     // Stub implementation
 }
 
-} // namespace ssftpd
+} // namespace simple_sftpd

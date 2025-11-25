@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include "ssftpd/ftp_rate_limiter.hpp"
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/ftp_rate_limiter.hpp"
+#include "simple-sftpd/logger.hpp"
 
-namespace ssftpd {
+namespace simple_sftpd {
 
 FTPRateLimiter::FTPRateLimiter(std::shared_ptr<Logger> logger)
     : logger_(logger) {
@@ -41,4 +41,4 @@ void FTPRateLimiter::setConnectionLimit(int max_connections_per_ip) {
     max_connections_per_ip_ = max_connections_per_ip;
 }
 
-} // namespace ssftpd
+} // namespace simple_sftpd

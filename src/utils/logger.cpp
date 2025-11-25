@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/logger.hpp"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-namespace ssftpd {
+namespace simple_sftpd {
 
 Logger::Logger(const std::string& log_file, LogLevel level, bool console, bool file)
     : log_file_(log_file), level_(level), console_(console), file_(file) {
@@ -107,4 +107,4 @@ std::string Logger::getTimestamp() const {
     return ss.str();
 }
 
-} // namespace ssftpd
+} // namespace simple_sftpd

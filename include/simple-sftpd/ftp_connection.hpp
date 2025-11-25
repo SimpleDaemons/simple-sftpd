@@ -14,12 +14,38 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_virtual_host.hpp"
+#pragma once
+
+#include <memory>
+#include <string>
+#include <atomic>
+#include <thread>
 
 namespace simple_sftpd {
 
-FTPVirtualHost::FTPVirtualHost(const std::string& hostname, const std::string& root_directory)
-    : hostname_(hostname), root_directory_(root_directory), enabled_(true) {
-}
+class Logger;
+class FTPServerConfig;
+
+class FTPConnection {
+public:
+    FTPConnection(int socket, std::shared_ptr<Logger> logger, std::shared_ptr<FTPServerConfig> config);
+    ~FTPConnection();
+
+    void start();
+    void stop();
+    bool isActive() const;
+
+private:
+    void handleClient();
+    void sendResponse(const std::string& response);
+    std::string readLine();
+
+    int socket_;
+    std::shared_ptr<Logger> logger_;
+    std::shared_ptr<FTPServerConfig> config_;
+    
+    std::atomic<bool> active_;
+    std::thread client_thread_;
+};
 
 } // namespace simple_sftpd

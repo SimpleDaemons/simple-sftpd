@@ -105,7 +105,7 @@ if [ -n "$DATA_DIR" ] && [ ! -d "$DATA_DIR" ]; then
 fi
 
 # Build and deploy
-echo "Deploying ssftpd with profile: $PROFILE"
+echo "Deploying simple-sftpd with profile: $PROFILE"
 
 if [ "$FORCE" = true ]; then
     echo "Force rebuilding images..."
@@ -121,7 +121,7 @@ case $PROFILE in
         ;;
     "runtime")
         echo "Starting runtime environment..."
-        docker-compose --profile runtime up -d ssftpd
+        docker-compose --profile runtime up -d simple-sftpd
         echo "Runtime container started."
         ;;
     *)

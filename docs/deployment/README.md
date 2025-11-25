@@ -1,10 +1,10 @@
 # Deployment Guide
 
-This guide covers deploying ssftpd in various environments, from development to production.
+This guide covers deploying simple-sftpd in various environments, from development to production.
 
 ## 🐳 Docker Deployment (Recommended)
 
-Docker is the recommended deployment method for ssftpd, providing:
+Docker is the recommended deployment method for simple-sftpd, providing:
 
 - **Zero dependencies** - No need to install build tools or dependencies
 - **Cross-platform** - Works consistently across Linux, macOS, and Windows
@@ -80,36 +80,36 @@ make install
 **Ubuntu/Debian:**
 ```bash
 sudo apt update
-sudo apt install ssftpd
+sudo apt install simple-sftpd
 ```
 
 **CentOS/RHEL:**
 ```bash
-sudo yum install ssftpd
+sudo yum install simple-sftpd
 # or
-sudo dnf install ssftpd
+sudo dnf install simple-sftpd
 ```
 
 **macOS:**
 ```bash
-brew install ssftpd
+brew install simple-sftpd
 ```
 
 ### Configuration
 
 1. **Copy example configuration:**
    ```bash
-   sudo cp /etc/ssftpd/ssftpd.conf.example /etc/ssftpd/ssftpd.conf
+   sudo cp /etc/simple-sftpd/simple-sftpd.conf.example /etc/simple-sftpd/simple-sftpd.conf
    ```
 
 2. **Edit configuration:**
    ```bash
-   sudo nano /etc/ssftpd/ssftpd.conf
+   sudo nano /etc/simple-sftpd/simple-sftpd.conf
    ```
 
 3. **Validate configuration:**
    ```bash
-   ssftpd --test-config
+   simple-sftpd --test-config
    ```
 
 ### Service Management
@@ -118,36 +118,36 @@ brew install ssftpd
 
 ```bash
 # Install service
-sudo systemctl enable ssftpd
-sudo systemctl start ssftpd
+sudo systemctl enable simple-sftpd
+sudo systemctl start simple-sftpd
 
 # Check status
-sudo systemctl status ssftpd
+sudo systemctl status simple-sftpd
 
 # View logs
-sudo journalctl -u ssftpd -f
+sudo journalctl -u simple-sftpd -f
 ```
 
 #### macOS (launchd)
 
 ```bash
 # Install service
-sudo cp scripts/com.simpledaemons.ssftpd.plist /Library/LaunchDaemons/
-sudo launchctl load /Library/LaunchDaemons/com.simpledaemons.ssftpd.plist
+sudo cp scripts/com.simpledaemons.simple-sftpd.plist /Library/LaunchDaemons/
+sudo launchctl load /Library/LaunchDaemons/com.simpledaemons.simple-sftpd.plist
 
 # Check status
-sudo launchctl list | grep ssftpd
+sudo launchctl list | grep simple-sftpd
 ```
 
 #### Windows (Service)
 
 ```cmd
 # Install service
-sc create ssftpd binPath="C:\Program Files\ssftpd\ssftpd.exe" start=auto
-sc start ssftpd
+sc create simple-sftpd binPath="C:\Program Files\simple-sftpd\simple-sftpd.exe" start=auto
+sc start simple-sftpd
 
 # Check status
-sc query ssftpd
+sc query simple-sftpd
 ```
 
 ## Production Deployment
@@ -194,7 +194,7 @@ mmap_enabled = true
 
 ```bash
 # Check service status
-systemctl status ssftpd
+systemctl status simple-sftpd
 
 # Test FTP connectivity
 nc -z localhost 21
@@ -207,13 +207,13 @@ openssl s_client -connect localhost:990 -starttls ftp
 
 ```bash
 # Follow logs in real-time
-tail -f /var/log/ssftpd/ssftpd.log
+tail -f /var/log/simple-sftpd/simple-sftpd.log
 
 # Search for errors
-grep ERROR /var/log/ssftpd/ssftpd.log
+grep ERROR /var/log/simple-sftpd/simple-sftpd.log
 
 # Monitor access logs
-tail -f /var/log/ssftpd/access.log
+tail -f /var/log/simple-sftpd/access.log
 ```
 
 ### Backup and Recovery
@@ -222,19 +222,19 @@ tail -f /var/log/ssftpd/access.log
 
 ```bash
 #!/bin/bash
-# backup-ssftpd.sh
+# backup-simple-sftpd.sh
 
 BACKUP_DIR="./backup/$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 
 # Backup configuration
-cp -r /etc/ssftpd "$BACKUP_DIR/"
+cp -r /etc/simple-sftpd "$BACKUP_DIR/"
 
 # Backup FTP data
 cp -r /var/ftp "$BACKUP_DIR/"
 
 # Backup logs
-cp -r /var/log/ssftpd "$BACKUP_DIR/"
+cp -r /var/log/simple-sftpd "$BACKUP_DIR/"
 
 echo "Backup completed: $BACKUP_DIR"
 ```
@@ -243,7 +243,7 @@ echo "Backup completed: $BACKUP_DIR"
 
 ```bash
 #!/bin/bash
-# restore-ssftpd.sh
+# restore-simple-sftpd.sh
 
 BACKUP_DIR="$1"
 if [ -z "$BACKUP_DIR" ]; then
@@ -252,15 +252,15 @@ if [ -z "$BACKUP_DIR" ]; then
 fi
 
 # Stop service
-systemctl stop ssftpd
+systemctl stop simple-sftpd
 
 # Restore files
-cp -r "$BACKUP_DIR/ssftpd" /etc/
+cp -r "$BACKUP_DIR/simple-sftpd" /etc/
 cp -r "$BACKUP_DIR/ftp" /var/
-cp -r "$BACKUP_DIR/ssftpd" /var/log/
+cp -r "$BACKUP_DIR/simple-sftpd" /var/log/
 
 # Start service
-systemctl start ssftpd
+systemctl start simple-sftpd
 
 echo "Restore completed from: $BACKUP_DIR"
 ```
@@ -298,8 +298,8 @@ backend ftp_servers
 ```yaml
 version: '3.8'
 services:
-  ssftpd:
-    image: ssftpd:latest
+  simple-sftpd:
+    image: simple-sftpd:latest
     deploy:
       replicas: 3
       endpoint_mode: dnsrr
@@ -308,7 +308,7 @@ services:
       - "990:990"
     volumes:
       - ftp_data:/var/ftp
-      - ftp_config:/etc/ssftpd:ro
+      - ftp_config:/etc/simple-sftpd:ro
 
 volumes:
   ftp_data:
@@ -322,7 +322,7 @@ volumes:
 ```yaml
 # docker-compose.yml
 services:
-  ssftpd:
+  simple-sftpd:
     deploy:
       resources:
         limits:
@@ -347,24 +347,24 @@ services:
 2. **Permission issues**
    ```bash
    # Fix directory permissions
-   sudo chown -R ssftpd:ssftpd /var/ftp
+   sudo chown -R simple-sftpd:simple-sftpd /var/ftp
    sudo chmod 755 /var/ftp
    ```
 
 3. **Configuration errors**
    ```bash
    # Validate configuration
-   ssftpd --test-config
+   simple-sftpd --test-config
    ```
 
 ### Debug Mode
 
 ```bash
 # Run with debug logging
-ssftpd --verbose --foreground
+simple-sftpd --verbose --foreground
 
 # Check configuration
-ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
+simple-sftpd --test-config --config /etc/simple-sftpd/simple-sftpd.conf
 ```
 
 ## Support

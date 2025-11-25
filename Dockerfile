@@ -136,31 +136,31 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN useradd -r -s /bin/false ssftpd
+RUN useradd -r -s /bin/false simple-sftpd
 
 # Create FTP directories
 RUN mkdir -p /var/ftp/pub /var/ftp/incoming /var/ftp/outgoing \
-    && chown -R ssftpd:ssftpd /var/ftp
+    && chown -R simple-sftpd:simple-sftpd /var/ftp
 
 # Copy binary from builder
-COPY --from=ubuntu-builder /app/build/bin/ssftpd /usr/local/bin/
-COPY --from=ubuntu-builder /app/config/ /etc/ssftpd/
+COPY --from=ubuntu-builder /app/build/bin/simple-sftpd /usr/local/bin/
+COPY --from=ubuntu-builder /app/config/ /etc/simple-sftpd/
 
 # Set ownership
-RUN chown -R ssftpd:ssftpd /etc/ssftpd
+RUN chown -R simple-sftpd:simple-sftpd /etc/simple-sftpd
 
 # Expose FTP ports (21 for FTP, 990 for FTPS, passive mode range)
 EXPOSE 21/tcp 990/tcp 1024-65535/tcp
 
 # Switch to non-root user
-USER ssftpd
+USER simple-sftpd
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD nc -z localhost 21 || exit 1
 
 # Default command
-CMD ["ssftpd", "--config", "/etc/ssftpd/ssftpd.conf"]
+CMD ["simple-sftpd", "--config", "/etc/simple-sftpd/simple-sftpd.conf"]
 
 # Development image
 FROM base-builder AS dev

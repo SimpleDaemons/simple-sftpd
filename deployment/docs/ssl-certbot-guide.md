@@ -1,10 +1,10 @@
 # SSL Certificate Management with Certbot
 
-This guide explains how to use Certbot to obtain and manage SSL certificates for ssftpd, enabling secure FTP (FTPS) connections.
+This guide explains how to use Certbot to obtain and manage SSL certificates for simple-sftpd, enabling secure FTP (FTPS) connections.
 
 ## 📋 Prerequisites
 
-- ssftpd installed and configured
+- simple-sftpd installed and configured
 - Domain name pointing to your server
 - Port 80 accessible for HTTP-01 challenge
 - Root or sudo access
@@ -51,17 +51,17 @@ sudo certbot certonly --standalone -d ftp.example.com -d ftp2.example.com
 sudo certbot certonly --manual --preferred-challenges dns -d *.example.com
 ```
 
-### 3. Configure ssftpd SSL
+### 3. Configure simple-sftpd SSL
 
 ```bash
-# Copy certificates to ssftpd SSL directory
-sudo mkdir -p /etc/ssftpd/ssl
-sudo cp /etc/letsencrypt/live/ftp.example.com/fullchain.pem /etc/ssftpd/ssl/
-sudo cp /etc/letsencrypt/live/ftp.example.com/privkey.pem /etc/ssftpd/ssl/
+# Copy certificates to simple-sftpd SSL directory
+sudo mkdir -p /etc/simple-sftpd/ssl
+sudo cp /etc/letsencrypt/live/ftp.example.com/fullchain.pem /etc/simple-sftpd/ssl/
+sudo cp /etc/letsencrypt/live/ftp.example.com/privkey.pem /etc/simple-sftpd/ssl/
 
 # Set proper permissions
-sudo chown -R ssftpd:ssftpd /etc/ssftpd/ssl/
-sudo chmod 600 /etc/ssftpd/ssl/*
+sudo chown -R simple-sftpd:simple-sftpd /etc/simple-sftpd/ssl/
+sudo chmod 600 /etc/simple-sftpd/ssl/*
 ```
 
 ## 🔧 Detailed Configuration
@@ -115,15 +115,15 @@ sudo certbot certonly --standalone -d ftp.example.com
 └── privkey.pem       # Private key
 ```
 
-### ssftpd SSL Directory
+### simple-sftpd SSL Directory
 ```
-/etc/ssftpd/ssl/
+/etc/simple-sftpd/ssl/
 ├── ftp.example.com.crt    # Full certificate chain
 ├── ftp.example.com.key    # Private key
 └── ca-bundle.crt          # CA bundle (optional)
 ```
 
-## ⚙️ ssftpd SSL Configuration
+## ⚙️ simple-sftpd SSL Configuration
 
 ### Basic SSL Module Configuration
 
@@ -143,8 +143,8 @@ sudo certbot certonly --standalone -d ftp.example.com
   
   "certificates": {
     "default": {
-      "certificate_file": "/etc/ssftpd/ssl/ftp.example.com.crt",
-      "private_key_file": "/etc/ssftpd/ssl/ftp.example.com.key"
+      "certificate_file": "/etc/simple-sftpd/ssl/ftp.example.com.crt",
+      "private_key_file": "/etc/simple-sftpd/ssl/ftp.example.com.key"
     }
   }
 }
@@ -167,9 +167,9 @@ sudo certbot certonly --standalone -d ftp.example.com
   },
   
   "ssl": {
-    "certificate_file": "/etc/ssftpd/ssl/ftp.example.com.crt",
-    "private_key_file": "/etc/ssftpd/ssl/ftp.example.com.key",
-    "ca_bundle_file": "/etc/ssftpd/ssl/ca-bundle.crt"
+    "certificate_file": "/etc/simple-sftpd/ssl/ftp.example.com.crt",
+    "private_key_file": "/etc/simple-sftpd/ssl/ftp.example.com.key",
+    "ca_bundle_file": "/etc/simple-sftpd/ssl/ca-bundle.crt"
   }
 }
 ```
@@ -201,30 +201,30 @@ sudo certbot renew
 
 ### Post-Renewal Script
 
-Create a script to automatically update ssftpd after renewal:
+Create a script to automatically update simple-sftpd after renewal:
 
 ```bash
 #!/bin/bash
-# /etc/letsencrypt/renewal-hooks/post/ssftpd-reload.sh
+# /etc/letsencrypt/renewal-hooks/post/simple-sftpd-reload.sh
 
 # Copy renewed certificates
-sudo cp /etc/letsencrypt/live/ftp.example.com/fullchain.pem /etc/ssftpd/ssl/ftp.example.com.crt
-sudo cp /etc/letsencrypt/live/ftp.example.com/privkey.pem /etc/ssftpd/ssl/ftp.example.com.key
+sudo cp /etc/letsencrypt/live/ftp.example.com/fullchain.pem /etc/simple-sftpd/ssl/ftp.example.com.crt
+sudo cp /etc/letsencrypt/live/ftp.example.com/privkey.pem /etc/simple-sftpd/ssl/ftp.example.com.key
 
 # Set permissions
-sudo chown ssftpd:ssftpd /etc/ssftpd/ssl/*
-sudo chmod 600 /etc/ssftpd/ssl/*
+sudo chown simple-sftpd:simple-sftpd /etc/simple-sftpd/ssl/*
+sudo chmod 600 /etc/simple-sftpd/ssl/*
 
-# Reload ssftpd
-sudo systemctl reload ssftpd
+# Reload simple-sftpd
+sudo systemctl reload simple-sftpd
 
 # Log renewal
-echo "$(date): SSL certificate renewed for ftp.example.com" >> /var/log/ssftpd/ssl-renewal.log
+echo "$(date): SSL certificate renewed for ftp.example.com" >> /var/log/simple-sftpd/ssl-renewal.log
 ```
 
 Make it executable:
 ```bash
-sudo chmod +x /etc/letsencrypt/renewal-hooks/post/ssftpd-reload.sh
+sudo chmod +x /etc/letsencrypt/renewal-hooks/post/simple-sftpd-reload.sh
 ```
 
 ## 🛠️ Management Commands
@@ -239,7 +239,7 @@ sudo certbot certificates
 sudo certbot certificates --cert-name ftp.example.com
 
 # Check expiration
-openssl x509 -in /etc/ssftpd/ssl/ftp.example.com.crt -text -noout | grep "Not After"
+openssl x509 -in /etc/simple-sftpd/ssl/ftp.example.com.crt -text -noout | grep "Not After"
 ```
 
 ### Revoke Certificate
@@ -282,9 +282,9 @@ sudo certbot certonly --manual --preferred-challenges dns -d ftp.example.com
 #### Permission Denied
 ```bash
 # Fix SSL directory permissions
-sudo chown -R ssftpd:ssftpd /etc/ssftpd/ssl/
-sudo chmod 600 /etc/ssftpd/ssl/*
-sudo chmod 700 /etc/ssftpd/ssl/
+sudo chown -R simple-sftpd:simple-sftpd /etc/simple-sftpd/ssl/
+sudo chmod 600 /etc/simple-sftpd/ssl/*
+sudo chmod 700 /etc/simple-sftpd/ssl/
 ```
 
 #### Certificate Not Found
@@ -329,8 +329,8 @@ done
 # Check renewal logs
 sudo tail -f /var/log/letsencrypt/letsencrypt.log
 
-# Check ssftpd SSL logs
-sudo tail -f /var/log/ssftpd/ssl.log
+# Check simple-sftpd SSL logs
+sudo tail -f /var/log/simple-sftpd/ssl.log
 ```
 
 ### Automated Monitoring Script
@@ -339,7 +339,7 @@ sudo tail -f /var/log/ssftpd/ssl.log
 #!/bin/bash
 # /usr/local/bin/check-ssl-expiry.sh
 
-CERT_DIR="/etc/ssftpd/ssl"
+CERT_DIR="/etc/simple-sftpd/ssl"
 DAYS_WARNING=30
 
 for cert_file in "$CERT_DIR"/*.crt; do
@@ -364,8 +364,8 @@ done
 
 ```bash
 # Restrict access to private keys
-sudo chmod 600 /etc/ssftpd/ssl/*.key
-sudo chown ssftpd:ssftpd /etc/ssftpd/ssl/*.key
+sudo chmod 600 /etc/simple-sftpd/ssl/*.key
+sudo chown simple-sftpd:simple-sftpd /etc/simple-sftpd/ssl/*.key
 
 # Use strong key algorithms
 # Certbot automatically uses RSA 2048-bit or ECDSA P-256
@@ -409,21 +409,21 @@ sudo chown ssftpd:ssftpd /etc/ssftpd/ssl/*.key
 - [Challenge Types](https://letsencrypt.org/docs/challenge-types/)
 - [Rate Limits](https://letsencrypt.org/docs/rate-limits/)
 
-### ssftpd SSL Documentation
+### simple-sftpd SSL Documentation
 - [SSL Module Configuration](../modules-available/ssl.conf)
 - [Virtual Host SSL Setup](../sites-available/)
 - [SSL Troubleshooting](../troubleshooting.md)
 
 ### Community Support
-- [GitHub Issues](https://github.com/ssftpd/ssftpd/issues)
-- [Community Forum](https://community.ssftpd.org)
-- [Discord Server](https://discord.gg/ssftpd)
+- [GitHub Issues](https://github.com/simple-sftpd/simple-sftpd/issues)
+- [Community Forum](https://community.simple-sftpd.org)
+- [Discord Server](https://discord.gg/simple-sftpd)
 
 ---
 
 **Next Steps**: 
 1. Install Certbot on your system
 2. Obtain your first SSL certificate
-3. Configure ssftpd to use the certificate
+3. Configure simple-sftpd to use the certificate
 4. Set up automatic renewal
 5. Test FTPS connections

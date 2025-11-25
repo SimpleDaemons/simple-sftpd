@@ -1,6 +1,6 @@
-# Simple Secure FTP Daemon (ssftpd) - Roadmap
+# Simple Secure FTP Daemon (simple-sftpd) - Roadmap
 
-This document outlines the development roadmap for ssftpd, a secure, configurable, and feature-rich FTP server written in C++.
+This document outlines the development roadmap for simple-sftpd, a secure, configurable, and feature-rich FTP server written in C++.
 
 ## 🎯 Project Vision
 

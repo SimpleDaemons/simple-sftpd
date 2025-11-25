@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include "ssftpd/ftp_connection.hpp"
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/ftp_connection.hpp"
+#include "simple-sftpd/logger.hpp"
 
-namespace ssftpd {
+namespace simple_sftpd {
 
 FTPConnection::FTPConnection(int socket, std::shared_ptr<Logger> logger, std::shared_ptr<FTPServerConfig> config)
     : socket_(socket), logger_(logger), config_(config), active_(false) {
@@ -70,4 +70,4 @@ std::string FTPConnection::readLine() {
     return "";
 }
 
-} // namespace ssftpd
+} // namespace simple_sftpd

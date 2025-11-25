@@ -392,23 +392,23 @@ try {
 
 ### Basic Server Setup
 ```cpp
-#include "ssftpd/ftp_server.hpp"
-#include "ssftpd/ftp_server_config.hpp"
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/ftp_server.hpp"
+#include "simple-sftpd/ftp_server_config.hpp"
+#include "simple-sftpd/logger.hpp"
 
 int main() {
     // Create configuration
-    auto config = std::make_shared<simple_ftpd::FTPServerConfig>();
-    config->loadFromFile("/etc/ssftpd/ssftpd.conf");
+    auto config = std::make_shared<simple_sftpd::FTPServerConfig>();
+    config->loadFromFile("/etc/simple-sftpd/simple-sftpd.conf");
     
     // Create logger
-    auto logger = std::make_shared<simple_ftpd::Logger>(
-        "/var/log/ssftpd/ssftpd.log",
-        simple_ftpd::LogLevel::INFO
+    auto logger = std::make_shared<simple_sftpd::Logger>(
+        "/var/log/simple-sftpd/simple-sftpd.log",
+        simple_sftpd::LogLevel::INFO
     );
     
     // Create and start server
-    simple_ftpd::FTPServer server(config);
+    simple_sftpd::FTPServer server(config);
     if (server.start()) {
         logger->info("Server started successfully");
         // Keep server running
@@ -423,21 +423,21 @@ int main() {
 
 ### User Management
 ```cpp
-#include "ssftpd/ftp_user.hpp"
+#include "simple-sftpd/ftp_user.hpp"
 
 // Create user
-auto user = std::make_shared<simple_ftpd::FTPUser>("john");
+auto user = std::make_shared<simple_sftpd::FTPUser>("john");
 user->setPassword("secret123");
 user->setHomeDirectory("/var/ftp/john");
-user->grantPermission(simple_ftpd::UserPermission::READ);
-user->grantPermission(simple_ftpd::UserPermission::WRITE);
-user->grantPermission(simple_ftpd::UserPermission::LIST);
-user->grantPermission(simple_ftpd::UserPermission::UPLOAD);
-user->grantPermission(simple_ftpd::UserPermission::DOWNLOAD);
+user->grantPermission(simple_sftpd::UserPermission::READ);
+user->grantPermission(simple_sftpd::UserPermission::WRITE);
+user->grantPermission(simple_sftpd::UserPermission::LIST);
+user->grantPermission(simple_sftpd::UserPermission::UPLOAD);
+user->grantPermission(simple_sftpd::UserPermission::DOWNLOAD);
 
 // Verify user
 if (user->verifyPassword("secret123")) {
-    if (user->hasPermission(simple_ftpd::UserPermission::UPLOAD)) {
+    if (user->hasPermission(simple_sftpd::UserPermission::UPLOAD)) {
         // Allow upload
     }
 }
@@ -445,23 +445,23 @@ if (user->verifyPassword("secret123")) {
 
 ### Virtual Host Configuration
 ```cpp
-#include "ssftpd/ftp_virtual_host.hpp"
+#include "simple-sftpd/ftp_virtual_host.hpp"
 
 // Create virtual host
-auto vhost = std::make_shared<simple_ftpd::FTPVirtualHost>("ftp.example.com");
+auto vhost = std::make_shared<simple_sftpd::FTPVirtualHost>("ftp.example.com");
 vhost->setDocumentRoot("/var/ftp/example");
 vhost->setWelcomeMessage("Welcome to Example.com FTP Server");
 vhost->setBannerMessage("Example.com FTP Server Ready");
 
 // Configure SSL
-simple_ftpd::SSLConfig ssl_config;
+simple_sftpd::SSLConfig ssl_config;
 ssl_config.enabled = true;
 ssl_config.certificate_file = "/etc/ssl/certs/example.com.crt";
 ssl_config.private_key_file = "/etc/ssl/private/example.com.key";
 vhost->setSSLConfig(ssl_config);
 
 // Configure security
-simple_ftpd::SecurityConfig security_config;
+simple_sftpd::SecurityConfig security_config;
 security_config.chroot_enabled = true;
 security_config.chroot_directory = "/var/ftp/example";
 security_config.drop_privileges = true;
@@ -474,8 +474,8 @@ vhost->setSecurityConfig(security_config);
 ### Debug Logging
 ```cpp
 // Enable debug logging
-logger->setLogLevel(simple_ftpd::LogLevel::DEBUG);
-logger->setLogFormat(simple_ftpd::LogFormat::EXTENDED);
+logger->setLogLevel(simple_sftpd::LogLevel::DEBUG);
+logger->setLogFormat(simple_sftpd::LogFormat::EXTENDED);
 
 // Add debug statements
 logger->debug("Function: " + std::string(__FUNCTION__));

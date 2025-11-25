@@ -22,7 +22,7 @@ services:
       - dev
 
   # Runtime container
-  ssftpd:
+  simple-sftpd:
     build:
       context: .
       dockerfile: Dockerfile
@@ -32,12 +32,12 @@ services:
       - "990:990/tcp"
       - "1024-65535:1024-65535/tcp"
     volumes:
-      - ./config:/etc/ssftpd:ro
-      - ./logs:/var/log/ssftpd
+      - ./config:/etc/simple-sftpd:ro
+      - ./logs:/var/log/simple-sftpd
       - ./data:/var/ftp
     environment:
       - FTP_ROOT_DIR=/var/ftp
-      - FTP_CONFIG_FILE=/etc/ssftpd/ssftpd.conf
+      - FTP_CONFIG_FILE=/etc/simple-sftpd/simple-sftpd.conf
       - LOG_LEVEL=info
     restart: unless-stopped
     healthcheck:

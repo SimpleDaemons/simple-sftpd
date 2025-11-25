@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include "ssftpd/ftp_user_manager.hpp"
-#include "ssftpd/ftp_user.hpp"
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/ftp_user_manager.hpp"
+#include "simple-sftpd/ftp_user.hpp"
+#include "simple-sftpd/logger.hpp"
 
-namespace ssftpd {
+namespace simple_sftpd {
 
 FTPUserManager::FTPUserManager(std::shared_ptr<Logger> logger)
     : logger_(logger) {
@@ -72,4 +72,4 @@ std::vector<std::string> FTPUserManager::listUsers() const {
     return usernames;
 }
 
-} // namespace ssftpd
+} // namespace simple_sftpd

@@ -1,6 +1,6 @@
 # User Guide
 
-This comprehensive guide covers all aspects of using ssftpd, from basic operations to advanced features and troubleshooting.
+This comprehensive guide covers all aspects of using simple-sftpd, from basic operations to advanced features and troubleshooting.
 
 ## 🚀 Quick Start
 
@@ -8,35 +8,35 @@ This comprehensive guide covers all aspects of using ssftpd, from basic operatio
 
 ```bash
 # Start with default configuration
-sudo ssftpd start
+sudo simple-sftpd start
 
 # Start with custom configuration
-sudo ssftpd start --config /etc/ssftpd/ssftpd.conf
+sudo simple-sftpd start --config /etc/simple-sftpd/simple-sftpd.conf
 
 # Start in foreground mode (for testing)
-sudo ssftpd --config /etc/ssftpd/ssftpd.conf --foreground
+sudo simple-sftpd --config /etc/simple-sftpd/simple-sftpd.conf --foreground
 
 # Start as daemon
-sudo ssftpd --daemon start --config /etc/ssftpd/ssftpd.conf
+sudo simple-sftpd --daemon start --config /etc/simple-sftpd/simple-sftpd.conf
 ```
 
 ### Basic Commands
 
 ```bash
 # Check server status
-ssftpd status
+simple-sftpd status
 
 # Stop the server
-sudo ssftpd stop
+sudo simple-sftpd stop
 
 # Restart the server
-sudo ssftpd restart
+sudo simple-sftpd restart
 
 # Reload configuration
-sudo ssftpd reload
+sudo simple-sftpd reload
 
 # Check server version
-ssftpd --version
+simple-sftpd --version
 ```
 
 ## 👥 User Management
@@ -45,14 +45,14 @@ ssftpd --version
 
 ```bash
 # Create a new user
-sudo ssftpd user add \
+sudo simple-sftpd user add \
   --username john \
   --password securepass123 \
   --home /var/ftp/john \
   --permissions READ,WRITE,UPLOAD,DOWNLOAD
 
 # Create user with specific limits
-sudo ssftpd user add \
+sudo simple-sftpd user add \
   --username limited \
   --password pass123 \
   --home /var/ftp/limited \
@@ -62,7 +62,7 @@ sudo ssftpd user add \
   --transfer-rate 5MB/s
 
 # Create admin user
-sudo ssftpd user add \
+sudo simple-sftpd user add \
   --username admin \
   --password adminpass \
   --home /var/ftp/admin \
@@ -74,29 +74,29 @@ sudo ssftpd user add \
 
 ```bash
 # List all users
-ssftpd user list
+simple-sftpd user list
 
 # Get user details
-ssftpd user info --username john
+simple-sftpd user info --username john
 
 # Modify user permissions
-sudo ssftpd user modify \
+sudo simple-sftpd user modify \
   --username john \
   --permissions READ,WRITE,UPLOAD,DOWNLOAD,DELETE
 
 # Change user password
-sudo ssftpd user password \
+sudo simple-sftpd user password \
   --username john \
   --password newpassword123
 
 # Disable user
-sudo ssftpd user disable --username john
+sudo simple-sftpd user disable --username john
 
 # Enable user
-sudo ssftpd user enable --username john
+sudo simple-sftpd user enable --username john
 
 # Remove user
-sudo ssftpd user remove --username john
+sudo simple-sftpd user remove --username john
 ```
 
 ### User Types and Permissions
@@ -140,14 +140,14 @@ sudo ssftpd user remove --username john
 
 ```bash
 # Create basic virtual host
-sudo ssftpd virtual add \
+sudo simple-sftpd virtual add \
   --hostname ftp.example.com \
   --root /var/ftp/example.com \
-  --ssl-cert /etc/ssftpd/ssl/example.com.crt \
-  --ssl-key /etc/ssftpd/ssl/example.com.key
+  --ssl-cert /etc/simple-sftpd/ssl/example.com.crt \
+  --ssl-key /etc/simple-sftpd/ssl/example.com.key
 
 # Create virtual host with custom settings
-sudo ssftpd virtual add \
+sudo simple-sftpd virtual add \
   --hostname secure.example.com \
   --root /var/ftp/secure \
   --port 2121 \
@@ -161,36 +161,36 @@ sudo ssftpd virtual add \
 
 ```bash
 # List all virtual hosts
-ssftpd virtual list
+simple-sftpd virtual list
 
 # Get virtual host details
-ssftpd virtual info --hostname ftp.example.com
+simple-sftpd virtual info --hostname ftp.example.com
 
 # Enable virtual host
-sudo ssftpd virtual enable --hostname ftp.example.com
+sudo simple-sftpd virtual enable --hostname ftp.example.com
 
 # Disable virtual host
-sudo ssftpd virtual disable --hostname ftp.example.com
+sudo simple-sftpd virtual disable --hostname ftp.example.com
 
 # Remove virtual host
-sudo ssftpd virtual remove --hostname ftp.example.com
+sudo simple-sftpd virtual remove --hostname ftp.example.com
 ```
 
 ### Virtual Host Configuration
 
 ```bash
 # Update virtual host settings
-sudo ssftpd virtual modify \
+sudo simple-sftpd virtual modify \
   --hostname ftp.example.com \
   --max-connections 100 \
-  --ssl-cert /etc/ssftpd/ssl/new-cert.crt \
-  --ssl-key /etc/ssftpd/ssl/new-key.key
+  --ssl-cert /etc/simple-sftpd/ssl/new-cert.crt \
+  --ssl-key /etc/simple-sftpd/ssl/new-key.key
 
 # Set default virtual host
-sudo ssftpd virtual set-default --hostname ftp.example.com
+sudo simple-sftpd virtual set-default --hostname ftp.example.com
 
 # Test virtual host configuration
-ssftpd virtual test --hostname ftp.example.com
+simple-sftpd virtual test --hostname ftp.example.com
 ```
 
 ## 🔒 SSL Certificate Management
@@ -199,7 +199,7 @@ ssftpd virtual test --hostname ftp.example.com
 
 ```bash
 # Generate self-signed certificate
-sudo ssftpd ssl generate \
+sudo simple-sftpd ssl generate \
   --hostname ftp.example.com \
   --country US \
   --state California \
@@ -209,7 +209,7 @@ sudo ssftpd ssl generate \
   --days 365
 
 # Generate certificate with custom settings
-sudo ssftpd ssl generate \
+sudo simple-sftpd ssl generate \
   --hostname ftp.example.com \
   --key-size 4096 \
   --signature-algorithm sha256 \
@@ -220,20 +220,20 @@ sudo ssftpd ssl generate \
 
 ```bash
 # Install existing certificate
-sudo ssftpd ssl install \
+sudo simple-sftpd ssl install \
   --hostname ftp.example.com \
   --cert /path/to/certificate.crt \
   --key /path/to/private.key
 
 # Install with CA certificate
-sudo ssftpd ssl install \
+sudo simple-sftpd ssl install \
   --hostname ftp.example.com \
   --cert /path/to/certificate.crt \
   --key /path/to/private.key \
   --ca /path/to/ca.crt
 
 # Install Let's Encrypt certificate
-sudo ssftpd ssl install \
+sudo simple-sftpd ssl install \
   --hostname ftp.example.com \
   --cert /etc/letsencrypt/live/ftp.example.com/fullchain.pem \
   --key /etc/letsencrypt/live/ftp.example.com/privkey.pem
@@ -243,19 +243,19 @@ sudo ssftpd ssl install \
 
 ```bash
 # List all certificates
-ssftpd ssl list
+simple-sftpd ssl list
 
 # Check certificate status
-ssftpd ssl status --hostname ftp.example.com
+simple-sftpd ssl status --hostname ftp.example.com
 
 # Renew certificate
-sudo ssftpd ssl renew --hostname ftp.example.com
+sudo simple-sftpd ssl renew --hostname ftp.example.com
 
 # Remove certificate
-sudo ssftpd ssl remove --hostname ftp.example.com
+sudo simple-sftpd ssl remove --hostname ftp.example.com
 
 # Validate certificate
-ssftpd ssl validate --hostname ftp.example.com
+simple-sftpd ssl validate --hostname ftp.example.com
 ```
 
 ## 📊 Monitoring and Statistics
@@ -264,64 +264,64 @@ ssftpd ssl validate --hostname ftp.example.com
 
 ```bash
 # Get server status
-ssftpd status
+simple-sftpd status
 
 # Get detailed status
-ssftpd status --detailed
+simple-sftpd status --detailed
 
 # Get status in JSON format
-ssftpd status --json
+simple-sftpd status --json
 
 # Get status for specific virtual host
-ssftpd status --hostname ftp.example.com
+simple-sftpd status --hostname ftp.example.com
 ```
 
 ### Connection Information
 
 ```bash
 # List active connections
-ssftpd connections
+simple-sftpd connections
 
 # Get connection details
-ssftpd connections --detailed
+simple-sftpd connections --detailed
 
 # Filter connections by user
-ssftpd connections --user john
+simple-sftpd connections --user john
 
 # Filter connections by IP
-ssftpd connections --ip 192.168.1.100
+simple-sftpd connections --ip 192.168.1.100
 ```
 
 ### Transfer Statistics
 
 ```bash
 # Get transfer statistics
-ssftpd transfers
+simple-sftpd transfers
 
 # Get user transfer stats
-ssftpd transfers --user john
+simple-sftpd transfers --user john
 
 # Get virtual host transfer stats
-ssftpd transfers --hostname ftp.example.com
+simple-sftpd transfers --hostname ftp.example.com
 
 # Get transfer stats for time period
-ssftpd transfers --since "2024-01-01" --until "2024-01-31"
+simple-sftpd transfers --since "2024-01-01" --until "2024-01-31"
 ```
 
 ### Performance Metrics
 
 ```bash
 # Get performance metrics
-ssftpd metrics
+simple-sftpd metrics
 
 # Get system resource usage
-ssftpd metrics --system
+simple-sftpd metrics --system
 
 # Get network statistics
-ssftpd metrics --network
+simple-sftpd metrics --network
 
 # Get disk usage statistics
-ssftpd metrics --disk
+simple-sftpd metrics --disk
 ```
 
 ## 📝 Logging and Troubleshooting
@@ -330,41 +330,41 @@ ssftpd metrics --disk
 
 ```bash
 # View main server log
-sudo tail -f /var/log/ssftpd/ssftpd.log
+sudo tail -f /var/log/simple-sftpd/simple-sftpd.log
 
 # View access log
-sudo tail -f /var/log/ssftpd/access.log
+sudo tail -f /var/log/simple-sftpd/access.log
 
 # View error log
-sudo tail -f /var/log/ssftpd/error.log
+sudo tail -f /var/log/simple-sftpd/error.log
 
 # View audit log
-sudo tail -f /var/log/ssftpd/audit.log
+sudo tail -f /var/log/simple-sftpd/audit.log
 
 # Search logs for specific user
-sudo grep "john" /var/log/ssftpd/ssftpd.log
+sudo grep "john" /var/log/simple-sftpd/simple-sftpd.log
 
 # Search logs for specific IP
-sudo grep "192.168.1.100" /var/log/ssftpd/access.log
+sudo grep "192.168.1.100" /var/log/simple-sftpd/access.log
 ```
 
 ### Log Analysis
 
 ```bash
 # Get log summary
-ssftpd logs summary
+simple-sftpd logs summary
 
 # Get error count
-ssftpd logs errors --count
+simple-sftpd logs errors --count
 
 # Get access patterns
-ssftpd logs access --pattern
+simple-sftpd logs access --pattern
 
 # Get user activity
-ssftpd logs user --username john
+simple-sftpd logs user --username john
 
 # Export logs
-ssftpd logs export --format csv --output /tmp/logs.csv
+simple-sftpd logs export --format csv --output /tmp/logs.csv
 ```
 
 ### Common Issues and Solutions
@@ -373,7 +373,7 @@ ssftpd logs export --format csv --output /tmp/logs.csv
 
 ```bash
 # Check if server is running
-ssftpd status
+simple-sftpd status
 
 # Check if port is open
 sudo netstat -tlnp | grep :21
@@ -390,29 +390,29 @@ ftp localhost
 
 ```bash
 # Check user configuration
-ssftpd user info --username john
+simple-sftpd user info --username john
 
 # Verify password
-sudo ssftpd user password --username john --password newpass
+sudo simple-sftpd user password --username john --password newpass
 
 # Check user permissions
-ssftpd user permissions --username john
+simple-sftpd user permissions --username john
 
 # Test user login
-ssftpd user test --username john
+simple-sftpd user test --username john
 ```
 
 #### SSL/TLS Issues
 
 ```bash
 # Check certificate validity
-ssftpd ssl status --hostname ftp.example.com
+simple-sftpd ssl status --hostname ftp.example.com
 
 # Validate certificate
-ssftpd ssl validate --hostname ftp.example.com
+simple-sftpd ssl validate --hostname ftp.example.com
 
 # Check SSL configuration
-ssftpd ssl config --hostname ftp.example.com
+simple-sftpd ssl config --hostname ftp.example.com
 
 # Test SSL connection
 openssl s_client -connect ftp.example.com:990
@@ -424,51 +424,51 @@ openssl s_client -connect ftp.example.com:990
 
 ```bash
 # Enable custom commands
-ssftpd commands enable --command version
+simple-sftpd commands enable --command version
 
 # Disable custom commands
-ssftpd commands disable --command help
+simple-sftpd commands disable --command help
 
 # List available commands
-ssftpd commands list
+simple-sftpd commands list
 
 # Test custom command
-ssftpd commands test --command version
+simple-sftpd commands test --command version
 ```
 
 ### File Transfer Optimization
 
 ```bash
 # Enable sendfile optimization
-ssftpd transfer optimize --sendfile
+simple-sftpd transfer optimize --sendfile
 
 # Enable memory mapping
-ssftpd transfer optimize --mmap
+simple-sftpd transfer optimize --mmap
 
 # Set buffer sizes
-ssftpd transfer buffer --read 16384 --write 16384
+simple-sftpd transfer buffer --read 16384 --write 16384
 
 # Enable compression
-ssftpd transfer compression --enable --level 6
+simple-sftpd transfer compression --enable --level 6
 ```
 
 ### Rate Limiting
 
 ```bash
 # Set global rate limits
-sudo ssftpd rate-limit set \
+sudo simple-sftpd rate-limit set \
   --connections-per-minute 100 \
   --transfers-per-minute 50 \
   --bytes-per-minute 100MB
 
 # Set per-user rate limits
-sudo ssftpd rate-limit user \
+sudo simple-sftpd rate-limit user \
   --username john \
   --connections-per-minute 10 \
   --transfer-rate 5MB/s
 
 # Set per-IP rate limits
-sudo ssftpd rate-limit ip \
+sudo simple-sftpd rate-limit ip \
   --ip 192.168.1.100 \
   --connections-per-minute 5 \
   --transfer-rate 2MB/s
@@ -480,18 +480,18 @@ sudo ssftpd rate-limit ip \
 
 ```bash
 # Enable web interface
-sudo ssftpd web enable --port 8080
+sudo simple-sftpd web enable --port 8080
 
 # Access web interface
 # Open browser to: http://localhost:8080
 
 # Set web interface authentication
-sudo ssftpd web auth \
+sudo simple-sftpd web auth \
   --username admin \
   --password adminpass
 
 # Configure web interface
-sudo ssftpd web config \
+sudo simple-sftpd web config \
   --theme dark \
   --language en \
   --timezone UTC
@@ -513,32 +513,32 @@ sudo ssftpd web config \
 
 ```bash
 # Backup all configurations
-sudo ssftpd backup create --output /backup/ssftpd-$(date +%Y%m%d).tar.gz
+sudo simple-sftpd backup create --output /backup/simple-sftpd-$(date +%Y%m%d).tar.gz
 
 # Backup specific configuration
-sudo ssftpd backup config --output /backup/config-$(date +%Y%m%d).tar.gz
+sudo simple-sftpd backup config --output /backup/config-$(date +%Y%m%d).tar.gz
 
 # Backup user configurations
-sudo ssftpd backup users --output /backup/users-$(date +%Y%m%d).tar.gz
+sudo simple-sftpd backup users --output /backup/users-$(date +%Y%m%d).tar.gz
 
 # Backup SSL certificates
-sudo ssftpd backup ssl --output /backup/ssl-$(date +%Y%m%d).tar.gz
+sudo simple-sftpd backup ssl --output /backup/ssl-$(date +%Y%m%d).tar.gz
 ```
 
 ### Configuration Restoration
 
 ```bash
 # Restore from backup
-sudo ssftpd backup restore --file /backup/ssftpd-20240115.tar.gz
+sudo simple-sftpd backup restore --file /backup/simple-sftpd-20240115.tar.gz
 
 # Restore specific configuration
-sudo ssftpd backup restore-config --file /backup/config-20240115.tar.gz
+sudo simple-sftpd backup restore-config --file /backup/config-20240115.tar.gz
 
 # Restore users
-sudo ssftpd backup restore-users --file /backup/users-20240115.tar.gz
+sudo simple-sftpd backup restore-users --file /backup/users-20240115.tar.gz
 
 # Restore SSL certificates
-sudo ssftpd backup restore-ssl --file /backup/ssl-20240115.tar.gz
+sudo simple-sftpd backup restore-ssl --file /backup/ssl-20240115.tar.gz
 ```
 
 ## 📚 Command Reference
@@ -547,41 +547,41 @@ sudo ssftpd backup restore-ssl --file /backup/ssl-20240115.tar.gz
 
 | Command | Description | Options |
 |---------|-------------|---------|
-| `ssftpd start` | Start the server | `--config`, `--daemon`, `--foreground` |
-| `ssftpd stop` | Stop the server | `--force`, `--timeout` |
-| `ssftpd restart` | Restart the server | `--config`, `--daemon` |
-| `ssftpd reload` | Reload configuration | `--config` |
-| `ssftpd status` | Show server status | `--detailed`, `--json` |
+| `simple-sftpd start` | Start the server | `--config`, `--daemon`, `--foreground` |
+| `simple-sftpd stop` | Stop the server | `--force`, `--timeout` |
+| `simple-sftpd restart` | Restart the server | `--config`, `--daemon` |
+| `simple-sftpd reload` | Reload configuration | `--config` |
+| `simple-sftpd status` | Show server status | `--detailed`, `--json` |
 
 ### User Management Commands
 
 | Command | Description | Options |
 |---------|-------------|---------|
-| `ssftpd user add` | Add new user | `--username`, `--password`, `--home`, `--permissions` |
-| `ssftpd user modify` | Modify user | `--username`, `--permissions`, `--limits` |
-| `ssftpd user remove` | Remove user | `--username`, `--force` |
-| `ssftpd user list` | List users | `--detailed`, `--json` |
-| `ssftpd user info` | Show user info | `--username` |
+| `simple-sftpd user add` | Add new user | `--username`, `--password`, `--home`, `--permissions` |
+| `simple-sftpd user modify` | Modify user | `--username`, `--permissions`, `--limits` |
+| `simple-sftpd user remove` | Remove user | `--username`, `--force` |
+| `simple-sftpd user list` | List users | `--detailed`, `--json` |
+| `simple-sftpd user info` | Show user info | `--username` |
 
 ### Virtual Host Commands
 
 | Command | Description | Options |
 |---------|-------------|---------|
-| `ssftpd virtual add` | Add virtual host | `--hostname`, `--root`, `--ssl-cert`, `--ssl-key` |
-| `ssftpd virtual modify` | Modify virtual host | `--hostname`, `--settings` |
-| `ssftpd virtual remove` | Remove virtual host | `--hostname`, `--force` |
-| `ssftpd virtual list` | List virtual hosts | `--detailed`, `--json` |
-| `ssftpd virtual info` | Show virtual host info | `--hostname` |
+| `simple-sftpd virtual add` | Add virtual host | `--hostname`, `--root`, `--ssl-cert`, `--ssl-key` |
+| `simple-sftpd virtual modify` | Modify virtual host | `--hostname`, `--settings` |
+| `simple-sftpd virtual remove` | Remove virtual host | `--hostname`, `--force` |
+| `simple-sftpd virtual list` | List virtual hosts | `--detailed`, `--json` |
+| `simple-sftpd virtual info` | Show virtual host info | `--hostname` |
 
 ### SSL Commands
 
 | Command | Description | Options |
 |---------|-------------|---------|
-| `ssftpd ssl generate` | Generate certificate | `--hostname`, `--country`, `--state`, `--city` |
-| `ssftpd ssl install` | Install certificate | `--hostname`, `--cert`, `--key`, `--ca` |
-| `ssftpd ssl renew` | Renew certificate | `--hostname` |
-| `ssftpd ssl remove` | Remove certificate | `--hostname` |
-| `ssftpd ssl status` | Show certificate status | `--hostname` |
+| `simple-sftpd ssl generate` | Generate certificate | `--hostname`, `--country`, `--state`, `--city` |
+| `simple-sftpd ssl install` | Install certificate | `--hostname`, `--cert`, `--key`, `--ca` |
+| `simple-sftpd ssl renew` | Renew certificate | `--hostname` |
+| `simple-sftpd ssl remove` | Remove certificate | `--hostname` |
+| `simple-sftpd ssl status` | Show certificate status | `--hostname` |
 
 ## 🚨 Troubleshooting Guide
 
@@ -589,7 +589,7 @@ sudo ssftpd backup restore-ssl --file /backup/ssl-20240115.tar.gz
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `Connection refused` | Server not running | Start server with `ssftpd start` |
+| `Connection refused` | Server not running | Start server with `simple-sftpd start` |
 | `Authentication failed` | Invalid credentials | Check username/password |
 | `Permission denied` | Insufficient permissions | Check user permissions |
 | `SSL handshake failed` | Certificate issues | Validate SSL configuration |
@@ -599,35 +599,35 @@ sudo ssftpd backup restore-ssl --file /backup/ssl-20240115.tar.gz
 
 ```bash
 # Test server configuration
-ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
+simple-sftpd --test-config --config /etc/simple-sftpd/simple-sftpd.conf
 
 # Test SSL configuration
-ssftpd --test-ssl --config /etc/ssftpd/ssftpd.conf
+simple-sftpd --test-ssl --config /etc/simple-sftpd/simple-sftpd.conf
 
 # Validate user configurations
-ssftpd-ctl validate-users --config /etc/ssftpd/ssftpd.conf
+simple-sftpd-ctl validate-users --config /etc/simple-sftpd/simple-sftpd.conf
 
 # Check file permissions
-ssftpd-ctl check-permissions --config /etc/ssftpd/ssftpd.conf
+simple-sftpd-ctl check-permissions --config /etc/simple-sftpd/simple-sftpd.conf
 
 # Test network connectivity
-ssftpd-ctl test-network --host localhost --port 21
+simple-sftpd-ctl test-network --host localhost --port 21
 ```
 
 ### Performance Tuning
 
 ```bash
 # Monitor performance
-ssftpd metrics --real-time
+simple-sftpd metrics --real-time
 
 # Analyze bottlenecks
-ssftpd analyze --performance
+simple-sftpd analyze --performance
 
 # Optimize settings
-ssftpd optimize --auto
+simple-sftpd optimize --auto
 
 # Generate performance report
-ssftpd report --performance --output /tmp/performance.pdf
+simple-sftpd report --performance --output /tmp/performance.pdf
 ```
 
 ## 📚 Next Steps
@@ -642,4 +642,4 @@ After mastering the basic usage:
 
 ---
 
-**Need help?** Check our [Troubleshooting Guide](troubleshooting.md) or open an [issue on GitHub](https://github.com/ssftpd/ssftpd/issues).
+**Need help?** Check our [Troubleshooting Guide](troubleshooting.md) or open an [issue on GitHub](https://github.com/simple-sftpd/simple-sftpd/issues).

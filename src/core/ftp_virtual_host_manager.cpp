@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#include "ssftpd/ftp_virtual_host_manager.hpp"
-#include "ssftpd/ftp_virtual_host.hpp"
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/ftp_virtual_host_manager.hpp"
+#include "simple-sftpd/ftp_virtual_host.hpp"
+#include "simple-sftpd/logger.hpp"
 #include <vector>
 #include <string>
 
-namespace ssftpd {
+namespace simple_sftpd {
 
 FTPVirtualHostManager::FTPVirtualHostManager(std::shared_ptr<Logger> logger)
     : logger_(logger) {
@@ -66,4 +66,4 @@ std::vector<std::string> FTPVirtualHostManager::listVirtualHosts() const {
     return hostnames;
 }
 
-} // namespace ssftpd
+} // namespace simple_sftpd

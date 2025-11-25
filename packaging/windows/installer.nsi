@@ -3,9 +3,9 @@
 
 !define PRODUCT_NAME "Simple-Secure FTP Daemon"
 !define PRODUCT_VERSION "0.1.0"
-!define PRODUCT_PUBLISHER "ssftpd Team"
-!define PRODUCT_WEB_SITE "https://github.com/ssftpd/ssftpd"
-!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\ssftpd.exe"
+!define PRODUCT_PUBLISHER "simple-sftpd Team"
+!define PRODUCT_WEB_SITE "https://github.com/simple-sftpd/simple-sftpd"
+!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\simple-sftpd.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
@@ -39,8 +39,8 @@ SetCompressor lzma
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "ssftpd-${PRODUCT_VERSION}-windows-x64.exe"
-InstallDir "$PROGRAMFILES\ssftpd"
+OutFile "simple-sftpd-${PRODUCT_VERSION}-windows-x64.exe"
+InstallDir "$PROGRAMFILES\simple-sftpd"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
@@ -50,9 +50,9 @@ Section "MainApplication" SEC01
   SetOverwrite ifnewer
   
   ; Main executable
-  File "ssftpd.exe"
-  File "ssftpd-site.exe"
-  File "ssftpd-module.exe"
+  File "simple-sftpd.exe"
+  File "simple-sftpd-site.exe"
+  File "simple-sftpd-module.exe"
   
   ; Libraries
   File "*.dll"
@@ -75,10 +75,10 @@ Section "MainApplication" SEC01
   CreateDirectory "$INSTDIR\ssl"
   
   ; Create shortcuts
-  CreateDirectory "$SMPROGRAMS\ssftpd"
-  CreateShortCut "$SMPROGRAMS\ssftpd\ssftpd.lnk" "$INSTDIR\ssftpd.exe"
-  CreateShortCut "$SMPROGRAMS\ssftpd\Uninstall.lnk" "$INSTDIR\uninst.exe"
-  CreateShortCut "$DESKTOP\ssftpd.lnk" "$INSTDIR\ssftpd.exe"
+  CreateDirectory "$SMPROGRAMS\simple-sftpd"
+  CreateShortCut "$SMPROGRAMS\simple-sftpd\simple-sftpd.lnk" "$INSTDIR\simple-sftpd.exe"
+  CreateShortCut "$SMPROGRAMS\simple-sftpd\Uninstall.lnk" "$INSTDIR\uninst.exe"
+  CreateShortCut "$DESKTOP\simple-sftpd.lnk" "$INSTDIR\simple-sftpd.exe"
 SectionEnd
 
 Section "ServiceInstallation" SEC02
@@ -95,19 +95,19 @@ Section "ServiceInstallation" SEC02
   
   admin_ok:
     ; Install service
-    ExecWait '"$INSTDIR\nssm.exe" install ssftpd "$INSTDIR\ssftpd.exe" --config "$INSTDIR\etc\deployment\ssftpd.conf"'
-    ExecWait '"$INSTDIR\nssm.exe" set ssftpd DisplayName "Simple-Secure FTP Daemon"'
-    ExecWait '"$INSTDIR\nssm.exe" set ssftpd Description "Secure, configurable FTP server with modular architecture"'
-    ExecWait '"$INSTDIR\nssm.exe" set ssftpd AppDirectory "$INSTDIR"'
-    ExecWait '"$INSTDIR\nssm.exe" set ssftpd AppStdout "$INSTDIR\logs\ssftpd-service.log"'
-    ExecWait '"$INSTDIR\nssm.exe" set ssftpd AppStderr "$INSTDIR\logs\ssftpd-service-error.log"'
-    ExecWait '"$INSTDIR\nssm.exe" set ssftpd Start SERVICE_AUTO_START'
+    ExecWait '"$INSTDIR\nssm.exe" install simple-sftpd "$INSTDIR\simple-sftpd.exe" --config "$INSTDIR\etc\deployment\simple-sftpd.conf"'
+    ExecWait '"$INSTDIR\nssm.exe" set simple-sftpd DisplayName "Simple-Secure FTP Daemon"'
+    ExecWait '"$INSTDIR\nssm.exe" set simple-sftpd Description "Secure, configurable FTP server with modular architecture"'
+    ExecWait '"$INSTDIR\nssm.exe" set simple-sftpd AppDirectory "$INSTDIR"'
+    ExecWait '"$INSTDIR\nssm.exe" set simple-sftpd AppStdout "$INSTDIR\logs\simple-sftpd-service.log"'
+    ExecWait '"$INSTDIR\nssm.exe" set simple-sftpd AppStderr "$INSTDIR\logs\simple-sftpd-service-error.log"'
+    ExecWait '"$INSTDIR\nssm.exe" set simple-sftpd Start SERVICE_AUTO_START'
     
     ; Set environment variables
-    ExecWait '"$INSTDIR\nssm.exe" set ssftpd AppEnvironmentExtra SSFTPD_HOME="$INSTDIR" SSFTPD_CONFIG="$INSTDIR\etc\deployment" SSFTPD_LOGS="$INSTDIR\logs"'
+    ExecWait '"$INSTDIR\nssm.exe" set simple-sftpd AppEnvironmentExtra SIMPLE_SFTPD_HOME="$INSTDIR" SIMPLE_SFTPD_CONFIG="$INSTDIR\etc\deployment" SIMPLE_SFTPD_LOGS="$INSTDIR\logs"'
     
     ; Start service
-    ExecWait 'net start ssftpd'
+    ExecWait 'net start simple-sftpd'
     
     Goto admin_done
   
@@ -119,15 +119,15 @@ SectionEnd
 
 Section -AdditionalIcons
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateShortCut "$SMPROGRAMS\ssftpd\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
+  CreateShortCut "$SMPROGRAMS\simple-sftpd\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
 SectionEnd
 
 Section -Post
   WriteUninstaller "$INSTDIR\uninst.exe"
-  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\ssftpd.exe"
+  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\simple-sftpd.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\ssftpd.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\simple-sftpd.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
@@ -146,17 +146,17 @@ FunctionEnd
 
 Section Uninstall
   ; Stop and remove service
-  ExecWait 'net stop ssftpd'
-  ExecWait '"$INSTDIR\nssm.exe" remove ssftpd confirm'
+  ExecWait 'net stop simple-sftpd'
+  ExecWait '"$INSTDIR\nssm.exe" remove simple-sftpd confirm'
   
   ; Remove shortcuts
-  Delete "$SMPROGRAMS\ssftpd\Uninstall.lnk"
-  Delete "$SMPROGRAMS\ssftpd\Website.lnk"
-  Delete "$SMPROGRAMS\ssftpd\ssftpd.lnk"
-  Delete "$DESKTOP\ssftpd.lnk"
+  Delete "$SMPROGRAMS\simple-sftpd\Uninstall.lnk"
+  Delete "$SMPROGRAMS\simple-sftpd\Website.lnk"
+  Delete "$SMPROGRAMS\simple-sftpd\simple-sftpd.lnk"
+  Delete "$DESKTOP\simple-sftpd.lnk"
   
   ; Remove directories
-  RMDir "$SMPROGRAMS\ssftpd"
+  RMDir "$SMPROGRAMS\simple-sftpd"
   RMDir /r "$INSTDIR\etc"
   RMDir /r "$INSTDIR\docs"
   RMDir /r "$INSTDIR\logs"
@@ -164,9 +164,9 @@ Section Uninstall
   RMDir /r "$INSTDIR\ssl"
   
   ; Remove files
-  Delete "$INSTDIR\ssftpd.exe"
-  Delete "$INSTDIR\ssftpd-site.exe"
-  Delete "$INSTDIR\ssftpd-module.exe"
+  Delete "$INSTDIR\simple-sftpd.exe"
+  Delete "$INSTDIR\simple-sftpd-site.exe"
+  Delete "$INSTDIR\simple-sftpd-module.exe"
   Delete "$INSTDIR\*.dll"
   Delete "$INSTDIR\nssm.exe"
   Delete "$INSTDIR\${PRODUCT_NAME}.url"

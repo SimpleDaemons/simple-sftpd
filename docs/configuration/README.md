@@ -1,14 +1,14 @@
 # Configuration Guide
 
-This guide covers all aspects of configuring ssftpd, from basic server settings to advanced features like virtual hosting and SSL/TLS.
+This guide covers all aspects of configuring simple-sftpd, from basic server settings to advanced features like virtual hosting and SSL/TLS.
 
 ## 📁 Configuration Files
 
-ssftpd uses a hierarchical configuration system with the following structure:
+simple-sftpd uses a hierarchical configuration system with the following structure:
 
 ```
-/etc/ssftpd/
-├── ssftpd.conf              # Main server configuration
+/etc/simple-sftpd/
+├── simple-sftpd.conf              # Main server configuration
 ├── users/                   # User definitions
 │   ├── admin.conf          # Admin user configuration
 │   ├── user1.conf          # Regular user configuration
@@ -24,7 +24,7 @@ ssftpd uses a hierarchical configuration system with the following structure:
 
 ## ⚙️ Main Configuration File
 
-The main configuration file (`ssftpd.conf`) controls global server settings.
+The main configuration file (`simple-sftpd.conf`) controls global server settings.
 
 ### Basic Server Configuration
 
@@ -58,9 +58,9 @@ sendfile_enabled = true
 ```ini
 [ssl]
 # Certificate settings
-certificate_file = "/etc/ssftpd/ssl/server.crt"
-private_key_file = "/etc/ssftpd/ssl/server.key"
-ca_bundle_file = "/etc/ssftpd/ssl/ca-bundle.crt"
+certificate_file = "/etc/simple-sftpd/ssl/server.crt"
+private_key_file = "/etc/simple-sftpd/ssl/server.key"
+ca_bundle_file = "/etc/simple-sftpd/ssl/ca-bundle.crt"
 
 # SSL protocol settings
 ssl_protocols = "TLSv1.2,TLSv1.3"
@@ -69,7 +69,7 @@ ssl_prefer_server_ciphers = true
 
 # Certificate validation
 verify_client = false
-client_ca_file = "/etc/ssftpd/ssl/client-ca.crt"
+client_ca_file = "/etc/simple-sftpd/ssl/client-ca.crt"
 ```
 
 ### Logging Configuration
@@ -82,9 +82,9 @@ access_log_level = "info"
 error_log_level = "error"
 
 # Log files
-log_file = "/var/log/ssftpd/ssftpd.log"
-access_log_file = "/var/log/ssftpd/access.log"
-error_log_file = "/var/log/ssftpd/error.log"
+log_file = "/var/log/simple-sftpd/simple-sftpd.log"
+access_log_file = "/var/log/simple-sftpd/access.log"
+error_log_file = "/var/log/simple-sftpd/error.log"
 
 # Log rotation
 log_rotation = true
@@ -122,7 +122,7 @@ max_transfer_rate_per_user = "5MB/s"
 
 ## 👥 User Configuration
 
-User configurations are stored in separate files under `/etc/ssftpd/users/`.
+User configurations are stored in separate files under `/etc/simple-sftpd/users/`.
 
 ### Admin User Configuration
 
@@ -249,8 +249,8 @@ document_root = "/var/ftp/example.com"
 chroot_directory = "/var/ftp"
 
 # SSL certificate
-ssl_certificate = "/etc/ssftpd/ssl/example.com.crt"
-ssl_private_key = "/etc/ssftpd/ssl/example.com.key"
+ssl_certificate = "/etc/simple-sftpd/ssl/example.com.crt"
+ssl_private_key = "/etc/simple-sftpd/ssl/example.com.key"
 
 # User access
 allowed_users = "admin,user1,anonymous"
@@ -280,8 +280,8 @@ document_root = "/var/ftp/ftp.example.com"
 chroot_directory = "/var/ftp/ftp.example.com"
 
 # SSL certificate
-ssl_certificate = "/etc/ssftpd/ssl/ftp.example.com.crt"
-ssl_private_key = "/etc/ssftpd/ssl/ftp.example.com.key"
+ssl_certificate = "/etc/simple-sftpd/ssl/ftp.example.com.crt"
+ssl_private_key = "/etc/simple-sftpd/ssl/ftp.example.com.key"
 
 # User access
 allowed_users = "admin,user2"
@@ -383,7 +383,7 @@ max_disk_usage = 90
 [auditing]
 # Audit logging
 enable_audit_log = true
-audit_log_file = "/var/log/ssftpd/audit.log"
+audit_log_file = "/var/log/simple-sftpd/audit.log"
 audit_log_level = "info"
 
 # Audit events
@@ -415,7 +415,7 @@ enable_noop = true
 
 # Custom commands
 custom_commands = "version,status,info"
-version_command = "ssftpd version 0.1.0"
+version_command = "simple-sftpd version 0.1.0"
 status_command = "Server is running normally"
 info_command = "Simple-Secure FTP Daemon"
 ```
@@ -456,7 +456,7 @@ enable_ssl = false
 
 [logging]
 log_level = "info"
-log_file = "/var/log/ssftpd/ssftpd.log"
+log_file = "/var/log/simple-sftpd/simple-sftpd.log"
 
 [user:anonymous]
 username = "anonymous"
@@ -477,8 +477,8 @@ connection_timeout = 600
 
 [ssl]
 enable_ssl = true
-certificate_file = "/etc/ssftpd/ssl/server.crt"
-private_key_file = "/etc/ssftpd/ssl/server.key"
+certificate_file = "/etc/simple-sftpd/ssl/server.crt"
+private_key_file = "/etc/simple-sftpd/ssl/server.key"
 require_ssl = true
 
 [security]
@@ -510,8 +510,8 @@ max_connections = 50
 [ssl]
 enable_ssl = true
 require_ssl = true
-certificate_file = "/etc/ssftpd/ssl/server.crt"
-private_key_file = "/etc/ssftpd/ssl/server.key"
+certificate_file = "/etc/simple-sftpd/ssl/server.crt"
+private_key_file = "/etc/simple-sftpd/ssl/server.key"
 ssl_protocols = "TLSv1.3"
 ssl_ciphers = "ECDHE-RSA-AES256-GCM-SHA384"
 
@@ -537,38 +537,38 @@ audit_log_retention_days = 365
 
 ```bash
 # Test configuration file syntax
-ssftpd --test-config --config /etc/ssftpd/ssftpd.conf
+simple-sftpd --test-config --config /etc/simple-sftpd/simple-sftpd.conf
 
 # Test configuration with specific user
-ssftpd --test-config --config /etc/ssftpd/ssftpd.conf --user admin
+simple-sftpd --test-config --config /etc/simple-sftpd/simple-sftpd.conf --user admin
 
 # Validate SSL configuration
-ssftpd --test-ssl --config /etc/ssftpd/ssftpd.conf
+simple-sftpd --test-ssl --config /etc/simple-sftpd/simple-sftpd.conf
 ```
 
 ### Configuration Check
 
 ```bash
 # Check configuration file permissions
-ls -la /etc/ssftpd/ssftpd.conf
+ls -la /etc/simple-sftpd/simple-sftpd.conf
 
 # Verify SSL certificates
-openssl x509 -in /etc/ssftpd/ssl/server.crt -text -noout
+openssl x509 -in /etc/simple-sftpd/ssl/server.crt -text -noout
 
 # Check user configurations
-ssftpd-ctl validate-users --config /etc/ssftpd/ssftpd.conf
+simple-sftpd-ctl validate-users --config /etc/simple-sftpd/simple-sftpd.conf
 ```
 
 ## 📚 Next Steps
 
 After configuring your server:
 
-1. **Test the configuration**: Use `ssftpd --test-config`
-2. **Start the server**: Use `ssftpd --config /etc/ssftpd/ssftpd.conf`
+1. **Test the configuration**: Use `simple-sftpd --test-config`
+2. **Start the server**: Use `simple-sftpd --config /etc/simple-sftpd/simple-sftpd.conf`
 3. **Set up users**: See [User Management](../user-guide/user-management.md)
 4. **Configure SSL**: See [SSL Configuration](ssl.md)
 5. **Set up monitoring**: See [Monitoring Guide](../user-guide/monitoring.md)
 
 ---
 
-**Need help?** Check our [Configuration Examples](../examples/README.md) or open an [issue on GitHub](https://github.com/ssftpd/ssftpd/issues).
+**Need help?** Check our [Configuration Examples](../examples/README.md) or open an [issue on GitHub](https://github.com/simple-sftpd/simple-sftpd/issues).
