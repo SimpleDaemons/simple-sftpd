@@ -20,6 +20,7 @@
 #include <string>
 #include <atomic>
 #include <thread>
+#include <mutex>
 
 namespace simple_sftpd {
 
@@ -58,7 +59,17 @@ private:
     void handleMKD(const std::string& dirname);
     void handleRMD(const std::string& dirname);
     
+    // Data Connection Management
+    int createPassiveDataSocket();
+    int acceptDataConnection();
+    void closeDataSocket();
+    std::string formatPassiveResponse(int port);
+    
+    // Path and Permission Utilities
     std::string resolvePath(const std::string& path);
+    bool validatePath(const std::string& path);
+    bool hasPermission(const std::string& operation, const std::string& path);
+    bool isPathWithinHome(const std::string& path);
 
     int socket_;
     std::shared_ptr<Logger> logger_;
@@ -72,6 +83,12 @@ private:
     std::string username_;
     std::shared_ptr<FTPUser> current_user_;
     std::string current_directory_;
+    
+    // Data connection state
+    int passive_listen_socket_;
+    int data_socket_;
+    std::mutex data_socket_mutex_;
+    std::string transfer_type_;  // "A" for ASCII, "I" for binary
 };
 
 } // namespace simple_sftpd

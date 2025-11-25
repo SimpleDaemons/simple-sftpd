@@ -26,9 +26,27 @@ bool FTPUser::authenticate(const std::string& password) const {
     return password_ == password;
 }
 
-bool FTPUser::hasPermission(const std::string& path) const {
+bool FTPUser::hasPermission(const std::string& operation, const std::string& path) const {
+    (void)operation; // Suppress unused parameter warning
     (void)path; // Suppress unused parameter warning
-    return true; // Stub implementation - allow all permissions
+    
+    // Basic permission implementation
+    // For v0.1.0, we implement simple permission checks
+    // More advanced permission system will be in v0.2.0
+    
+    // If permissions_ vector is empty, allow all (backward compatibility)
+    if (permissions_.empty()) {
+        return true;
+    }
+    
+    // Check if operation is in permissions list
+    for (const auto& perm : permissions_) {
+        if (perm == operation || perm == "all") {
+            return true;
+        }
+    }
+    
+    return false;
 }
 
 } // namespace simple_sftpd
