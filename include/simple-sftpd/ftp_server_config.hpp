@@ -36,6 +36,7 @@ struct ConnectionConfig {
 struct LoggingConfig {
     std::string log_file = "/var/log/simple-sftpd/simple-sftpd.log";
     std::string log_level = "INFO";
+    std::string log_format = "STANDARD";  // STANDARD, JSON, or EXTENDED
     bool log_to_console = true;
     bool log_to_file = true;
 };

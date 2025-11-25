@@ -117,9 +117,28 @@ brew install simple-sftpd
 
 ### Configuration
 
-1. **Copy the example configuration:**
+simple-sftpd supports multiple configuration formats (INI, JSON, YAML) and provides example configurations for different use cases:
+
+**Configuration Formats:**
+- **INI** (`.conf`) - Traditional format, fully supported
+- **JSON** (`.json`) - Machine-readable format (parser pending)
+- **YAML** (`.yml`) - Human-readable format (parser pending)
+
+**Example Configurations:**
+- `config/simple/` - Minimal configuration for basic setups
+- `config/advanced/` - Enhanced configuration with SSL/TLS and performance tuning
+- `config/production/` - Hardened configuration for production deployments
+
+1. **Choose and copy a configuration:**
 ```bash
-sudo cp /etc/simple-sftpd/simple-sftpd.conf.example /etc/simple-sftpd/simple-sftpd.conf
+# For simple setup
+sudo cp config/simple/simple-sftpd.conf /etc/simple-sftpd/simple-sftpd.conf
+
+# For advanced setup
+sudo cp config/advanced/simple-sftpd.conf /etc/simple-sftpd/simple-sftpd.conf
+
+# For production
+sudo cp config/production/simple-sftpd.conf /etc/simple-sftpd/simple-sftpd.conf
 ```
 
 2. **Edit the configuration file:**
@@ -132,6 +151,8 @@ sudo nano /etc/simple-sftpd/simple-sftpd.conf
 sudo mkdir -p /var/ftp /var/log/simple-sftpd
 sudo chown ftp:ftp /var/ftp
 ```
+
+For detailed configuration options, see [Configuration Guide](docs/configuration/README.md).
 
 ### Running the Server
 

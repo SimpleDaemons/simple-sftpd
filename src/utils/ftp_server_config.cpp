@@ -111,6 +111,8 @@ bool FTPServerConfig::loadFromFile(const std::string& filename) {
                 logging.log_file = value;
             } else if (key == "log_level") {
                 logging.log_level = value;
+            } else if (key == "log_format") {
+                logging.log_format = value;
             } else if (key == "log_to_console") {
                 logging.log_to_console = (value == "true" || value == "1");
             } else if (key == "log_to_file") {

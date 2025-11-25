@@ -1,0 +1,25 @@
+{
+  "connection": {
+    "bind_address": "0.0.0.0",
+    "bind_port": 21,
+    "max_connections": 50,
+    "timeout_seconds": 300
+  },
+  "logging": {
+    "log_file": "/var/log/simple-sftpd/simple-sftpd.log",
+    "log_level": "INFO",
+    "log_format": "STANDARD",
+    "log_to_console": true,
+    "log_to_file": true
+  },
+  "security": {
+    "require_ssl": false,
+    "allow_anonymous": false
+  },
+  "rate_limit": {
+    "enabled": true,
+    "max_requests_per_minute": 60,
+    "max_connections_per_ip": 5
+  }
+}
+

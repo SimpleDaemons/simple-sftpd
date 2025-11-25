@@ -18,11 +18,14 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
+#include <ctime>
+#include <unistd.h>
 
 namespace simple_sftpd {
 
-Logger::Logger(const std::string& log_file, LogLevel level, bool console, bool file)
-    : log_file_(log_file), level_(level), console_(console), file_(file) {
+Logger::Logger(const std::string& log_file, LogLevel level, bool console, bool file, LogFormat format)
+    : log_file_(log_file), level_(level), format_(format), console_(console), file_(file) {
     if (file && !log_file_.empty()) {
         file_stream_.open(log_file_, std::ios::app);
     }
@@ -66,12 +69,20 @@ LogLevel Logger::getLevel() const {
     return level_;
 }
 
+void Logger::setFormat(LogFormat format) {
+    format_ = format;
+}
+
+LogFormat Logger::getFormat() const {
+    return format_;
+}
+
 void Logger::log(LogLevel level, const std::string& message) {
     if (level < level_) {
         return;
     }
     
-    std::string log_message = "[" + getTimestamp() + "] [" + levelToString(level) + "] " + message;
+    std::string log_message = formatMessage(level, message);
     
     if (console_) {
         std::cout << log_message << std::endl;
@@ -81,6 +92,58 @@ void Logger::log(LogLevel level, const std::string& message) {
         file_stream_ << log_message << std::endl;
         file_stream_.flush();
     }
+}
+
+std::string Logger::formatMessage(LogLevel level, const std::string& message) const {
+    switch (format_) {
+        case LogFormat::JSON: {
+            std::stringstream ss;
+            ss << "{"
+               << "\"timestamp\":\"" << getTimestamp() << "\","
+               << "\"level\":\"" << levelToString(level) << "\","
+               << "\"message\":\"" << escapeJsonString(message) << "\""
+               << "}";
+            return ss.str();
+        }
+        case LogFormat::EXTENDED: {
+            std::stringstream ss;
+            ss << "[" << getTimestamp() << "] "
+               << "[" << levelToString(level) << "] "
+               << "[PID:" << getpid() << "] "
+               << message;
+            return ss.str();
+        }
+        case LogFormat::STANDARD:
+        default: {
+            return "[" + getTimestamp() + "] [" + levelToString(level) + "] " + message;
+        }
+    }
+}
+
+std::string Logger::escapeJsonString(const std::string& str) const {
+    std::string escaped;
+    for (char c : str) {
+        switch (c) {
+            case '"': escaped += "\\\""; break;
+            case '\\': escaped += "\\\\"; break;
+            case '\b': escaped += "\\b"; break;
+            case '\f': escaped += "\\f"; break;
+            case '\n': escaped += "\\n"; break;
+            case '\r': escaped += "\\r"; break;
+            case '\t': escaped += "\\t"; break;
+            default:
+                if (static_cast<unsigned char>(c) < 0x20) {
+                    std::stringstream ss;
+                    ss << "\\u" << std::hex << std::setw(4) << std::setfill('0') 
+                       << static_cast<int>(static_cast<unsigned char>(c));
+                    escaped += ss.str();
+                } else {
+                    escaped += c;
+                }
+                break;
+        }
+    }
+    return escaped;
 }
 
 std::string Logger::levelToString(LogLevel level) const {
