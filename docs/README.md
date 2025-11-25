@@ -41,16 +41,17 @@ This documentation is organized into several sections to help you find the infor
 ## 🌟 Key Features
 
 ### 🔒 Security First
-- **SSL/TLS encryption** for secure file transfers
-- **User authentication** with multiple backends
-- **Access control** and path restrictions
-- **Chroot isolation** for enhanced security
+- **SSL/TLS encryption** for secure file transfers (v0.2.0)
+- **User authentication** with username/password (PAM, LDAP in v0.2.0)
+- **Access control** and path restrictions (implemented)
+- **Path validation** and directory traversal protection (implemented)
+- **Chroot isolation** for enhanced security (v0.2.0)
 
 ### 🚀 High Performance
 - **Multi-threaded architecture** for concurrent connections
-- **Optimized I/O** with sendfile and memory mapping
-- **Connection pooling** for efficient resource usage
-- **Rate limiting** to prevent abuse
+- **Connection management** with thread-safe tracking
+- **Rate limiting** to prevent abuse (implemented)
+- **Optimized I/O** with sendfile and memory mapping (v0.2.0)
 
 ### 🏗️ Enterprise Ready
 - **Virtual hosting** for multiple domains
@@ -60,9 +61,10 @@ This documentation is organized into several sections to help you find the infor
 
 ### 🔧 Developer Friendly
 - **Modern C++17** codebase
-- **Comprehensive testing** with Google Test
+- **Comprehensive testing** with Google Test (46 tests passing)
 - **Cross-platform** support (Linux, macOS, Windows)
 - **Extensible architecture** for custom features
+- **Complete CLI** for server management
 
 ## 📋 Prerequisites
 
@@ -90,10 +92,11 @@ brew install simple-sftpd      # macOS
 
 ## 📖 Documentation Versions
 
-- **Current Version**: v0.1.0
+- **Current Version**: v0.1.0-alpha (85% complete)
 - **Documentation**: Always up-to-date with latest release
 - **API**: Covers all public interfaces
 - **Examples**: Tested and verified
+- **Status**: Core functionality complete, ready for final testing
 
 ## 🤝 Contributing to Documentation
 

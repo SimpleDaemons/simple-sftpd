@@ -32,8 +32,11 @@ sudo simple-sftpd stop
 # Restart the server
 sudo simple-sftpd restart
 
-# Reload configuration
+# Reload configuration (sends SIGHUP, full reload requires restart in v0.1.0)
 sudo simple-sftpd reload
+
+# Test configuration file
+simple-sftpd --test-config --config /etc/simple-sftpd/simple-sftpd.conf
 
 # Check server version
 simple-sftpd --version
