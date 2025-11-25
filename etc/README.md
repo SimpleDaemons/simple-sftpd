@@ -1,6 +1,6 @@
 # System Integration Configuration
 
-This directory contains system-level configuration files for integrating ssftpd with various operating systems and services.
+This directory contains system-level configuration files for integrating simple-sftpd with various operating systems and services.
 
 ## 📁 Directory Structure
 
@@ -8,11 +8,11 @@ This directory contains system-level configuration files for integrating ssftpd 
 etc/
 ├── README.md                    # This file
 ├── systemd/                     # systemd service files (Linux)
-│   ├── ssftpd.service          # Main service file
-│   ├── ssftpd@.service         # Template for multiple instances
-│   └── ssftpd.target           # Target for managing instances
+│   ├── simple-sftpd.service          # Main service file
+│   ├── simple-sftpd@.service         # Template for multiple instances
+│   └── simple-sftpd.target           # Target for managing instances
 ├── launchd/                     # macOS LaunchDaemon files
-│   └── com.ssftpd.ssftpd.plist # macOS service configuration
+│   └── com.simple-sftpd.simple-sftpd.plist # macOS service configuration
 ├── init.d/                      # SysV init scripts (legacy Linux)
 ├── logrotate.d/                 # Log rotation configuration
 └── rsyslog.d/                   # rsyslog configuration
@@ -24,36 +24,36 @@ etc/
 
 ```bash
 # Enable and start the service
-sudo systemctl enable ssftpd
-sudo systemctl start ssftpd
+sudo systemctl enable simple-sftpd
+sudo systemctl start simple-sftpd
 
 # Check service status
-sudo systemctl status ssftpd
+sudo systemctl status simple-sftpd
 
 # Reload configuration
-sudo systemctl reload ssftpd
+sudo systemctl reload simple-sftpd
 
 # Stop the service
-sudo systemctl stop ssftpd
+sudo systemctl stop simple-sftpd
 
 # View logs
-sudo journalctl -u ssftpd -f
+sudo journalctl -u simple-sftpd -f
 ```
 
 ### Multiple Instances
 
 ```bash
 # Start additional instances
-sudo systemctl start ssftpd@instance1
-sudo systemctl start ssftpd@instance2
+sudo systemctl start simple-sftpd@instance1
+sudo systemctl start simple-sftpd@instance2
 
 # Enable instances
-sudo systemctl enable ssftpd@instance1
-sudo systemctl enable ssftpd@instance2
+sudo systemctl enable simple-sftpd@instance1
+sudo systemctl enable simple-sftpd@instance2
 
 # Manage all instances
-sudo systemctl start ssftpd.target
-sudo systemctl stop ssftpd.target
+sudo systemctl start simple-sftpd.target
+sudo systemctl stop simple-sftpd.target
 ```
 
 ### Service Configuration
@@ -71,30 +71,30 @@ The systemd service files include:
 
 ```bash
 # Copy the plist file
-sudo cp etc/launchd/com.ssftpd.ssftpd.plist /Library/LaunchDaemons/
+sudo cp etc/launchd/com.simple-sftpd.simple-sftpd.plist /Library/LaunchDaemons/
 
 # Set permissions
-sudo chown root:wheel /Library/LaunchDaemons/com.ssftpd.ssftpd.plist
-sudo chmod 644 /Library/LaunchDaemons/com.ssftpd.ssftpd.plist
+sudo chown root:wheel /Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist
+sudo chmod 644 /Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist
 
 # Load the service
-sudo launchctl load /Library/LaunchDaemons/com.ssftpd.ssftpd.plist
+sudo launchctl load /Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist
 ```
 
 ### Service Management
 
 ```bash
 # Start the service
-sudo launchctl start com.ssftpd.ssftpd
+sudo launchctl start com.simple-sftpd.simple-sftpd
 
 # Stop the service
-sudo launchctl stop com.ssftpd.ssftpd
+sudo launchctl stop com.simple-sftpd.simple-sftpd
 
 # Unload the service
-sudo launchctl unload /Library/LaunchDaemons/com.ssftpd.ssftpd.plist
+sudo launchctl unload /Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist
 
 # Check if running
-sudo launchctl list | grep ssftpd
+sudo launchctl list | grep simple-sftpd
 ```
 
 ## 📊 Log Management
@@ -107,27 +107,27 @@ The logrotate configuration:
 - Keeps 52 weeks of general logs
 - Keeps 30 days of access/error/SSL logs
 - Compresses old logs
-- Reloads ssftpd after rotation
-- Runs as ssftpd user for security
+- Reloads simple-sftpd after rotation
+- Runs as simple-sftpd user for security
 
 ### Manual Log Rotation
 
 ```bash
 # Test logrotate configuration
-sudo logrotate -d /etc/logrotate.d/ssftpd
+sudo logrotate -d /etc/logrotate.d/simple-sftpd
 
 # Force log rotation
-sudo logrotate -f /etc/logrotate.d/ssftpd
+sudo logrotate -f /etc/logrotate.d/simple-sftpd
 
 # Check logrotate status
-sudo cat /var/lib/logrotate/status | grep ssftpd
+sudo cat /var/lib/logrotate/status | grep simple-sftpd
 ```
 
 ### Log Locations
 
 ```
-/var/log/ssftpd/
-├── ssftpd.log          # Main application log
+/var/log/simple-sftpd/
+├── simple-sftpd.log          # Main application log
 ├── access.log          # Access log
 ├── error.log           # Error log
 ├── ssl.log             # SSL/TLS log
@@ -142,17 +142,17 @@ The service files reference the deployment configuration:
 
 ```bash
 # Main configuration
---config /etc/ssftpd/deployment/ssftpd.conf
+--config /etc/simple-sftpd/deployment/simple-sftpd.conf
 
 # Instance-specific configuration
---config /etc/ssftpd/deployment/ssftpd.conf --instance instance1
+--config /etc/simple-sftpd/deployment/simple-sftpd.conf --instance instance1
 ```
 
 ### Directory Structure
 
 ```
-/usr/local/etc/ssftpd/          # macOS
-/etc/ssftpd/                    # Linux
+/usr/local/etc/simple-sftpd/          # macOS
+/etc/simple-sftpd/                    # Linux
 ├── deployment/                 # Main configuration
 ├── ssl/                       # SSL certificates
 └── users/                     # User configurations
@@ -171,42 +171,42 @@ sudo cp etc/systemd/*.target /etc/systemd/system/
 sudo systemctl daemon-reload
 
 # 3. Enable and start
-sudo systemctl enable ssftpd
-sudo systemctl start ssftpd
+sudo systemctl enable simple-sftpd
+sudo systemctl start simple-sftpd
 
 # 4. Check status
-sudo systemctl status ssftpd
+sudo systemctl status simple-sftpd
 ```
 
 ### macOS (LaunchDaemon)
 
 ```bash
 # 1. Copy plist file
-sudo cp etc/launchd/com.ssftpd.ssftpd.plist /Library/LaunchDaemons/
+sudo cp etc/launchd/com.simple-sftpd.simple-sftpd.plist /Library/LaunchDaemons/
 
 # 2. Set permissions
-sudo chown root:wheel /Library/LaunchDaemons/com.ssftpd.ssftpd.plist
-sudo chmod 644 /Library/LaunchDaemons/com.ssftpd.ssftpd.plist
+sudo chown root:wheel /Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist
+sudo chmod 644 /Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist
 
 # 3. Load service
-sudo launchctl load /Library/LaunchDaemons/com.ssftpd.ssftpd.plist
+sudo launchctl load /Library/LaunchDaemons/com.simple-sftpd.simple-sftpd.plist
 
 # 4. Start service
-sudo launchctl start com.ssftpd.ssftpd
+sudo launchctl start com.simple-sftpd.simple-sftpd
 ```
 
 ### Log Rotation
 
 ```bash
 # 1. Copy logrotate configuration
-sudo cp etc/logrotate.d/ssftpd /etc/logrotate.d/
+sudo cp etc/logrotate.d/simple-sftpd /etc/logrotate.d/
 
 # 2. Test configuration
-sudo logrotate -d /etc/logrotate.d/ssftpd
+sudo logrotate -d /etc/logrotate.d/simple-sftpd
 
 # 3. Set up cron job (if not using systemd timer)
 sudo crontab -e
-# Add: 0 0 * * * /usr/sbin/logrotate /etc/logrotate.d/ssftpd
+# Add: 0 0 * * * /usr/sbin/logrotate /etc/logrotate.d/simple-sftpd
 ```
 
 ## 🔍 Troubleshooting
@@ -215,30 +215,30 @@ sudo crontab -e
 
 ```bash
 # Check service status
-sudo systemctl status ssftpd
+sudo systemctl status simple-sftpd
 
 # View detailed logs
-sudo journalctl -u ssftpd -n 50
+sudo journalctl -u simple-sftpd -n 50
 
 # Check configuration
-sudo ssftpd --test-config --config /etc/ssftpd/deployment/ssftpd.conf
+sudo simple-sftpd --test-config --config /etc/simple-sftpd/deployment/simple-sftpd.conf
 
 # Check file permissions
-sudo ls -la /etc/ssftpd/
-sudo ls -la /var/log/ssftpd/
+sudo ls -la /etc/simple-sftpd/
+sudo ls -la /var/log/simple-sftpd/
 ```
 
 ### Permission Issues
 
 ```bash
 # Fix directory permissions
-sudo chown -R ssftpd:ssftpd /etc/ssftpd/
-sudo chown -R ssftpd:ssftpd /var/log/ssftpd/
-sudo chown -R ssftpd:ssftpd /var/lib/ssftpd/
+sudo chown -R simple-sftpd:simple-sftpd /etc/simple-sftpd/
+sudo chown -R simple-sftpd:simple-sftpd /var/log/simple-sftpd/
+sudo chown -R simple-sftpd:simple-sftpd /var/lib/simple-sftpd/
 
 # Fix file permissions
-sudo chmod 600 /etc/ssftpd/ssl/*.key
-sudo chmod 644 /etc/ssftpd/ssl/*.crt
+sudo chmod 600 /etc/simple-sftpd/ssl/*.key
+sudo chmod 644 /etc/simple-sftpd/ssl/*.crt
 ```
 
 ### Port Conflicts

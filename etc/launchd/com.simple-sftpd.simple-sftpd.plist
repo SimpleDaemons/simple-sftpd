@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.ssftpd.ssftpd</string>
+    <string>com.simple-sftpd.simple-sftpd</string>
     
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/sbin/ssftpd</string>
+        <string>/usr/local/sbin/simple-sftpd</string>
         <string>--config</string>
-        <string>/usr/local/etc/ssftpd/deployment/ssftpd.conf</string>
+        <string>/usr/local/etc/simple-sftpd/deployment/simple-sftpd.conf</string>
     </array>
     
     <key>RunAtLoad</key>
@@ -19,19 +19,19 @@
     <true/>
     
     <key>WorkingDirectory</key>
-    <string>/usr/local/var/ssftpd</string>
+    <string>/usr/local/var/simple-sftpd</string>
     
     <key>StandardOutPath</key>
-    <string>/usr/local/var/log/ssftpd/ssftpd.log</string>
+    <string>/usr/local/var/log/simple-sftpd/simple-sftpd.log</string>
     
     <key>StandardErrorPath</key>
-    <string>/usr/local/var/log/ssftpd/ssftpd-error.log</string>
+    <string>/usr/local/var/log/simple-sftpd/simple-sftpd-error.log</string>
     
     <key>UserName</key>
-    <string>ssftpd</string>
+    <string>simple-sftpd</string>
     
     <key>GroupName</key>
-    <string>ssftpd</string>
+    <string>simple-sftpd</string>
     
     <key>ProcessType</key>
     <string>Background</string>

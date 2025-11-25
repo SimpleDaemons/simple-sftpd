@@ -1,7 +1,7 @@
-Source: ssftpd
+Source: simple-sftpd
 Section: net
 Priority: optional
-Maintainer: ssftpd Team <team@ssftpd.org>
+Maintainer: simple-sftpd Team <team@simple-sftpd.org>
 Build-Depends: debhelper (>= 12),
                cmake,
                g++,
@@ -11,7 +11,7 @@ Build-Depends: debhelper (>= 12),
                libgtest-dev,
                pkg-config
 
-Package: ssftpd
+Package: simple-sftpd
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -20,9 +20,9 @@ Depends: ${shlibs:Depends},
          adduser,
          systemd-sysv | sysvinit-core
 Recommends: logrotate
-Suggests: ssftpd-doc
+Suggests: simple-sftpd-doc
 Description: Simple-Secure FTP Daemon
- Simple-Secure FTP Daemon (ssftpd) is a secure, configurable FTP server with
+ Simple-Secure FTP Daemon (simple-sftpd) is a secure, configurable FTP server with
  modular architecture. It supports SSL/TLS encryption, virtual hosting, user
  authentication, and rate limiting.
  .
@@ -37,25 +37,25 @@ Description: Simple-Secure FTP Daemon
  .
  This package contains the main server binary and configuration files.
 
-Package: ssftpd-dev
+Package: simple-sftpd-dev
 Architecture: any
 Section: libdevel
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         ssftpd (= ${binary:Version})
+         simple-sftpd (= ${binary:Version})
 Description: Development files for Simple-Secure FTP Daemon
- This package contains development files for ssftpd, including headers and
- libraries needed for developing applications that use ssftpd.
+ This package contains development files for simple-sftpd, including headers and
+ libraries needed for developing applications that use simple-sftpd.
  .
  This package is only needed if you want to develop applications that use
- ssftpd libraries.
+ simple-sftpd libraries.
 
-Package: ssftpd-doc
+Package: simple-sftpd-doc
 Architecture: all
 Section: doc
 Depends: ${misc:Depends}
 Description: Documentation for Simple-Secure FTP Daemon
- This package contains comprehensive documentation for ssftpd, including:
+ This package contains comprehensive documentation for simple-sftpd, including:
   * User guides and tutorials
   * Configuration examples
   * API documentation

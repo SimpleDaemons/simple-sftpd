@@ -1,6 +1,6 @@
-# Simple Secure FTP Daemon (ssftpd) - Roadmap Checklist
+# Simple Secure FTP Daemon (simple-sftpd) - Roadmap Checklist
 
-This document provides a detailed checklist for tracking progress on the ssftpd development roadmap.
+This document provides a detailed checklist for tracking progress on the simple-sftpd development roadmap.
 
 ## 📊 Overall Progress
 

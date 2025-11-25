@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include "ssftpd/ftp_connection_manager.hpp"
-#include "ssftpd/ftp_connection.hpp"
-#include "ssftpd/logger.hpp"
+#include "simple-sftpd/ftp_connection_manager.hpp"
+#include "simple-sftpd/ftp_connection.hpp"
+#include "simple-sftpd/logger.hpp"
 
-namespace ssftpd {
+namespace simple_sftpd {
 
 FTPConnectionManager::FTPConnectionManager(std::shared_ptr<FTPServerConfig> config,
                                          std::shared_ptr<Logger> logger)
@@ -95,4 +95,4 @@ void FTPConnectionManager::cleanupLoop() {
     }
 }
 
-} // namespace ssftpd
+} // namespace simple_sftpd

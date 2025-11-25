@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-SSL_DIR="/etc/ssl/ssftpd"
-CONFIG_DIR="/etc/ssftpd"
+SSL_DIR="/etc/ssl/simple-sftpd"
+CONFIG_DIR="/etc/simple-sftpd"
 FTP_USER="ftp"
 FTP_GROUP="ftp"
 
@@ -237,8 +237,8 @@ update_config() {
     print_status "Updating configuration for $domain..."
     
     # Check if configuration file exists
-    if [[ ! -f "$CONFIG_DIR/ssftpd.conf" ]]; then
-        print_warning "Configuration file not found at $CONFIG_DIR/ssftpd.conf"
+    if [[ ! -f "$CONFIG_DIR/simple-sftpd.conf" ]]; then
+        print_warning "Configuration file not found at $CONFIG_DIR/simple-sftpd.conf"
         print_status "Please create it manually with the following SSL settings:"
         echo ""
         echo "[ssl]"
@@ -252,14 +252,14 @@ update_config() {
     fi
     
     # Update SSL configuration in the config file
-    if grep -q "\[ssl\]" "$CONFIG_DIR/ssftpd.conf"; then
+    if grep -q "\[ssl\]" "$CONFIG_DIR/simple-sftpd.conf"; then
         # SSL section exists, update it
-        sed -i "s|^certificate_file = .*|certificate_file = $cert_file|" "$CONFIG_DIR/ssftpd.conf"
-        sed -i "s|^private_key_file = .*|private_key_file = $key_file|" "$CONFIG_DIR/ssftpd.conf"
-        sed -i "s|^enabled = .*|enabled = true|" "$CONFIG_DIR/ssftpd.conf"
+        sed -i "s|^certificate_file = .*|certificate_file = $cert_file|" "$CONFIG_DIR/simple-sftpd.conf"
+        sed -i "s|^private_key_file = .*|private_key_file = $key_file|" "$CONFIG_DIR/simple-sftpd.conf"
+        sed -i "s|^enabled = .*|enabled = true|" "$CONFIG_DIR/simple-sftpd.conf"
     else
         # SSL section doesn't exist, add it
-        cat >> "$CONFIG_DIR/ssftpd.conf" << EOF
+        cat >> "$CONFIG_DIR/simple-sftpd.conf" << EOF
 
 [ssl]
 enabled = true
@@ -299,8 +299,8 @@ chmod 600 "$SSL_DIR/private/$domain.key"
 chmod 644 "$SSL_DIR/certs/$domain.crt"
 
 # Reload FTP server if running
-if systemctl is-active --quiet ssftpd; then
-    systemctl reload ssftpd
+if systemctl is-active --quiet simple-sftpd; then
+    systemctl reload simple-sftpd
 fi
 
 echo "Certificate renewed successfully"
@@ -405,7 +405,7 @@ main() {
     print_success "SSL setup completed for $domain"
     echo ""
     echo "Next steps:"
-    echo "1. Restart the FTP server: systemctl restart ssftpd"
+    echo "1. Restart the FTP server: systemctl restart simple-sftpd"
     echo "2. Test the connection: ftp -p $domain"
     echo ""
     

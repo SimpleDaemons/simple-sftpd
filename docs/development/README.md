@@ -288,8 +288,8 @@ cd vcpkg
 #### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/ssftpd/ssftpd.git
-cd ssftpd
+git clone https://github.com/simple-sftpd/simple-sftpd.git
+cd simple-sftpd
 ```
 
 #### 2. Install Development Dependencies
@@ -332,7 +332,7 @@ make -j$(nproc)
 make build
 
 # Build specific targets
-make ssftpd
+make simple-sftpd
 make tests
 make examples
 ```
@@ -628,7 +628,7 @@ make -j$(nproc)
 
 ```bash
 # Start debugging
-gdb ./ssftpd
+gdb ./simple-sftpd
 
 # Set breakpoints
 (gdb) break main
@@ -653,7 +653,7 @@ gdb ./ssftpd
 
 ```bash
 # Start debugging
-lldb ./ssftpd
+lldb ./simple-sftpd
 
 # Set breakpoints
 (lldb) breakpoint set --name main
@@ -796,11 +796,11 @@ refactor(config): simplify configuration parsing logic
 ```bash
 # Fork the repository on GitHub
 # Clone your fork
-git clone https://github.com/yourusername/ssftpd.git
-cd ssftpd
+git clone https://github.com/yourusername/simple-sftpd.git
+cd simple-sftpd
 
 # Add upstream remote
-git remote add upstream https://github.com/ssftpd/ssftpd.git
+git remote add upstream https://github.com/simple-sftpd/simple-sftpd.git
 ```
 
 #### 2. Create Feature Branch
@@ -894,23 +894,23 @@ cmake .. \
 
 # Build and run
 make
-./ssftpd --config config.conf
+./simple-sftpd --config config.conf
 
 # Generate profile data
-gprof ./ssftpd gmon.out > profile.txt
+gprof ./simple-sftpd gmon.out > profile.txt
 ```
 
 #### Using perf (Linux)
 
 ```bash
 # Profile CPU usage
-perf record -g ./ssftpd --config config.conf
+perf record -g ./simple-sftpd --config config.conf
 
 # Analyze results
 perf report
 
 # Profile specific events
-perf record -e cache-misses ./ssftpd --config config.conf
+perf record -e cache-misses ./simple-sftpd --config config.conf
 ```
 
 #### Using Instruments (macOS)

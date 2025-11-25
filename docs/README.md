@@ -1,6 +1,6 @@
-# ssftpd Documentation
+# simple-sftpd Documentation
 
-Welcome to the comprehensive documentation for **Simple-Secure FTP Daemon (ssftpd)**, a secure, configurable, and feature-rich FTP server written in C++.
+Welcome to the comprehensive documentation for **Simple-Secure FTP Daemon (simple-sftpd)**, a secure, configurable, and feature-rich FTP server written in C++.
 
 ## 📚 Documentation Overview
 
@@ -30,7 +30,7 @@ This documentation is organized into several sections to help you find the infor
 
 | What You Need | Start Here |
 |---------------|------------|
-| **Install ssftpd** | [Installation Guide](installation/README.md) |
+| **Install simple-sftpd** | [Installation Guide](installation/README.md) |
 | **Configure the server** | [Configuration Guide](configuration/README.md) |
 | **Learn basic usage** | [Quick Start](getting-started/README.md) |
 | **Find examples** | [Examples](examples/README.md) |
@@ -66,7 +66,7 @@ This documentation is organized into several sections to help you find the infor
 
 ## 📋 Prerequisites
 
-Before using ssftpd, ensure you have:
+Before using simple-sftpd, ensure you have:
 
 - **C++17 Compiler**: GCC 7+, Clang 5+, or MSVC 2017+
 - **CMake 3.16+**: Build system
@@ -77,15 +77,15 @@ Before using ssftpd, ensure you have:
 
 ```bash
 # Install from source
-git clone https://github.com/ssftpd/ssftpd.git
-cd ssftpd
+git clone https://github.com/simple-sftpd/simple-sftpd.git
+cd simple-sftpd
 make install-dev
 make build
 make install
 
 # Or install from packages
-sudo apt install ssftpd  # Ubuntu/Debian
-brew install ssftpd      # macOS
+sudo apt install simple-sftpd  # Ubuntu/Debian
+brew install simple-sftpd      # macOS
 ```
 
 ## 📖 Documentation Versions
@@ -108,9 +108,9 @@ See our [Contributing Guide](development/contributing.md) for details.
 
 ## 📞 Support & Community
 
-- **Documentation Issues**: [GitHub Issues](https://github.com/ssftpd/ssftpd/issues)
-- **Questions**: [GitHub Discussions](https://github.com/ssftpd/ssftpd/discussions)
-- **Security Issues**: [Security Policy](https://github.com/ssftpd/ssftpd/security/policy)
+- **Documentation Issues**: [GitHub Issues](https://github.com/simple-sftpd/simple-sftpd/issues)
+- **Questions**: [GitHub Discussions](https://github.com/simple-sftpd/simple-sftpd/discussions)
+- **Security Issues**: [Security Policy](https://github.com/simple-sftpd/simple-sftpd/security/policy)
 
 ## 📄 License
 

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include "ssftpd/ftp_server_config.hpp"
+#include "simple-sftpd/ftp_server_config.hpp"
 #include <fstream>
 #include <iostream>
 
-namespace ssftpd {
+namespace simple_sftpd {
 
 bool FTPServerConfig::loadFromFile(const std::string& filename) {
     (void)filename; // Suppress unused parameter warning
@@ -28,7 +28,7 @@ bool FTPServerConfig::loadFromFile(const std::string& filename) {
     connection.max_connections = 100;
     connection.timeout_seconds = 300;
     
-    logging.log_file = "/var/log/ssftpd/ssftpd.log";
+    logging.log_file = "/var/log/simple-sftpd/simple-sftpd.log";
     logging.log_level = "INFO";
     logging.log_to_console = true;
     logging.log_to_file = true;
@@ -75,4 +75,4 @@ void FTPServerConfig::addWarning(const std::string& warning) {
     warnings_.push_back(warning);
 }
 
-} // namespace ssftpd
+} // namespace simple_sftpd

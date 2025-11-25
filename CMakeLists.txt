@@ -20,7 +20,7 @@ endif()
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-option(ENABLE_TESTS "Enable tests" OFF)
+option(ENABLE_TESTS "Enable tests" ON)
 option(ENABLE_PACKAGING "Enable package generation" ON)
 option(ENABLE_SSL "Enable SSL/TLS support" ON)
 option(ENABLE_JSON "Enable JSON support" ON)
@@ -79,7 +79,7 @@ if(MSVC)
         target_compile_options(${PROJECT_NAME} PRIVATE /MT)
     endif()
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-private-field -Wno-c99-extensions -Wno-unused-but-set-variable -Wno-unused-variable -Wno-reorder-ctor -Wno-unused-command-line-argument)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-private-field)
     if(ENABLE_STATIC_LINKING)
         # Only apply static linking flags for GCC, not clang
         if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -132,14 +132,14 @@ elseif(APPLE)
 endif()
 
 # Tests
-if(ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/CMakeLists.txt")
+if(ENABLE_TESTS)
     enable_testing()
-    add_subdirectory(src/tests)
+    add_subdirectory(tests)
 endif()
 
 # Package generation
 if(ENABLE_PACKAGING)
-    # CPack configuration is already included above
+    include(CPack)
     
     # Package information
     set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
@@ -278,8 +278,8 @@ if(ENABLE_PACKAGING)
         "*.lib"
     )
     
-    # CPack configuration is already included above
-    # CPack configuration is already included above
+    # Include CPack configuration
+    include(CPack)
 endif()
 
 # Print configuration summary

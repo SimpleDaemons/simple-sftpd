@@ -1,5 +1,5 @@
 @echo off
-REM Windows Service Installation Script for ssftpd
+REM Windows Service Installation Script for simple-sftpd
 REM Requires NSSM (Non-Sucking Service Manager) to be installed
 
 setlocal enabledelayedexpansion
@@ -14,12 +14,12 @@ if %errorLevel% neq 0 (
 )
 
 REM Set variables
-set SERVICE_NAME=ssftpd
+set SERVICE_NAME=simple-sftpd
 set SERVICE_DISPLAY=Simple-Secure FTP Daemon
-set EXECUTABLE_PATH=C:\Program Files\ssftpd\bin\ssftpd.exe
-set CONFIG_PATH=C:\Program Files\ssftpd\etc\deployment\ssftpd.conf
-set WORKING_DIR=C:\Program Files\ssftpd
-set LOG_DIR=C:\Program Files\ssftpd\logs
+set EXECUTABLE_PATH=C:\Program Files\simple-sftpd\bin\simple-sftpd.exe
+set CONFIG_PATH=C:\Program Files\simple-sftpd\etc\deployment\simple-sftpd.conf
+set WORKING_DIR=C:\Program Files\simple-sftpd
+set LOG_DIR=C:\Program Files\simple-sftpd\logs
 
 REM Check if NSSM is available
 where nssm >nul 2>&1
@@ -31,10 +31,10 @@ if %errorLevel% neq 0 (
     exit /b 1
 )
 
-REM Check if ssftpd executable exists
+REM Check if simple-sftpd executable exists
 if not exist "%EXECUTABLE_PATH%" (
-    echo ERROR: ssftpd executable not found at: %EXECUTABLE_PATH%
-    echo Please ensure ssftpd is properly installed
+    echo ERROR: simple-sftpd executable not found at: %EXECUTABLE_PATH%
+    echo Please ensure simple-sftpd is properly installed
     pause
     exit /b 1
 )
@@ -79,8 +79,8 @@ nssm set %SERVICE_NAME% AppDirectory "%WORKING_DIR%"
 nssm set %SERVICE_NAME% DisplayName "%SERVICE_DISPLAY%"
 nssm set %SERVICE_NAME% Description "Secure, configurable FTP server with modular architecture"
 nssm set %SERVICE_NAME% Start SERVICE_AUTO_START
-nssm set %SERVICE_NAME% AppStdout "%LOG_DIR%\ssftpd-service.log"
-nssm set %SERVICE_NAME% AppStderr "%LOG_DIR%\ssftpd-service-error.log"
+nssm set %SERVICE_NAME% AppStdout "%LOG_DIR%\simple-sftpd-service.log"
+nssm set %SERVICE_NAME% AppStderr "%LOG_DIR%\simple-sftpd-service-error.log"
 
 REM Set service dependencies
 nssm set %SERVICE_NAME% DependOnService Tcpip
@@ -93,7 +93,7 @@ nssm set %SERVICE_NAME% AppStopMethodWindow 1500
 nssm set %SERVICE_NAME% AppStopMethodThreads 1500
 
 REM Set environment variables
-nssm set %SERVICE_NAME% AppEnvironmentExtra SSFTPD_HOME="%WORKING_DIR%" SSFTPD_CONFIG="%CONFIG_PATH%" SSFTPD_LOGS="%LOG_DIR%"
+nssm set %SERVICE_NAME% AppEnvironmentExtra SIMPLE_SFTPD_HOME="%WORKING_DIR%" SIMPLE_SFTPD_CONFIG="%CONFIG_PATH%" SIMPLE_SFTPD_LOGS="%LOG_DIR%"
 
 echo Service installed successfully!
 echo.
