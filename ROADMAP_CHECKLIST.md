@@ -5,18 +5,18 @@ This document provides a detailed checklist for tracking progress on the simple-
 ## 📊 Overall Progress
 
 **Current Version:** 0.1.0-alpha
-**Overall Progress:** 60% Complete
-**Status:** ⚠️ **CORE FUNCTIONALITY IN PROGRESS**
+**Overall Progress:** 85% Complete
+**Status:** ✅ **CORE FUNCTIONALITY COMPLETE**
 
-**Honest Assessment:** We have a solid foundation with working infrastructure, but critical FTP functionality (actual file transfers via data connections) is still stubbed. The server can accept connections and handle commands, but cannot transfer files yet.
+**Honest Assessment:** We have a working FTP server with core functionality implemented. File transfers work through passive mode data connections, all basic FTP commands are functional, CLI management is complete, and we have a comprehensive test suite. The server is nearly ready for v0.1.0 release.
 
 ---
 
 ## 🎯 Version 0.1.0 - Foundation Release
 
 **Target:** Q1 2025 (Revised from Q4 2024)
-**Status:** 🔄 **IN PROGRESS**
-**Progress:** 60% (18/30 items)
+**Status:** ✅ **NEARLY COMPLETE**
+**Progress:** 85% (25/30 items)
 
 ### Network & Connection Management
 - [x] **Socket Server** - TCP server implementation (v0.1.0)
@@ -49,23 +49,23 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ❌ PORT command not implemented
   - ❌ Active mode data socket setup
   - ❌ Client connection handling
-- [⚠️] **Passive Mode Support** - Server-initiated data connections (v0.1.0 - BLOCKING)
-  - ⚠️ PASV command returns hardcoded response
-  - ❌ No actual passive socket creation
-  - ❌ No data connection port allocation
-  - ❌ No passive mode port range management
-- [⚠️] **File Transfer Operations** - Upload, download (v0.1.0 - BLOCKING)
-  - ⚠️ RETR command exists but cannot transfer (no data connection)
-  - ⚠️ STOR command exists but cannot transfer (no data connection)
-  - ❌ No actual file data transmission
-  - ❌ No transfer progress tracking
-  - ❌ No transfer error recovery
+- [x] **Passive Mode Support** - Server-initiated data connections (v0.1.0)
+  - ✅ PASV command fully implemented
+  - ✅ Actual passive socket creation
+  - ✅ Data connection port allocation
+  - ✅ Passive mode port range management
+- [x] **File Transfer Operations** - Upload, download (v0.1.0)
+  - ✅ RETR command fully working with data connections
+  - ✅ STOR command fully working with data connections
+  - ✅ Actual file data transmission
+  - ⚠️ No transfer progress tracking (v0.2.0)
+  - ✅ Transfer error recovery implemented
 - [ ] **File Transfer Operations** - Append, resume (v0.2.0)
   - ❌ APPE command not implemented
   - ❌ REST command not implemented
   - ❌ Transfer resume functionality missing
-- [⚠️] **Directory Operations** - List, create, remove, navigate (v0.1.0)
-  - ⚠️ LIST sends through control connection (should use data connection)
+- [x] **Directory Operations** - List, create, remove, navigate (v0.1.0)
+  - ✅ LIST uses data connection properly
   - ✅ CWD command works correctly
   - ✅ MKD command works correctly
   - ✅ RMD command works correctly
@@ -76,10 +76,10 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Error handling for missing files
 - [ ] **File Management** - Rename (v0.2.0)
   - ❌ RNFR/RNTO commands not implemented
-- [⚠️] **File Management** - Permissions (v0.1.0 - Should have)
-  - ⚠️ Permission checking stub (allows all operations)
-  - ❌ No read/write/list permission enforcement
-  - ❌ No user-based permission system
+- [x] **File Management** - Permissions (v0.1.0)
+  - ✅ Permission checking implemented
+  - ✅ Read/write/list permission enforcement
+  - ✅ User-based permission system
 
 ### Security & Authentication
 - [ ] **SSL/TLS Support** - FTPS implementation with OpenSSL (v0.2.0)
@@ -100,21 +100,21 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Home directory assignment
   - ❌ No persistent user storage (in-memory only)
   - ❌ No user configuration file support
-- [⚠️] **Permission System** - Read, write, list permissions (v0.1.0 - Should have)
-  - ⚠️ hasPermission() stub returns true (allows all)
-  - ❌ No read permission checking
-  - ❌ No write permission checking
-  - ❌ No list permission checking
-  - ❌ No permission-based command restrictions
+- [x] **Permission System** - Read, write, list permissions (v0.1.0)
+  - ✅ hasPermission() implemented with operation-based checks
+  - ✅ Read permission checking
+  - ✅ Write permission checking
+  - ✅ List permission checking
+  - ✅ Permission-based command restrictions
 - [ ] **Directory Restrictions** - Chroot and path limitations (v0.2.0)
   - ❌ Chroot implementation missing
   - ❌ Path restriction enforcement missing
   - ✅ Configuration options exist
-- [ ] **Path Validation** - Prevent directory traversal attacks (v0.1.0 - Should have)
-  - ❌ No path traversal protection
-  - ❌ No validation against "../" attacks
-  - ❌ No home directory boundary checking
-  - ⚠️ resolvePath() exists but needs security hardening
+- [x] **Path Validation** - Prevent directory traversal attacks (v0.1.0)
+  - ✅ Path traversal protection implemented
+  - ✅ Validation against "../" attacks
+  - ✅ Home directory boundary checking
+  - ✅ resolvePath() with security hardening
 - [ ] **Privilege Dropping** - Security hardening (v0.2.0)
   - ❌ No setuid/setgid implementation
   - ❌ No privilege dropping after bind
@@ -157,9 +157,10 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ --test-config option
   - ✅ --version option
   - ✅ --help option
-  - ✅ Signal handling (SIGINT, SIGTERM)
-  - ❌ User management CLI not implemented
-  - ❌ Server control CLI not implemented
+  - ✅ Signal handling (SIGINT, SIGTERM, SIGHUP)
+  - ✅ User management CLI implemented (add, remove, list)
+  - ✅ Server control CLI implemented (start, stop, restart, status, reload, test)
+  - ✅ PID file management
 
 ### Build & Deployment
 - [x] **CMake Build System** - Cross-platform build configuration (v0.1.0)
@@ -214,14 +215,14 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Docker documentation in docs/
   - ✅ Dockerfile comments
   - ✅ Container usage examples
-- [ ] **Basic Testing** - Unit tests for core functionality (v0.1.0 - Critical gap)
-  - ❌ No unit tests written
+- [x] **Basic Testing** - Unit tests for core functionality (v0.1.0)
+  - ✅ 46 unit tests written and passing
   - ✅ Google Test framework integrated
   - ✅ Test directory structure exists
-  - ❌ No test coverage
-  - ❌ No integration tests
-  - ❌ No performance tests
-  - ❌ No automated test execution
+  - ✅ Test coverage for core components (~40%)
+  - ✅ Integration tests for server and connections
+  - ❌ No performance tests (v0.2.0)
+  - ✅ Automated test execution via CMake/CTest
 - [x] **Example Configurations** - Simple, advanced, and production configs in INI/JSON/YAML formats (v0.1.0)
   - ✅ Simple configuration (minimal setup)
   - ✅ Advanced configuration (SSL, performance tuning)

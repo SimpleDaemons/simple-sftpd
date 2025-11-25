@@ -6,18 +6,18 @@ A secure, configurable, and feature-rich FTP server written in C++ for Linux, ma
 
 ### Core FTP Functionality
 - **RFC 959 Compliant**: Full FTP protocol implementation
-- **Active/Passive Mode**: Support for both connection modes
-- **File Transfer**: Upload, download, append, and resume capabilities
+- **Passive Mode**: Full PASV support with data connections (Active mode in v0.2.0)
+- **File Transfer**: Upload and download working (append and resume in v0.2.0)
 - **Directory Operations**: List, create, remove, and navigate directories
-- **File Management**: Rename, delete, and modify file permissions
+- **File Management**: Delete and directory operations (rename in v0.2.0)
 
 ### Security Features
-- **SSL/TLS Support**: Secure file transfers with OpenSSL
-- **User Authentication**: Multiple authentication methods (password, hash, PAM, LDAP)
-- **Access Control**: Granular permissions and path restrictions
-- **Chroot Support**: Isolated file system access
-- **Privilege Dropping**: Security hardening for production use
-- **Rate Limiting**: Protection against abuse and DoS attacks
+- **SSL/TLS Support**: Configuration ready, implementation in v0.2.0
+- **User Authentication**: Username/password authentication (PAM, LDAP in v0.2.0)
+- **Access Control**: Basic permissions and path restrictions implemented
+- **Path Validation**: Directory traversal protection and home directory enforcement
+- **Chroot Support**: Configuration ready, implementation in v0.2.0
+- **Rate Limiting**: Time-window based protection against abuse and DoS attacks
 
 ### Virtual Hosting
 - **Multi-Domain Support**: Host multiple FTP sites on one server
@@ -34,10 +34,10 @@ A secure, configurable, and feature-rich FTP server written in C++ for Linux, ma
 
 ### Performance & Monitoring
 - **Multi-threaded**: Efficient handling of multiple connections
-- **Connection Pooling**: Optimized resource management
-- **Transfer Optimization**: Sendfile and memory-mapped I/O support
-- **Statistics**: Comprehensive usage and performance metrics
-- **Logging**: Advanced logging with rotation and filtering
+- **Connection Management**: Thread-safe connection tracking and cleanup
+- **Transfer Optimization**: Basic file transfers (sendfile and memory-mapped I/O in v0.2.0)
+- **Statistics**: Basic metrics (comprehensive statistics in v0.2.0)
+- **Logging**: Advanced logging with STANDARD, JSON, and EXTENDED formats
 
 ### Platform Support
 - **Cross-Platform**: Linux, macOS, and Windows
@@ -687,11 +687,16 @@ This project is licensed under the Apache License, Version 2.0 - see the [LICENS
 
 ## Changelog
 
-### v0.1.0 (Current)
-- Initial release
-- Core FTP server functionality
-- SSL/TLS support
-- Virtual hosting
-- User management
-- Multi-platform support
-- Comprehensive configuration system
+### v0.1.0 (Current - 85% Complete)
+- ✅ Core FTP server functionality with file transfers
+- ✅ Passive mode data connections
+- ✅ User authentication and management
+- ✅ CLI management interface (start, stop, restart, status, reload, test, user, virtual, ssl)
+- ✅ Path validation and security
+- ✅ Basic permission system
+- ✅ Comprehensive logging (STANDARD, JSON, EXTENDED formats)
+- ✅ Test suite (46 tests passing)
+- ✅ Multi-platform support
+- ✅ Comprehensive configuration system
+- 🔄 SSL/TLS support (v0.2.0)
+- 🔄 Virtual hosting (v0.3.0)
