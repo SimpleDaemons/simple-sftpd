@@ -76,25 +76,41 @@ client_ca_file = "/etc/simple-sftpd/ssl/client-ca.crt"
 
 ```ini
 [logging]
-# Log levels
-log_level = "info"
-access_log_level = "info"
-error_log_level = "error"
-
-# Log files
+# Log file
 log_file = "/var/log/simple-sftpd/simple-sftpd.log"
-access_log_file = "/var/log/simple-sftpd/access.log"
-error_log_file = "/var/log/simple-sftpd/error.log"
 
-# Log rotation
-log_rotation = true
-max_log_size = "100MB"
-max_log_files = 10
+# Log level: TRACE, DEBUG, INFO, WARN, ERROR, FATAL
+log_level = "INFO"
 
-# Log format
-log_format = "%Y-%m-%d %H:%M:%S [%LEVEL] %MESSAGE"
-access_log_format = "%TIMESTAMP %IP %USER %COMMAND %RESULT %BYTES"
+# Log format: STANDARD, JSON, or EXTENDED
+# STANDARD: [timestamp] [LEVEL] message
+# JSON: {"timestamp":"...","level":"...","message":"..."}
+# EXTENDED: [timestamp] [LEVEL] [PID:...] message
+log_format = "STANDARD"
+
+# Output destinations
+log_to_console = true
+log_to_file = true
 ```
+
+**Log Format Examples:**
+
+**STANDARD Format:**
+```
+[2024-11-25 16:30:45.123] [INFO] FTP Server started on 0.0.0.0:21
+```
+
+**JSON Format:**
+```json
+{"timestamp":"2024-11-25 16:30:45.123","level":"INFO","message":"FTP Server started on 0.0.0.0:21"}
+```
+
+**EXTENDED Format:**
+```
+[2024-11-25 16:30:45.123] [INFO] [PID:12345] FTP Server started on 0.0.0.0:21
+```
+
+The JSON format is ideal for log aggregation systems like ELK Stack, Splunk, or cloud logging services, as it provides structured, machine-readable log entries.
 
 ### Rate Limiting
 

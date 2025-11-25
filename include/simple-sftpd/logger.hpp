@@ -32,9 +32,15 @@ enum class LogLevel {
     FATAL = 5
 };
 
+enum class LogFormat {
+    STANDARD = 0,
+    JSON = 1,
+    EXTENDED = 2
+};
+
 class Logger {
 public:
-    Logger(const std::string& log_file, LogLevel level, bool console, bool file);
+    Logger(const std::string& log_file, LogLevel level, bool console, bool file, LogFormat format = LogFormat::STANDARD);
     ~Logger();
 
     void trace(const std::string& message);
@@ -46,14 +52,19 @@ public:
 
     void setLevel(LogLevel level);
     LogLevel getLevel() const;
+    void setFormat(LogFormat format);
+    LogFormat getFormat() const;
 
 private:
     void log(LogLevel level, const std::string& message);
     std::string levelToString(LogLevel level) const;
     std::string getTimestamp() const;
+    std::string formatMessage(LogLevel level, const std::string& message) const;
+    std::string escapeJsonString(const std::string& str) const;
 
     std::string log_file_;
     LogLevel level_;
+    LogFormat format_;
     bool console_;
     bool file_;
     std::ofstream file_stream_;

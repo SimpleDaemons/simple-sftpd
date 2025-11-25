@@ -62,14 +62,13 @@ max_tls_version = 1.3
 [logging]
 log_file = "/var/log/simple-sftpd/simple-sftpd.log"
 log_level = "INFO"
+log_format = "STANDARD"
+# Log format options: STANDARD, JSON, EXTENDED
+# STANDARD: [timestamp] [LEVEL] message
+# JSON: {"timestamp":"...","level":"...","message":"..."}
+# EXTENDED: [timestamp] [LEVEL] [PID:...] message
 log_to_console = true
 log_to_file = true
-log_commands = true
-log_transfers = true
-log_errors = true
-log_format = "STANDARD"
-max_log_size = 10MB
-max_log_files = 5
 
 # Security Configuration
 [security]

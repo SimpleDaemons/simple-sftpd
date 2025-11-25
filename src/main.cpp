@@ -312,6 +312,13 @@ bool startServer(const std::string& config_file, bool daemon_mode) {
         }
 
         // Initialize logger
+        LogFormat log_format = LogFormat::STANDARD;
+        if (config->logging.log_format == "JSON") {
+            log_format = LogFormat::JSON;
+        } else if (config->logging.log_format == "EXTENDED") {
+            log_format = LogFormat::EXTENDED;
+        }
+        
         g_logger = std::make_shared<Logger>(
             config->logging.log_file,
             config->logging.log_level == "TRACE" ? LogLevel::TRACE :
@@ -321,7 +328,8 @@ bool startServer(const std::string& config_file, bool daemon_mode) {
             config->logging.log_level == "ERROR" ? LogLevel::ERROR :
             config->logging.log_level == "FATAL" ? LogLevel::FATAL : LogLevel::INFO,
             config->logging.log_to_console,
-            config->logging.log_to_file
+            config->logging.log_to_file,
+            log_format
         );
 
         g_logger->info("Starting Simple FTP Daemon v0.1.0");

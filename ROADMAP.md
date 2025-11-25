@@ -17,16 +17,19 @@ To create a modern, secure, and highly configurable FTP server that provides:
 **Target: Q4 2024**
 
 **Core Features:**
-- ✅ Basic FTP protocol implementation (RFC 959)
-- ✅ SSL/TLS support for secure transfers
-- ✅ User authentication and management
-- ✅ Configuration system with INI/JSON support
-- ✅ Cross-platform build system (CMake)
-- ✅ Docker integration and deployment
-- ✅ Basic logging and monitoring
-- ✅ Service integration (systemd, launchd, Windows services)
+- ✅ Basic FTP protocol implementation (RFC 959) - Core commands working
+- 🔄 SSL/TLS support for secure transfers - Configuration ready, implementation pending
+- ✅ User authentication and management - Basic authentication working
+- ✅ Configuration system with INI support - JSON/YAML configs available
+- ✅ Cross-platform build system (CMake) - Fully functional
+- ✅ Docker integration and deployment - Dockerfile ready
+- ✅ Basic logging and monitoring - Comprehensive logging implemented
+- ✅ Service integration (systemd, launchd, Windows services) - Service files ready
+- ✅ Rate limiting - Implemented with time-window based limiting
+- ✅ Socket server - Full networking implementation
+- ✅ FTP command handling - USER, PASS, QUIT, PWD, CWD, LIST, RETR, STOR, DELE, MKD, RMD
 
-**Status:** 🟢 **COMPLETED** - All foundation features implemented
+**Status:** 🔄 **IN PROGRESS** - Core functionality implemented, advanced features pending
 
 ### Version 0.2.0 - Security & Performance
 **Target: Q1 2025**
@@ -93,26 +96,27 @@ To create a modern, secure, and highly configurable FTP server that provides:
 ## 🚀 Feature Categories
 
 ### Core Protocol Support
-- ✅ **FTP (RFC 959)** - Complete implementation
-- ✅ **FTPS (RFC 4217)** - SSL/TLS over FTP
+- ✅ **FTP (RFC 959)** - Basic implementation with core commands
+- 🔄 **FTPS (RFC 4217)** - SSL/TLS over FTP (configuration ready, implementation pending)
 - 🔄 **SFTP (RFC 4253)** - SSH File Transfer Protocol
 - 🔄 **FTP over HTTP** - Proxy and tunneling support
 - 🔄 **IPv6 Support** - Full IPv6 compatibility
 
 ### Security & Authentication
-- ✅ **Basic Authentication** - Username/password
-- ✅ **SSL/TLS Encryption** - Secure data transfer
+- ✅ **Basic Authentication** - Username/password (implemented)
+- 🔄 **SSL/TLS Encryption** - Secure data transfer (configuration ready)
 - 🔄 **Certificate Authentication** - X.509 certificates
 - 🔄 **PAM Integration** - Pluggable Authentication Modules
 - 🔄 **LDAP/Active Directory** - Enterprise authentication
 - 🔄 **OAuth2/OpenID Connect** - Modern authentication
 - 🔄 **Two-Factor Authentication** - TOTP, SMS, email
 - 🔄 **IP Whitelisting** - Network-based access control
+- ✅ **Rate Limiting** - Time-window based rate limiting (implemented)
 
 ### User & Access Management
-- ✅ **User Accounts** - Local user management
-- ✅ **Permission System** - Read, write, list permissions
-- ✅ **Directory Restrictions** - Chroot and path limits
+- ✅ **User Accounts** - Local user management (basic implementation)
+- 🔄 **Permission System** - Read, write, list permissions (stub - allows all)
+- 🔄 **Directory Restrictions** - Chroot and path limits (configuration ready)
 - 🔄 **Group Management** - User groups and inheritance
 - 🔄 **Quota System** - Storage and bandwidth limits
 - 🔄 **Session Management** - Concurrent session limits
@@ -126,9 +130,9 @@ To create a modern, secure, and highly configurable FTP server that provides:
 - 🔄 **Dynamic Configuration** - Runtime host management
 
 ### Performance & Scalability
-- ✅ **Multi-threading** - Concurrent connection handling
-- 🔄 **Connection Pooling** - Optimized resource usage
-- 🔄 **Memory-mapped I/O** - Efficient file operations
+- ✅ **Multi-threading** - Concurrent connection handling (implemented)
+- ✅ **Connection Management** - Connection pooling and cleanup (implemented)
+- 🔄 **Memory-mapped I/O** - Efficient file operations (configuration ready)
 - 🔄 **Compression** - On-the-fly compression
 - 🔄 **Caching** - Intelligent file caching
 - 🔄 **Load Balancing** - Horizontal scaling

@@ -33,7 +33,13 @@ namespace simple_sftpd {
 
 FTPServer::FTPServer(std::shared_ptr<FTPServerConfig> config)
     : config_(config), running_(false), server_socket_(-1) {
-    logger_ = std::make_shared<Logger>("", LogLevel::INFO, true, false);
+    LogFormat log_format = LogFormat::STANDARD;
+    if (config->logging.log_format == "JSON") {
+        log_format = LogFormat::JSON;
+    } else if (config->logging.log_format == "EXTENDED") {
+        log_format = LogFormat::EXTENDED;
+    }
+    logger_ = std::make_shared<Logger>("", LogLevel::INFO, true, false, log_format);
     connection_manager_ = std::make_shared<FTPConnectionManager>(config, logger_);
 }
 
