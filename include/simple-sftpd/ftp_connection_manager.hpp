@@ -21,6 +21,7 @@
 #include <mutex>
 #include <thread>
 #include <chrono>
+#include <atomic>
 
 namespace simple_sftpd {
 

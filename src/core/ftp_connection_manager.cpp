@@ -17,6 +17,8 @@
 #include "simple-sftpd/ftp_connection_manager.hpp"
 #include "simple-sftpd/ftp_connection.hpp"
 #include "simple-sftpd/logger.hpp"
+#include <atomic>
+#include <algorithm>
 
 namespace simple_sftpd {
 
@@ -91,7 +93,20 @@ std::vector<std::shared_ptr<FTPConnection>> FTPConnectionManager::getConnections
 void FTPConnectionManager::cleanupLoop() {
     while (running_) {
         std::this_thread::sleep_for(cleanup_interval_);
-        // Stub cleanup implementation
+        
+        // Clean up inactive connections
+        std::lock_guard<std::mutex> lock(connections_mutex_);
+        auto it = connections_.begin();
+        while (it != connections_.end()) {
+            if (!(*it) || !(*it)->isActive()) {
+                if (*it) {
+                    (*it)->stop();
+                }
+                it = connections_.erase(it);
+            } else {
+                ++it;
+            }
+        }
     }
 }
 

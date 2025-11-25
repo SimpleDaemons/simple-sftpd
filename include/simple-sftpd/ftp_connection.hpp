@@ -25,6 +25,8 @@ namespace simple_sftpd {
 
 class Logger;
 class FTPServerConfig;
+class FTPUserManager;
+class FTPUser;
 
 class FTPConnection {
 public:
@@ -39,13 +41,37 @@ private:
     void handleClient();
     void sendResponse(const std::string& response);
     std::string readLine();
+    
+    // FTP Command Handlers
+    void handleUSER(const std::string& username);
+    void handlePASS(const std::string& password);
+    void handleQUIT();
+    void handlePWD();
+    void handleCWD(const std::string& path);
+    void handleLIST(const std::string& path);
+    void handlePASV();
+    void handleTYPE(const std::string& type);
+    void handleSIZE(const std::string& filename);
+    void handleRETR(const std::string& filename);
+    void handleSTOR(const std::string& filename);
+    void handleDELE(const std::string& filename);
+    void handleMKD(const std::string& dirname);
+    void handleRMD(const std::string& dirname);
+    
+    std::string resolvePath(const std::string& path);
 
     int socket_;
     std::shared_ptr<Logger> logger_;
     std::shared_ptr<FTPServerConfig> config_;
+    std::shared_ptr<FTPUserManager> user_manager_;
     
     std::atomic<bool> active_;
     std::thread client_thread_;
+    
+    bool authenticated_;
+    std::string username_;
+    std::shared_ptr<FTPUser> current_user_;
+    std::string current_directory_;
 };
 
 } // namespace simple_sftpd
