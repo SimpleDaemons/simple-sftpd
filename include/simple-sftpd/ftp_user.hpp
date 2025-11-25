@@ -37,7 +37,7 @@ public:
     void setHomeDirectory(const std::string& home_dir) { home_directory_ = home_dir; }
 
     bool authenticate(const std::string& password) const;
-    bool hasPermission(const std::string& path) const;
+    bool hasPermission(const std::string& operation, const std::string& path) const;
 
 private:
     std::string username_;

@@ -20,19 +20,25 @@
 #include "simple-sftpd/ftp_user.hpp"
 #include "simple-sftpd/ftp_server_config.hpp"
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/select.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <cstring>
 #include <sstream>
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <dirent.h>
+#include <errno.h>
 
 namespace simple_sftpd {
 
 FTPConnection::FTPConnection(int socket, std::shared_ptr<Logger> logger, std::shared_ptr<FTPServerConfig> config)
     : socket_(socket), logger_(logger), config_(config), active_(false),
-      authenticated_(false), current_user_(nullptr), current_directory_("/") {
+      authenticated_(false), current_user_(nullptr), current_directory_("/"),
+      passive_listen_socket_(-1), data_socket_(-1), transfer_type_("A") {
     user_manager_ = std::make_shared<FTPUserManager>(logger_);
     
     // Add default test user for development/testing
@@ -66,6 +72,7 @@ void FTPConnection::stop() {
     }
     
     active_ = false;
+    closeDataSocket();
     if (socket_ >= 0) {
         close(socket_);
         socket_ = -1;
@@ -228,6 +235,10 @@ void FTPConnection::handlePASS(const std::string& password) {
     if (current_user_ && current_user_->authenticate(password)) {
         authenticated_ = true;
         current_directory_ = current_user_->getHomeDirectory();
+        // Ensure current directory is within home
+        if (!isPathWithinHome(current_directory_)) {
+            current_directory_ = current_user_->getHomeDirectory();
+        }
         sendResponse("230 User logged in, proceed");
         logger_->info("User " + username_ + " logged in");
     } else {
@@ -248,6 +259,11 @@ void FTPConnection::handlePWD() {
 void FTPConnection::handleCWD(const std::string& path) {
     std::string new_path = resolvePath(path);
     
+    if (!validatePath(new_path)) {
+        sendResponse("550 Invalid path");
+        return;
+    }
+    
     if (std::filesystem::exists(new_path) && std::filesystem::is_directory(new_path)) {
         current_directory_ = new_path;
         sendResponse("250 CWD command successful");
@@ -257,7 +273,17 @@ void FTPConnection::handleCWD(const std::string& path) {
 }
 
 void FTPConnection::handleLIST(const std::string& path) {
+    if (!hasPermission("list", "")) {
+        sendResponse("550 Permission denied");
+        return;
+    }
+    
     std::string list_path = path.empty() ? current_directory_ : resolvePath(path);
+    
+    if (!validatePath(list_path)) {
+        sendResponse("550 Invalid path");
+        return;
+    }
     
     if (!std::filesystem::exists(list_path)) {
         sendResponse("550 File or directory not found");
@@ -265,6 +291,13 @@ void FTPConnection::handleLIST(const std::string& path) {
     }
     
     sendResponse("150 Opening ASCII mode data connection for file list");
+    
+    // Accept data connection
+    int data_fd = acceptDataConnection();
+    if (data_fd < 0) {
+        sendResponse("425 Can't open data connection");
+        return;
+    }
     
     std::string listing;
     if (std::filesystem::is_directory(list_path)) {
@@ -282,6 +315,9 @@ void FTPConnection::handleLIST(const std::string& path) {
             }
         } catch (const std::exception& e) {
             logger_->error("Error listing directory: " + std::string(e.what()));
+            close(data_fd);
+            sendResponse("550 Error listing directory");
+            return;
         }
     } else {
         // Single file
@@ -290,18 +326,29 @@ void FTPConnection::handleLIST(const std::string& path) {
                   std::filesystem::path(list_path).filename().string() + "\r\n";
     }
     
-    // Send listing (simplified - in real FTP, this would go through data connection)
-    sendResponse(listing);
+    // Send listing through data connection
+    send(data_fd, listing.c_str(), listing.length(), 0);
+    close(data_fd);
     sendResponse("226 Transfer complete");
 }
 
 void FTPConnection::handlePASV() {
-    // Simplified - in real implementation, would set up passive mode data connection
-    sendResponse("227 Entering Passive Mode (127,0,0,1,4,28)");
+    closeDataSocket(); // Close any existing passive socket
+    
+    int port = createPassiveDataSocket();
+    if (port < 0) {
+        sendResponse("425 Can't open passive connection");
+        return;
+    }
+    
+    std::string response = formatPassiveResponse(port);
+    sendResponse(response);
+    logger_->debug("Passive mode enabled on port " + std::to_string(port));
 }
 
 void FTPConnection::handleTYPE(const std::string& type) {
     if (type == "A" || type == "I") {
+        transfer_type_ = type;
         sendResponse("200 Type set to " + type);
     } else {
         sendResponse("504 Command not implemented for that parameter");
@@ -320,43 +367,128 @@ void FTPConnection::handleSIZE(const std::string& filename) {
 }
 
 void FTPConnection::handleRETR(const std::string& filename) {
+    if (!hasPermission("read", filename)) {
+        sendResponse("550 Permission denied");
+        return;
+    }
+    
     std::string filepath = resolvePath(filename);
+    
+    if (!validatePath(filepath)) {
+        sendResponse("550 Invalid path");
+        return;
+    }
     
     if (!std::filesystem::exists(filepath) || !std::filesystem::is_regular_file(filepath)) {
         sendResponse("550 File not found");
         return;
     }
     
-    sendResponse("150 Opening data connection");
+    sendResponse("150 Opening " + transfer_type_ + " mode data connection");
     
-    // Simplified - in real implementation, would send file through data connection
-    std::ifstream file(filepath, std::ios::binary);
-    if (file.is_open()) {
-        // For now, just acknowledge
-        file.close();
-        sendResponse("226 Transfer complete");
-    } else {
-        sendResponse("550 Failed to open file");
+    // Accept data connection
+    int data_fd = acceptDataConnection();
+    if (data_fd < 0) {
+        sendResponse("425 Can't open data connection");
+        return;
     }
+    
+    // Open file
+    std::ifstream file(filepath, std::ios::binary);
+    if (!file.is_open()) {
+        close(data_fd);
+        sendResponse("550 Failed to open file");
+        return;
+    }
+    
+    // Transfer file
+    char buffer[8192];
+    size_t total_bytes = 0;
+    while (file.read(buffer, sizeof(buffer)) || file.gcount() > 0) {
+        size_t bytes_read = file.gcount();
+        ssize_t sent = send(data_fd, buffer, bytes_read, 0);
+        if (sent < 0) {
+            logger_->error("Error sending file data: " + std::string(strerror(errno)));
+            file.close();
+            close(data_fd);
+            sendResponse("426 Connection closed, transfer aborted");
+            return;
+        }
+        total_bytes += sent;
+    }
+    
+    file.close();
+    close(data_fd);
+    logger_->info("File transfer complete: " + filename + " (" + std::to_string(total_bytes) + " bytes)");
+    sendResponse("226 Transfer complete");
 }
 
 void FTPConnection::handleSTOR(const std::string& filename) {
+    if (!hasPermission("write", filename)) {
+        sendResponse("550 Permission denied");
+        return;
+    }
+    
     std::string filepath = resolvePath(filename);
     
-    sendResponse("150 Opening data connection");
-    
-    // Simplified - in real implementation, would receive file through data connection
-    std::ofstream file(filepath, std::ios::binary);
-    if (file.is_open()) {
-        file.close();
-        sendResponse("226 Transfer complete");
-    } else {
-        sendResponse("550 Failed to create file");
+    if (!validatePath(filepath)) {
+        sendResponse("550 Invalid path");
+        return;
     }
+    
+    sendResponse("150 Opening " + transfer_type_ + " mode data connection");
+    
+    // Accept data connection
+    int data_fd = acceptDataConnection();
+    if (data_fd < 0) {
+        sendResponse("425 Can't open data connection");
+        return;
+    }
+    
+    // Create parent directory if needed
+    std::filesystem::path file_path(filepath);
+    if (file_path.has_parent_path()) {
+        std::filesystem::create_directories(file_path.parent_path());
+    }
+    
+    // Open file for writing
+    std::ofstream file(filepath, std::ios::binary);
+    if (!file.is_open()) {
+        close(data_fd);
+        sendResponse("550 Failed to create file");
+        return;
+    }
+    
+    // Receive file
+    char buffer[8192];
+    size_t total_bytes = 0;
+    while (true) {
+        ssize_t received = recv(data_fd, buffer, sizeof(buffer), 0);
+        if (received <= 0) {
+            break; // Connection closed or error
+        }
+        file.write(buffer, received);
+        total_bytes += received;
+    }
+    
+    file.close();
+    close(data_fd);
+    logger_->info("File upload complete: " + filename + " (" + std::to_string(total_bytes) + " bytes)");
+    sendResponse("226 Transfer complete");
 }
 
 void FTPConnection::handleDELE(const std::string& filename) {
+    if (!hasPermission("write", filename)) {
+        sendResponse("550 Permission denied");
+        return;
+    }
+    
     std::string filepath = resolvePath(filename);
+    
+    if (!validatePath(filepath)) {
+        sendResponse("550 Invalid path");
+        return;
+    }
     
     if (std::filesystem::exists(filepath) && std::filesystem::is_regular_file(filepath)) {
         if (std::filesystem::remove(filepath)) {
@@ -370,7 +502,17 @@ void FTPConnection::handleDELE(const std::string& filename) {
 }
 
 void FTPConnection::handleMKD(const std::string& dirname) {
+    if (!hasPermission("write", dirname)) {
+        sendResponse("550 Permission denied");
+        return;
+    }
+    
     std::string dirpath = resolvePath(dirname);
+    
+    if (!validatePath(dirpath)) {
+        sendResponse("550 Invalid path");
+        return;
+    }
     
     if (std::filesystem::create_directory(dirpath)) {
         sendResponse("257 \"" + dirpath + "\" created");
@@ -380,7 +522,17 @@ void FTPConnection::handleMKD(const std::string& dirname) {
 }
 
 void FTPConnection::handleRMD(const std::string& dirname) {
+    if (!hasPermission("write", dirname)) {
+        sendResponse("550 Permission denied");
+        return;
+    }
+    
     std::string dirpath = resolvePath(dirname);
+    
+    if (!validatePath(dirpath)) {
+        sendResponse("550 Invalid path");
+        return;
+    }
     
     if (std::filesystem::exists(dirpath) && std::filesystem::is_directory(dirpath)) {
         if (std::filesystem::remove(dirpath)) {
@@ -394,23 +546,191 @@ void FTPConnection::handleRMD(const std::string& dirname) {
 }
 
 std::string FTPConnection::resolvePath(const std::string& path) {
-    std::string resolved;
-    
     if (path.empty()) {
         return current_directory_;
     }
     
+    std::string resolved;
     if (path[0] == '/') {
-        // Absolute path
-        resolved = path;
+        // Absolute path - resolve relative to user's home directory
+        if (current_user_) {
+            resolved = current_user_->getHomeDirectory() + path;
+        } else {
+            resolved = path;
+        }
     } else {
         // Relative path
         resolved = current_directory_ + "/" + path;
     }
     
-    // Normalize path
+    // Normalize path (remove .. and .)
     std::filesystem::path p(resolved);
-    return std::filesystem::canonical(p).string();
+    try {
+        return std::filesystem::canonical(p).string();
+    } catch (const std::exception&) {
+        // If canonical fails, at least normalize
+        return p.lexically_normal().string();
+    }
+}
+
+bool FTPConnection::validatePath(const std::string& path) {
+    if (!current_user_) {
+        return false;
+    }
+    
+    std::string home = current_user_->getHomeDirectory();
+    std::string resolved = resolvePath(path);
+    
+    // Check if resolved path is within home directory
+    return isPathWithinHome(resolved);
+}
+
+bool FTPConnection::isPathWithinHome(const std::string& path) {
+    if (!current_user_) {
+        return false;
+    }
+    
+    std::string home = current_user_->getHomeDirectory();
+    std::filesystem::path path_p(path);
+    std::filesystem::path home_p(home);
+    
+    try {
+        std::filesystem::path canonical_path = std::filesystem::canonical(path_p);
+        std::filesystem::path canonical_home = std::filesystem::canonical(home_p);
+        
+        // Check if canonical_path starts with canonical_home
+        auto it = canonical_path.begin();
+        auto home_it = canonical_home.begin();
+        
+        while (home_it != canonical_home.end()) {
+            if (it == canonical_path.end() || *it != *home_it) {
+                return false;
+            }
+            ++it;
+            ++home_it;
+        }
+        return true;
+    } catch (const std::exception&) {
+        // If canonical fails, do simple string comparison
+        return path.find(home) == 0;
+    }
+}
+
+bool FTPConnection::hasPermission(const std::string& operation, const std::string& path) {
+    if (!current_user_) {
+        return false;
+    }
+    
+    // Basic permission check - delegate to FTPUser
+    return current_user_->hasPermission(operation, path);
+}
+
+int FTPConnection::createPassiveDataSocket() {
+    closeDataSocket();
+    
+    // Create socket
+    passive_listen_socket_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (passive_listen_socket_ < 0) {
+        logger_->error("Failed to create passive socket: " + std::string(strerror(errno)));
+        return -1;
+    }
+    
+    // Set socket options
+    int reuse = 1;
+    setsockopt(passive_listen_socket_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+    
+    // Bind to any available port in the range
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = INADDR_ANY;
+    
+    int port_range_start = config_->connection.passive_port_range_start;
+    int port_range_end = config_->connection.passive_port_range_end;
+    
+    for (int port = port_range_start; port <= port_range_end; ++port) {
+        addr.sin_port = htons(port);
+        if (bind(passive_listen_socket_, (struct sockaddr*)&addr, sizeof(addr)) == 0) {
+            if (listen(passive_listen_socket_, 1) == 0) {
+                logger_->debug("Passive socket listening on port " + std::to_string(port));
+                return port;
+            }
+        }
+    }
+    
+    close(passive_listen_socket_);
+    passive_listen_socket_ = -1;
+    logger_->error("Failed to bind passive socket in port range");
+    return -1;
+}
+
+int FTPConnection::acceptDataConnection() {
+    std::lock_guard<std::mutex> lock(data_socket_mutex_);
+    
+    if (passive_listen_socket_ < 0) {
+        logger_->error("No passive socket available");
+        return -1;
+    }
+    
+    // Set socket to non-blocking for timeout
+    int flags = fcntl(passive_listen_socket_, F_GETFL, 0);
+    fcntl(passive_listen_socket_, F_SETFL, flags | O_NONBLOCK);
+    
+    // Wait for connection with timeout
+    struct timeval timeout;
+    timeout.tv_sec = 10; // 10 second timeout
+    timeout.tv_usec = 0;
+    
+    fd_set read_fds;
+    FD_ZERO(&read_fds);
+    FD_SET(passive_listen_socket_, &read_fds);
+    
+    int result = select(passive_listen_socket_ + 1, &read_fds, nullptr, nullptr, &timeout);
+    if (result <= 0) {
+        logger_->error("Timeout waiting for data connection");
+        return -1;
+    }
+    
+    // Accept connection
+    struct sockaddr_in client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    data_socket_ = accept(passive_listen_socket_, (struct sockaddr*)&client_addr, &client_len);
+    
+    if (data_socket_ < 0) {
+        logger_->error("Failed to accept data connection: " + std::string(strerror(errno)));
+        return -1;
+    }
+    
+    // Restore blocking mode
+    fcntl(passive_listen_socket_, F_SETFL, flags);
+    
+    logger_->debug("Data connection accepted from " + std::string(inet_ntoa(client_addr.sin_addr)));
+    return data_socket_;
+}
+
+void FTPConnection::closeDataSocket() {
+    std::lock_guard<std::mutex> lock(data_socket_mutex_);
+    
+    if (data_socket_ >= 0) {
+        close(data_socket_);
+        data_socket_ = -1;
+    }
+    
+    if (passive_listen_socket_ >= 0) {
+        close(passive_listen_socket_);
+        passive_listen_socket_ = -1;
+    }
+}
+
+std::string FTPConnection::formatPassiveResponse(int port) {
+    // Get server IP (simplified - use localhost for now)
+    // In production, should get actual server IP
+    std::string ip = "127,0,0,1";
+    
+    int p1 = port / 256;
+    int p2 = port % 256;
+    
+    return "227 Entering Passive Mode (" + ip + "," + std::to_string(p1) + "," + std::to_string(p2) + ")";
 }
 
 } // namespace simple_sftpd
