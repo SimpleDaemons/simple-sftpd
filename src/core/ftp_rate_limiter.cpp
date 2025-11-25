@@ -16,6 +16,7 @@
 
 #include "simple-sftpd/ftp_rate_limiter.hpp"
 #include "simple-sftpd/logger.hpp"
+#include <chrono>
 
 namespace simple_sftpd {
 
@@ -24,13 +25,44 @@ FTPRateLimiter::FTPRateLimiter(std::shared_ptr<Logger> logger)
 }
 
 bool FTPRateLimiter::isAllowed(const std::string& client_ip) {
-    (void)client_ip; // Suppress unused parameter warning
-    return true; // Stub implementation - allow all requests
+    std::lock_guard<std::mutex> lock(rate_limit_mutex_);
+    
+    auto now = std::chrono::steady_clock::now();
+    auto& entry = rate_limits_[client_ip];
+    
+    // Check if window has expired (1 minute)
+    auto window_duration = std::chrono::minutes(1);
+    if (entry.window_start == std::chrono::steady_clock::time_point{} ||
+        (now - entry.window_start) >= window_duration) {
+        // Reset window
+        entry.window_start = now;
+        entry.request_count = 0;
+    }
+    
+    // Check rate limit
+    if (entry.request_count >= max_requests_per_minute_) {
+        logger_->warn("Rate limit exceeded for IP: " + client_ip);
+        return false;
+    }
+    
+    return true;
 }
 
 void FTPRateLimiter::recordRequest(const std::string& client_ip) {
-    (void)client_ip; // Suppress unused parameter warning
-    // Stub implementation
+    std::lock_guard<std::mutex> lock(rate_limit_mutex_);
+    
+    auto now = std::chrono::steady_clock::now();
+    auto& entry = rate_limits_[client_ip];
+    
+    // Check if window has expired
+    auto window_duration = std::chrono::minutes(1);
+    if (entry.window_start == std::chrono::steady_clock::time_point{} ||
+        (now - entry.window_start) >= window_duration) {
+        entry.window_start = now;
+        entry.request_count = 0;
+    }
+    
+    entry.request_count++;
 }
 
 void FTPRateLimiter::setRateLimit(int max_requests_per_minute) {
