@@ -237,7 +237,7 @@ This document provides a detailed checklist for tracking progress on the simple-
 
 **Target:** Q2 2025 (Revised from Q1 2025)
 **Status:** ✅ **IN PROGRESS**
-**Progress:** 60% (12/20 items)
+**Progress:** 70% (14/20 items)
 
 ### Security Enhancements
 - [x] **SSL/TLS Support** - FTPS implementation with OpenSSL (v0.2.0)
@@ -298,13 +298,21 @@ This document provides a detailed checklist for tracking progress on the simple-
 - [ ] **Load Balancing** - Multiple server instances (v0.3.0)
 - [ ] **Clustering Support** - Distributed deployment (v0.3.0)
 - [ ] **Caching System** - Intelligent file caching (v0.2.0)
-- [ ] **Performance Monitoring** - Real-time performance metrics (v0.2.0)
+- [x] **Performance Monitoring** - Real-time performance metrics (v0.2.0)
+  - ✅ PerformanceMonitor class implemented
+  - ✅ Connection statistics tracking
+  - ✅ Transfer statistics tracking
+  - ✅ Request and error counting
+  - ✅ Average transfer rate calculation
 
 ### Advanced Features
-- [ ] **IPv6 Support** - Full IPv6 compatibility
-- [ ] **SFTP Protocol** - SSH File Transfer Protocol
-- [ ] **Webhook Support** - Event notifications
-- [ ] **Plugin System** - Custom extension framework
+- [x] **IPv6 Support** - Full IPv6 compatibility (v0.2.0)
+  - ✅ IPv6 dual-stack support
+  - ✅ IPV6_V6ONLY disabled for dual-stack
+  - ✅ IPv6 socket support
+- [ ] **SFTP Protocol** - SSH File Transfer Protocol (v0.3.0)
+- [ ] **Webhook Support** - Event notifications (v0.3.0)
+- [ ] **Plugin System** - Custom extension framework (v0.3.0)
 
 ---
 
