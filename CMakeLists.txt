@@ -24,6 +24,7 @@ option(ENABLE_TESTS "Enable tests" ON)
 option(ENABLE_PACKAGING "Enable package generation" ON)
 option(ENABLE_SSL "Enable SSL/TLS support" ON)
 option(ENABLE_JSON "Enable JSON support" ON)
+option(ENABLE_COMPRESSION "Enable compression support (gzip, bzip2)" ON)
 option(ENABLE_STATIC_LINKING "Enable static linking for self-contained binaries" OFF)
 
 # Find required packages
@@ -37,6 +38,14 @@ endif()
 if(ENABLE_JSON)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(JSONCPP REQUIRED jsoncpp)
+endif()
+
+if(ENABLE_COMPRESSION)
+    find_package(ZLIB REQUIRED)
+    find_library(BZIP2_LIB bz2)
+    if(NOT BZIP2_LIB)
+        message(WARNING "bzip2 library not found, bzip2 compression will be disabled")
+    endif()
 endif()
 
 # Include directories
@@ -54,6 +63,13 @@ target_link_libraries(${PROJECT_NAME} Threads::Threads)
 
 if(ENABLE_SSL)
     target_link_libraries(${PROJECT_NAME} OpenSSL::SSL OpenSSL::Crypto)
+endif()
+
+if(ENABLE_COMPRESSION)
+    target_link_libraries(${PROJECT_NAME} ZLIB::ZLIB)
+    if(BZIP2_LIB)
+        target_link_libraries(${PROJECT_NAME} ${BZIP2_LIB})
+    endif()
 endif()
 
 if(ENABLE_JSON)

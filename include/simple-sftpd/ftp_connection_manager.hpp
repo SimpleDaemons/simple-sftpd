@@ -43,9 +43,16 @@ public:
     
     size_t getConnectionCount() const;
     std::vector<std::shared_ptr<FTPConnection>> getConnections() const;
+    
+    // Connection Pooling
+    std::shared_ptr<FTPConnection> acquireConnection();
+    void releaseConnection(std::shared_ptr<FTPConnection> connection);
+    void setPoolSize(size_t pool_size);
+    size_t getPoolSize() const { return pool_size_; }
 
 private:
     void cleanupLoop();
+    void poolMaintenanceLoop();
 
     std::shared_ptr<FTPServerConfig> config_;
     std::shared_ptr<Logger> logger_;
@@ -55,6 +62,12 @@ private:
     std::thread cleanup_thread_;
     std::chrono::seconds connection_timeout_;
     std::chrono::seconds cleanup_interval_;
+    
+    // Connection Pooling
+    mutable std::mutex pool_mutex_;
+    std::vector<std::shared_ptr<FTPConnection>> connection_pool_;
+    size_t pool_size_;
+    std::thread pool_maintenance_thread_;
 };
 
 } // namespace simple_sftpd

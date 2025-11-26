@@ -44,9 +44,13 @@ public:
      * @param cert_file Path to certificate file
      * @param key_file Path to private key file
      * @param ca_file Optional path to CA certificate file
+     * @param require_client_cert Require client certificate authentication
+     * @param client_ca_file Path to CA file for client certificate verification
      * @return true if successful, false otherwise
      */
-    bool initialize(const std::string& cert_file, const std::string& key_file, const std::string& ca_file = "");
+    bool initialize(const std::string& cert_file, const std::string& key_file, 
+                    const std::string& ca_file = "", bool require_client_cert = false,
+                    const std::string& client_ca_file = "");
 
     /**
      * @brief Create SSL connection from socket
@@ -110,6 +114,13 @@ public:
      * @return Error description
      */
     std::string getLastError() const;
+    
+    /**
+     * @brief Get client certificate from SSL connection
+     * @param ssl SSL connection
+     * @return Certificate information as string, empty if not available
+     */
+    std::string getClientCertificate(void* ssl) const;
 
 private:
     std::shared_ptr<Logger> logger_;

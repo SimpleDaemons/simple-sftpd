@@ -20,6 +20,7 @@
 #include "simple-sftpd/ftp_user.hpp"
 #include "simple-sftpd/ftp_server_config.hpp"
 #include "simple-sftpd/ssl_context.hpp"
+#include "simple-sftpd/file_cache.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -53,6 +54,29 @@ FTPConnection::FTPConnection(int socket, std::shared_ptr<Logger> logger, std::sh
     if (config->security.allow_anonymous) {
         auto anon_user = std::make_shared<FTPUser>("anonymous", "", "/tmp");
         user_manager_->addUser(anon_user);
+    }
+    
+    // Initialize PAM if enabled
+    if (config->security.enable_pam) {
+        pam_auth_ = std::make_shared<PAMAuth>(logger_);
+        if (pam_auth_->isAvailable()) {
+            logger_->info("PAM authentication enabled");
+        } else {
+            logger_->warn("PAM authentication requested but not available");
+        }
+    }
+    
+    // Initialize SSL if configured
+    if (!config->security.ssl_cert_file.empty() && !config->security.ssl_key_file.empty()) {
+        ssl_context_ = std::make_shared<SSLContext>(logger_);
+        if (ssl_context_->initialize(config->security.ssl_cert_file, config->security.ssl_key_file, 
+                                     config->security.ssl_ca_file, config->security.require_client_cert,
+                                     config->security.ssl_client_ca_file)) {
+            ssl_enabled_ = true;
+            logger_->info("SSL/TLS enabled for connection");
+        } else {
+            logger_->warn("Failed to initialize SSL context");
+        }
     }
 }
 
