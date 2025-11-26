@@ -578,14 +578,31 @@ void FTPConnection::handleSTOR(const std::string& filename) {
         return;
     }
     
-    // Receive file
+    // Receive file with bandwidth throttling
     char buffer[8192];
     size_t total_bytes = 0;
+    auto start_time = std::chrono::steady_clock::now();
+    int max_rate = config_->rate_limit.max_transfer_rate;
+    
     while (true) {
         ssize_t received = recv(data_fd, buffer, sizeof(buffer), 0);
         if (received <= 0) {
             break; // Connection closed or error
         }
+        
+        // Bandwidth throttling for uploads
+        if (max_rate > 0) {
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time).count();
+            if (elapsed > 0) {
+                size_t allowed_bytes = (max_rate * elapsed) / 1000;
+                if (total_bytes + received > allowed_bytes) {
+                    size_t delay_ms = ((total_bytes + received - allowed_bytes) * 1000) / max_rate;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
+                }
+            }
+        }
+        
         file.write(buffer, received);
         total_bytes += received;
     }
