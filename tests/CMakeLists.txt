@@ -84,6 +84,13 @@ else()
     )
 endif()
 
+# Link OpenSSL if SSL is enabled
+if(ENABLE_SSL)
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(simple-sftpd-tests PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+    target_compile_definitions(simple-sftpd-tests PRIVATE SIMPLE_SFTPD_SSL_ENABLED)
+endif()
+
 # Add source files for testing (without main.cpp)
 target_sources(simple-sftpd-tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/core/ftp_user.cpp
@@ -94,6 +101,7 @@ target_sources(simple-sftpd-tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/core/ftp_server.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/ftp_server_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/ssl_context.cpp
 )
 
 # Compiler options

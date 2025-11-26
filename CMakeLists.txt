@@ -31,6 +31,7 @@ find_package(Threads REQUIRED)
 
 if(ENABLE_SSL)
     find_package(OpenSSL REQUIRED)
+    add_definitions(-DSIMPLE_SFTPD_SSL_ENABLED)
 endif()
 
 if(ENABLE_JSON)
