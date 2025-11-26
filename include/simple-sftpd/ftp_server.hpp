@@ -28,6 +28,7 @@ class FTPServerConfig;
 class Logger;
 class FTPConnectionManager;
 class IPAccessControl;
+class PerformanceMonitor;
 
 class FTPServer {
 public:
