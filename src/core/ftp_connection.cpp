@@ -40,7 +40,8 @@ FTPConnection::FTPConnection(int socket, std::shared_ptr<Logger> logger, std::sh
     : socket_(socket), logger_(logger), config_(config), active_(false),
       authenticated_(false), current_user_(nullptr), current_directory_("/"),
       ssl_enabled_(false), ssl_active_(false), ssl_(nullptr), data_ssl_(nullptr),
-      passive_listen_socket_(-1), data_socket_(-1), transfer_type_("A"), protection_level_("C") {
+      passive_listen_socket_(-1), data_socket_(-1), transfer_type_("A"), protection_level_("C"),
+      active_mode_port_(0), active_mode_enabled_(false) {
     user_manager_ = std::make_shared<FTPUserManager>(logger_);
     
     // Add default test user for development/testing
@@ -371,6 +372,8 @@ void FTPConnection::handleLIST(const std::string& path) {
 }
 
 void FTPConnection::handlePASV() {
+    // Disable active mode if it was enabled
+    active_mode_enabled_ = false;
     closeDataSocket(); // Close any existing passive socket
     
     int port = createPassiveDataSocket();
@@ -382,6 +385,49 @@ void FTPConnection::handlePASV() {
     std::string response = formatPassiveResponse(port);
     sendResponse(response);
     logger_->debug("Passive mode enabled on port " + std::to_string(port));
+}
+
+void FTPConnection::handlePORT(const std::string& address_port) {
+    // Parse PORT command: PORT h1,h2,h3,h4,p1,p2
+    // Example: PORT 192,168,1,100,4,28
+    std::vector<int> parts;
+    std::istringstream iss(address_port);
+    std::string token;
+    
+    while (std::getline(iss, token, ',')) {
+        try {
+            parts.push_back(std::stoi(token));
+        } catch (...) {
+            sendResponse("501 Invalid PORT command format");
+            return;
+        }
+    }
+    
+    if (parts.size() != 6) {
+        sendResponse("501 Invalid PORT command format");
+        return;
+    }
+    
+    // Build IP address
+    active_mode_ip_ = std::to_string(parts[0]) + "." +
+                      std::to_string(parts[1]) + "." +
+                      std::to_string(parts[2]) + "." +
+                      std::to_string(parts[3]);
+    
+    // Calculate port: p1 * 256 + p2
+    active_mode_port_ = parts[4] * 256 + parts[5];
+    
+    if (active_mode_port_ < 1024 || active_mode_port_ > 65535) {
+        sendResponse("501 Invalid port number");
+        return;
+    }
+    
+    // Close any existing passive connection
+    closeDataSocket();
+    active_mode_enabled_ = true;
+    
+    logger_->info("Active mode enabled: " + active_mode_ip_ + ":" + std::to_string(active_mode_port_));
+    sendResponse("200 PORT command successful");
 }
 
 void FTPConnection::handleTYPE(const std::string& type) {

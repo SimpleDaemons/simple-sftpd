@@ -52,6 +52,7 @@ private:
     void handleCWD(const std::string& path);
     void handleLIST(const std::string& path);
     void handlePASV();
+    void handlePORT(const std::string& address_port);
     void handleTYPE(const std::string& type);
     void handleSIZE(const std::string& filename);
     void handleRETR(const std::string& filename);
