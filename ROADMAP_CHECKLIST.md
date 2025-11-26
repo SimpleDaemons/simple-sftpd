@@ -236,31 +236,65 @@ This document provides a detailed checklist for tracking progress on the simple-
 ## 🚀 Version 0.2.0 - Security & Performance
 
 **Target:** Q2 2025 (Revised from Q1 2025)
-**Status:** ⏳ **PLANNED**
-**Progress:** 0% (0/20 items)
+**Status:** ✅ **IN PROGRESS**
+**Progress:** 60% (12/20 items)
 
 ### Security Enhancements
-- [ ] **SSL/TLS Support** - FTPS implementation with OpenSSL (v0.2.0 - Moved from v0.1.0)
+- [x] **SSL/TLS Support** - FTPS implementation with OpenSSL (v0.2.0)
+  - ✅ SSLContext class with OpenSSL integration
+  - ✅ AUTH TLS command support
+  - ✅ PBSZ and PROT commands for protection levels
+  - ✅ SSL-enabled control channel
+  - ⚠️ Data channel encryption pending (v0.2.1)
 - [ ] **PAM Integration** - Pluggable Authentication Modules (v0.2.0)
 - [ ] **LDAP/Active Directory** - Enterprise authentication (v0.2.0)
 - [ ] **Certificate Authentication** - X.509 certificate support (v0.2.0)
-- [ ] **IP-based Access Control** - Whitelisting and blacklisting (v0.2.0)
+- [x] **IP-based Access Control** - Whitelisting and blacklisting (v0.2.0)
+  - ✅ IPAccessControl class implemented
+  - ✅ CIDR notation support
+  - ✅ Whitelist and blacklist filtering
+  - ✅ Integration into server connection handling
 - [x] **Rate Limiting** - Connection and transfer rate limits (v0.1.0)
 - [x] **DoS Protection** - Attack prevention mechanisms (v0.1.0)
-- [ ] **Chroot Support** - Directory restrictions (v0.2.0 - Moved from v0.1.0)
-- [ ] **Privilege Dropping** - Security hardening (v0.2.0)
-- [ ] **Audit Logging** - Security event logging (v0.2.0)
+- [x] **Chroot Support** - Directory restrictions (v0.2.0)
+  - ✅ Chroot implementation after authentication
+  - ✅ Configuration support
+  - ✅ Path normalization relative to chroot
+- [x] **Privilege Dropping** - Security hardening (v0.2.0)
+  - ✅ setuid/setgid after socket bind
+  - ✅ Configuration support for user/group
+  - ✅ Security hardening for production
+- [x] **Audit Logging** - Security event logging (v0.2.0)
+  - ✅ Login success/failure logging
+  - ✅ File operation audit logs
+  - ✅ Directory operation audit logs
+  - ✅ User context in all audit entries
 - [ ] **Vulnerability Scanning** - Security assessment tools (v0.2.0)
 
 ### Performance Improvements
-- [ ] **Active Mode Support** - Client-initiated data connections (v0.2.0)
+- [x] **Active Mode Support** - Client-initiated data connections (v0.2.0)
+  - ✅ PORT command implementation
+  - ✅ Active mode data connections
+  - ✅ Dual-mode support (passive and active)
 - [ ] **Connection Pooling** - Optimized connection management (v0.2.0)
 - [ ] **Memory-mapped I/O** - Efficient large file handling (v0.2.0)
 - [ ] **Compression Support** - gzip, bzip2 compression (v0.2.0)
-- [ ] **Bandwidth Throttling** - QoS and traffic shaping (v0.2.0)
-- [ ] **File Transfer Resume** - Resume interrupted transfers (v0.2.0)
-- [ ] **File Transfer Append** - Append to existing files (v0.2.0)
-- [ ] **Rename Operations** - File and directory renaming (v0.2.0)
+- [x] **Bandwidth Throttling** - QoS and traffic shaping (v0.2.0)
+  - ✅ Transfer rate limiting for downloads
+  - ✅ Transfer rate limiting for uploads
+  - ✅ Per-connection and per-user rate limits
+  - ✅ Time-based throttling implementation
+- [x] **File Transfer Resume** - Resume interrupted transfers (v0.2.0)
+  - ✅ REST command implementation
+  - ✅ Resume support in RETR and STOR
+  - ✅ Position tracking and file seeking
+- [x] **File Transfer Append** - Append to existing files (v0.2.0)
+  - ✅ APPE command implementation
+  - ✅ Append mode file uploads
+- [x] **Rename Operations** - File and directory renaming (v0.2.0)
+  - ✅ RNFR/RNTO command implementation
+  - ✅ Two-phase rename protocol
+  - ✅ File and directory rename support
 - [ ] **Load Balancing** - Multiple server instances (v0.3.0)
 - [ ] **Clustering Support** - Distributed deployment (v0.3.0)
 - [ ] **Caching System** - Intelligent file caching (v0.2.0)
