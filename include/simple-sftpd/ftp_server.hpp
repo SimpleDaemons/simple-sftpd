@@ -27,6 +27,7 @@ namespace simple_sftpd {
 class FTPServerConfig;
 class Logger;
 class FTPConnectionManager;
+class IPAccessControl;
 
 class FTPServer {
 public:
@@ -40,10 +41,12 @@ public:
 private:
     void serverLoop();
     void handleConnection(int client_socket);
+    void dropPrivileges();
 
     std::shared_ptr<FTPServerConfig> config_;
     std::shared_ptr<Logger> logger_;
     std::shared_ptr<FTPConnectionManager> connection_manager_;
+    std::shared_ptr<IPAccessControl> ip_access_control_;
     
     std::atomic<bool> running_;
     std::thread server_thread_;
