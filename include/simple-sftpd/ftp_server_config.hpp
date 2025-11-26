@@ -45,6 +45,9 @@ struct SecurityConfig {
     bool require_ssl = false;
     std::string ssl_cert_file;
     std::string ssl_key_file;
+    std::string ssl_ca_file;
+    bool require_client_cert = false;
+    std::string ssl_client_ca_file;
     bool allow_anonymous = false;
     std::string anonymous_user = "anonymous";
     std::string anonymous_password = "anonymous@";
@@ -53,6 +56,7 @@ struct SecurityConfig {
     bool drop_privileges = false;
     std::string run_as_user = "ftp";
     std::string run_as_group = "ftp";
+    bool enable_pam = false;
 };
 
 struct RateLimitConfig {

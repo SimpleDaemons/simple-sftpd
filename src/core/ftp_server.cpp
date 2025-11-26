@@ -23,6 +23,7 @@
 #include "simple-sftpd/ftp_user.hpp"
 #include "simple-sftpd/ip_access_control.hpp"
 #include "simple-sftpd/performance_monitor.hpp"
+#include "simple-sftpd/file_cache.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -49,6 +50,7 @@ FTPServer::FTPServer(std::shared_ptr<FTPServerConfig> config)
     connection_manager_ = std::make_shared<FTPConnectionManager>(config, logger_);
     ip_access_control_ = std::make_shared<IPAccessControl>(logger_);
     performance_monitor_ = std::make_shared<PerformanceMonitor>(logger_);
+    file_cache_ = std::make_shared<FileCache>(logger_, 1000, std::chrono::seconds(60));
 }
 
 FTPServer::~FTPServer() {

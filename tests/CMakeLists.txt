@@ -104,6 +104,10 @@ target_sources(simple-sftpd-tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/ssl_context.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/ip_access_control.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/performance_monitor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/file_cache.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/compression.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/pam_auth.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/vulnerability_scanner.cpp
 )
 
 # Compiler options

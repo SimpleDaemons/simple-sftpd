@@ -29,6 +29,7 @@ class FTPServerConfig;
 class FTPUserManager;
 class FTPUser;
 class SSLContext;
+class FileCache;
 
 class FTPConnection {
 public:
@@ -93,6 +94,8 @@ private:
     std::shared_ptr<FTPServerConfig> config_;
     std::shared_ptr<FTPUserManager> user_manager_;
     std::shared_ptr<SSLContext> ssl_context_;
+    std::shared_ptr<FileCache> file_cache_;
+    std::shared_ptr<PAMAuth> pam_auth_;
     
     std::atomic<bool> active_;
     std::thread client_thread_;

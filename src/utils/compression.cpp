@@ -1,0 +1,201 @@
+/*
+ * Copyright 2024 SimpleDaemons
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "simple-sftpd/compression.hpp"
+#include "simple-sftpd/logger.hpp"
+#include <zlib.h>
+#include <bzlib.h>
+
+namespace simple_sftpd {
+
+Compression::Compression(std::shared_ptr<Logger> logger)
+    : logger_(logger) {
+}
+
+std::vector<uint8_t> Compression::compress(const std::vector<uint8_t>& data, Type type) {
+    switch (type) {
+        case Type::GZIP:
+            return compressGzip(data);
+        case Type::BZIP2:
+            return compressBzip2(data);
+        case Type::NONE:
+        default:
+            return data;
+    }
+}
+
+std::vector<uint8_t> Compression::decompress(const std::vector<uint8_t>& data, Type type) {
+    switch (type) {
+        case Type::GZIP:
+            return decompressGzip(data);
+        case Type::BZIP2:
+            return decompressBzip2(data);
+        case Type::NONE:
+        default:
+            return data;
+    }
+}
+
+bool Compression::isSupported(Type type) const {
+    switch (type) {
+        case Type::GZIP:
+        case Type::BZIP2:
+            return true;
+        case Type::NONE:
+        default:
+            return true;
+    }
+}
+
+std::vector<uint8_t> Compression::compressGzip(const std::vector<uint8_t>& data) {
+#ifdef ENABLE_COMPRESSION
+    z_stream zs;
+    memset(&zs, 0, sizeof(zs));
+    
+    if (deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 16 + MAX_WBITS, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
+        logger_->error("Failed to initialize gzip compression");
+        return data;
+    }
+    
+    zs.next_in = const_cast<Bytef*>(data.data());
+    zs.avail_in = data.size();
+    
+    std::vector<uint8_t> output;
+    output.resize(data.size() * 1.1 + 12); // Estimate compressed size
+    zs.next_out = output.data();
+    zs.avail_out = output.size();
+    
+    int ret = deflate(&zs, Z_FINISH);
+    if (ret == Z_STREAM_END) {
+        output.resize(zs.total_out);
+    } else {
+        logger_->error("Gzip compression failed");
+        deflateEnd(&zs);
+        return data;
+    }
+    
+    deflateEnd(&zs);
+    return output;
+#else
+    logger_->warn("Gzip compression not available - compression support disabled");
+    return data;
+#endif
+}
+
+std::vector<uint8_t> Compression::decompressGzip(const std::vector<uint8_t>& data) {
+#ifdef ENABLE_COMPRESSION
+    z_stream zs;
+    memset(&zs, 0, sizeof(zs));
+    
+    if (inflateInit2(&zs, 16 + MAX_WBITS) != Z_OK) {
+        logger_->error("Failed to initialize gzip decompression");
+        return data;
+    }
+    
+    zs.next_in = const_cast<Bytef*>(data.data());
+    zs.avail_in = data.size();
+    
+    std::vector<uint8_t> output;
+    output.resize(data.size() * 4); // Estimate decompressed size
+    zs.next_out = output.data();
+    zs.avail_out = output.size();
+    
+    int ret = inflate(&zs, Z_FINISH);
+    if (ret == Z_STREAM_END) {
+        output.resize(zs.total_out);
+    } else {
+        // Try with larger buffer
+        output.resize(output.size() * 2);
+        zs.next_out = output.data() + zs.total_out;
+        zs.avail_out = output.size() - zs.total_out;
+        ret = inflate(&zs, Z_FINISH);
+        if (ret == Z_STREAM_END) {
+            output.resize(zs.total_out);
+        } else {
+            logger_->error("Gzip decompression failed");
+            inflateEnd(&zs);
+            return data;
+        }
+    }
+    
+    inflateEnd(&zs);
+    return output;
+#else
+    logger_->warn("Gzip decompression not available - compression support disabled");
+    return data;
+#endif
+}
+
+std::vector<uint8_t> Compression::compressBzip2(const std::vector<uint8_t>& data) {
+#ifdef ENABLE_COMPRESSION
+    unsigned int dest_len = data.size() * 1.1 + 600; // Estimate
+    std::vector<uint8_t> output(dest_len);
+    
+    int ret = BZ2_bzBuffToBuffCompress(
+        reinterpret_cast<char*>(output.data()), &dest_len,
+        const_cast<char*>(reinterpret_cast<const char*>(data.data())), data.size(),
+        9, 0, 0);
+    
+    if (ret == BZ_OK) {
+        output.resize(dest_len);
+        return output;
+    } else {
+        logger_->error("Bzip2 compression failed");
+        return data;
+    }
+#else
+    logger_->warn("Bzip2 compression not available - compression support disabled");
+    return data;
+#endif
+}
+
+std::vector<uint8_t> Compression::decompressBzip2(const std::vector<uint8_t>& data) {
+#ifdef ENABLE_COMPRESSION
+    unsigned int dest_len = data.size() * 4; // Estimate
+    std::vector<uint8_t> output(dest_len);
+    
+    int ret = BZ2_bzBuffToBuffDecompress(
+        reinterpret_cast<char*>(output.data()), &dest_len,
+        const_cast<char*>(reinterpret_cast<const char*>(data.data())), data.size(),
+        0, 0);
+    
+    if (ret == BZ_OK) {
+        output.resize(dest_len);
+        return output;
+    } else {
+        // Try with larger buffer
+        dest_len = data.size() * 8;
+        output.resize(dest_len);
+        ret = BZ2_bzBuffToBuffDecompress(
+            reinterpret_cast<char*>(output.data()), &dest_len,
+            const_cast<char*>(reinterpret_cast<const char*>(data.data())), data.size(),
+            0, 0);
+        if (ret == BZ_OK) {
+            output.resize(dest_len);
+            return output;
+        } else {
+            logger_->error("Bzip2 decompression failed");
+            return data;
+        }
+    }
+#else
+    logger_->warn("Bzip2 decompression not available - compression support disabled");
+    return data;
+#endif
+}
+
+} // namespace simple_sftpd
+

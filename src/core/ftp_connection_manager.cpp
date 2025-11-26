@@ -26,7 +26,8 @@ FTPConnectionManager::FTPConnectionManager(std::shared_ptr<FTPServerConfig> conf
                                          std::shared_ptr<Logger> logger)
     : config_(config), logger_(logger), running_(false),
       connection_timeout_(std::chrono::seconds(300)),
-      cleanup_interval_(std::chrono::seconds(60)) {
+      cleanup_interval_(std::chrono::seconds(60)),
+      pool_size_(10) {
 }
 
 FTPConnectionManager::~FTPConnectionManager() {
@@ -40,6 +41,7 @@ bool FTPConnectionManager::start() {
     
     running_ = true;
     cleanup_thread_ = std::thread(&FTPConnectionManager::cleanupLoop, this);
+    pool_maintenance_thread_ = std::thread(&FTPConnectionManager::poolMaintenanceLoop, this);
     logger_->info("FTP connection manager started");
     return true;
 }
@@ -53,7 +55,15 @@ void FTPConnectionManager::stop() {
     if (cleanup_thread_.joinable()) {
         cleanup_thread_.join();
     }
+    if (pool_maintenance_thread_.joinable()) {
+        pool_maintenance_thread_.join();
+    }
     stopAllConnections();
+    
+    // Clear connection pool
+    std::lock_guard<std::mutex> pool_lock(pool_mutex_);
+    connection_pool_.clear();
+    
     logger_->info("FTP connection manager stopped");
 }
 
@@ -103,6 +113,73 @@ void FTPConnectionManager::cleanupLoop() {
                     (*it)->stop();
                 }
                 it = connections_.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+}
+
+std::shared_ptr<FTPConnection> FTPConnectionManager::acquireConnection() {
+    std::lock_guard<std::mutex> lock(pool_mutex_);
+    
+    // Try to get a connection from the pool
+    if (!connection_pool_.empty()) {
+        auto connection = connection_pool_.back();
+        connection_pool_.pop_back();
+        if (connection && connection->isActive()) {
+            return connection;
+        }
+    }
+    
+    // Pool is empty or connection is invalid, return nullptr
+    // Caller should create a new connection
+    return nullptr;
+}
+
+void FTPConnectionManager::releaseConnection(std::shared_ptr<FTPConnection> connection) {
+    if (!connection || !connection->isActive()) {
+        return;
+    }
+    
+    std::lock_guard<std::mutex> lock(pool_mutex_);
+    
+    // Add to pool if there's room
+    if (connection_pool_.size() < pool_size_) {
+        connection_pool_.push_back(connection);
+    } else {
+        // Pool is full, stop the connection
+        connection->stop();
+    }
+}
+
+void FTPConnectionManager::setPoolSize(size_t pool_size) {
+    std::lock_guard<std::mutex> lock(pool_mutex_);
+    pool_size_ = pool_size;
+    
+    // Trim pool if necessary
+    while (connection_pool_.size() > pool_size_) {
+        auto connection = connection_pool_.back();
+        connection_pool_.pop_back();
+        if (connection) {
+            connection->stop();
+        }
+    }
+}
+
+void FTPConnectionManager::poolMaintenanceLoop() {
+    while (running_) {
+        std::this_thread::sleep_for(std::chrono::seconds(30));
+        
+        // Clean up inactive connections from pool
+        std::lock_guard<std::mutex> lock(pool_mutex_);
+        auto it = connection_pool_.begin();
+        while (it != connection_pool_.end()) {
+            if (!(*it) || !(*it)->isActive()) {
+                if (*it) {
+                    (*it)->stop();
+                }
+                it = connection_pool_.erase(it);
             } else {
                 ++it;
             }

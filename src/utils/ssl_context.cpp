@@ -52,7 +52,9 @@ SSLContext::~SSLContext() {
 #endif
 }
 
-bool SSLContext::initialize(const std::string& cert_file, const std::string& key_file, const std::string& ca_file) {
+bool SSLContext::initialize(const std::string& cert_file, const std::string& key_file, 
+                          const std::string& ca_file, bool require_client_cert,
+                          const std::string& client_ca_file) {
 #ifdef SIMPLE_SFTPD_SSL_ENABLED
     if (!enabled_) {
         logger_->error("SSL not enabled - OpenSSL not available");
@@ -101,6 +103,21 @@ bool SSLContext::initialize(const std::string& cert_file, const std::string& key
             logger_->warn("Failed to load CA certificate file: " + ca_file);
             logSSLErrors();
         }
+    }
+    
+    // Client certificate authentication
+    if (require_client_cert) {
+        SSL_CTX_set_verify(ctx_, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, nullptr);
+        
+        if (!client_ca_file.empty()) {
+            if (SSL_CTX_load_verify_locations(ctx_, client_ca_file.c_str(), nullptr) <= 0) {
+                logger_->warn("Failed to load client CA certificate file: " + client_ca_file);
+                logSSLErrors();
+            }
+        }
+        
+        // Set verify depth
+        SSL_CTX_set_verify_depth(ctx_, 4);
     }
 
     // Set cipher list (prefer secure ciphers)
@@ -262,6 +279,30 @@ void SSLContext::logSSLErrors() {
         ERR_error_string_n(err, buf, sizeof(buf));
         logger_->error("SSL Error: " + std::string(buf));
     }
+#endif
+}
+
+std::string SSLContext::getClientCertificate(void* ssl) const {
+#ifdef SIMPLE_SFTPD_SSL_ENABLED
+    if (!ssl) {
+        return "";
+    }
+    
+    X509* cert = SSL_get_peer_certificate(static_cast<SSL*>(ssl));
+    if (!cert) {
+        return "";
+    }
+    
+    // Get certificate subject
+    char* subject = X509_NAME_oneline(X509_get_subject_name(cert), nullptr, 0);
+    std::string result = subject ? std::string(subject) : "";
+    OPENSSL_free(subject);
+    X509_free(cert);
+    
+    return result;
+#else
+    (void)ssl;
+    return "";
 #endif
 }
 

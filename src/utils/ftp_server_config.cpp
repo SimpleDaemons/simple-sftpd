@@ -137,6 +137,14 @@ bool FTPServerConfig::loadFromFile(const std::string& filename) {
                 security.run_as_user = value;
             } else if (key == "run_as_group") {
                 security.run_as_group = value;
+            } else if (key == "ssl_ca_file" || key == "ca_certificate_file") {
+                security.ssl_ca_file = value;
+            } else if (key == "require_client_cert") {
+                security.require_client_cert = (value == "true" || value == "1");
+            } else if (key == "ssl_client_ca_file") {
+                security.ssl_client_ca_file = value;
+            } else if (key == "enable_pam") {
+                security.enable_pam = (value == "true" || value == "1");
             }
         } else if (current_section == "rate_limit") {
             if (key == "enabled") {
