@@ -103,6 +103,7 @@ target_sources(simple-sftpd-tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/ssl_context.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/ip_access_control.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/performance_monitor.cpp
 )
 
 # Compiler options

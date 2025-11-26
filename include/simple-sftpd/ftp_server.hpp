@@ -47,6 +47,7 @@ private:
     std::shared_ptr<Logger> logger_;
     std::shared_ptr<FTPConnectionManager> connection_manager_;
     std::shared_ptr<IPAccessControl> ip_access_control_;
+    std::shared_ptr<PerformanceMonitor> performance_monitor_;
     
     std::atomic<bool> running_;
     std::thread server_thread_;

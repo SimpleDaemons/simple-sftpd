@@ -22,6 +22,7 @@
 #include "simple-sftpd/ftp_user_manager.hpp"
 #include "simple-sftpd/ftp_user.hpp"
 #include "simple-sftpd/ip_access_control.hpp"
+#include "simple-sftpd/performance_monitor.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -47,6 +48,7 @@ FTPServer::FTPServer(std::shared_ptr<FTPServerConfig> config)
     logger_ = std::make_shared<Logger>("", LogLevel::INFO, true, false, log_format);
     connection_manager_ = std::make_shared<FTPConnectionManager>(config, logger_);
     ip_access_control_ = std::make_shared<IPAccessControl>(logger_);
+    performance_monitor_ = std::make_shared<PerformanceMonitor>(logger_);
 }
 
 FTPServer::~FTPServer() {
@@ -58,12 +60,16 @@ bool FTPServer::start() {
         return true;
     }
     
-    // Create socket
+    // Create socket (support both IPv4 and IPv6)
     server_socket_ = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket_ < 0) {
         logger_->error("Failed to create socket: " + std::string(strerror(errno)));
         return false;
     }
+    
+    // Enable IPv6 if available (dual-stack)
+    int ipv6_only = 0;
+    setsockopt(server_socket_, IPPROTO_IPV6, IPV6_V6ONLY, &ipv6_only, sizeof(ipv6_only));
     
     // Set socket options
     int opt = 1;
@@ -171,6 +177,11 @@ void FTPServer::serverLoop() {
                 logger_->warn("Connection limit reached, rejecting new connection");
                 close(client_socket);
                 continue;
+            }
+            
+            // Record connection
+            if (performance_monitor_) {
+                performance_monitor_->recordConnection();
             }
             
             // Handle new connection
