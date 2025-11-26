@@ -42,7 +42,7 @@ FTPConnection::FTPConnection(int socket, std::shared_ptr<Logger> logger, std::sh
       authenticated_(false), current_user_(nullptr), current_directory_("/"),
       ssl_enabled_(false), ssl_active_(false), ssl_(nullptr), data_ssl_(nullptr),
       passive_listen_socket_(-1), data_socket_(-1), transfer_type_("A"), protection_level_("C"),
-      active_mode_port_(0), active_mode_enabled_(false) {
+      active_mode_port_(0), active_mode_enabled_(false), resume_position_(0) {
     user_manager_ = std::make_shared<FTPUserManager>(logger_);
     
     // Add default test user for development/testing
@@ -181,6 +181,14 @@ void FTPConnection::handleClient() {
                 handleMKD(argument);
             } else if (command == "RMD" || command == "XRMD") {
                 handleRMD(argument);
+            } else if (command == "REST") {
+                handleREST(argument);
+            } else if (command == "APPE") {
+                handleAPPE(argument);
+            } else if (command == "RNFR") {
+                handleRNFR(argument);
+            } else if (command == "RNTO") {
+                handleRNTO(argument);
             } else {
                 sendResponse("502 Command not implemented");
             }
@@ -279,6 +287,12 @@ void FTPConnection::handlePASS(const std::string& password) {
         if (!isPathWithinHome(current_directory_)) {
             current_directory_ = current_user_->getHomeDirectory();
         }
+        
+        // Apply chroot if enabled
+        if (config_->security.chroot_enabled && !config_->security.chroot_directory.empty()) {
+            applyChroot();
+        }
+        
         sendResponse("230 User logged in, proceed");
         logger_->info("User " + username_ + " logged in");
     } else {

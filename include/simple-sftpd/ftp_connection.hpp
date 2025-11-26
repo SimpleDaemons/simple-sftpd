@@ -80,6 +80,9 @@ private:
     bool initializeSSL();
     bool upgradeToSSL();
     void* getSSL() const { return ssl_; }
+    
+    // Security
+    void applyChroot();
 
     int socket_;
     std::shared_ptr<Logger> logger_;
@@ -112,6 +115,10 @@ private:
     std::string active_mode_ip_;
     int active_mode_port_;
     bool active_mode_enabled_;
+    
+    // Transfer resume state
+    std::streampos resume_position_;
+    std::string rename_from_path_;
 };
 
 } // namespace simple_sftpd
