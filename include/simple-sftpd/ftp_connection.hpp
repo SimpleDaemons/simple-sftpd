@@ -107,6 +107,11 @@ private:
     std::mutex data_socket_mutex_;
     std::string transfer_type_;  // "A" for ASCII, "I" for binary
     std::string protection_level_;  // "C" for clear, "P" for private (encrypted)
+    
+    // Active mode state
+    std::string active_mode_ip_;
+    int active_mode_port_;
+    bool active_mode_enabled_;
 };
 
 } // namespace simple_sftpd

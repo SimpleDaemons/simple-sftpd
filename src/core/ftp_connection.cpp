@@ -29,6 +29,7 @@
 #include <cstring>
 #include <sstream>
 #include <algorithm>
+#include <vector>
 #include <filesystem>
 #include <fstream>
 #include <dirent.h>
