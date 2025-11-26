@@ -63,6 +63,10 @@ private:
     void handleAUTH(const std::string& method);
     void handlePBSZ(const std::string& size);
     void handlePROT(const std::string& level);
+    void handleREST(const std::string& position);
+    void handleAPPE(const std::string& filename);
+    void handleRNFR(const std::string& filename);
+    void handleRNTO(const std::string& filename);
     
     // Data Connection Management
     int createPassiveDataSocket();
