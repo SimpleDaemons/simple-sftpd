@@ -59,6 +59,8 @@ struct RateLimitConfig {
     bool enabled = false;
     int max_requests_per_minute = 60;
     int max_connections_per_ip = 10;
+    int max_transfer_rate = 0;  // bytes per second, 0 = unlimited
+    int max_transfer_rate_per_user = 0;  // bytes per second per user
 };
 
 class FTPServerConfig {
