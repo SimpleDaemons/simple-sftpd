@@ -21,6 +21,7 @@
 #include "simple-sftpd/ftp_server_config.hpp"
 #include "simple-sftpd/ftp_user_manager.hpp"
 #include "simple-sftpd/ftp_user.hpp"
+#include "simple-sftpd/ip_access_control.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -28,6 +29,10 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <cstring>
+#ifndef _WIN32
+#include <pwd.h>
+#include <grp.h>
+#endif
 
 namespace simple_sftpd {
 
@@ -41,6 +46,7 @@ FTPServer::FTPServer(std::shared_ptr<FTPServerConfig> config)
     }
     logger_ = std::make_shared<Logger>("", LogLevel::INFO, true, false, log_format);
     connection_manager_ = std::make_shared<FTPConnectionManager>(config, logger_);
+    ip_access_control_ = std::make_shared<IPAccessControl>(logger_);
 }
 
 FTPServer::~FTPServer() {
@@ -149,6 +155,17 @@ void FTPServer::serverLoop() {
         int client_socket = accept(server_socket_, (struct sockaddr*)&client_addr, &client_len);
         
         if (client_socket >= 0) {
+            // Get client IP address
+            char client_ip[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
+            
+            // Check IP access control
+            if (ip_access_control_ && !ip_access_control_->isAllowed(client_ip)) {
+                logger_->warn("Connection rejected from blocked IP: " + std::string(client_ip));
+                close(client_socket);
+                continue;
+            }
+            
             // Check connection limit
             if (connection_manager_->getConnectionCount() >= static_cast<size_t>(config_->connection.max_connections)) {
                 logger_->warn("Connection limit reached, rejecting new connection");
@@ -176,6 +193,47 @@ void FTPServer::handleConnection(int client_socket) {
     
     // Note: Connection will remove itself when done
     // For now, we'll let the connection manager handle cleanup
+}
+
+void FTPServer::dropPrivileges() {
+#ifndef _WIN32
+    if (!config_->security.drop_privileges) {
+        return;
+    }
+    
+    // Get user and group IDs
+    struct passwd* pw = getpwnam(config_->security.run_as_user.c_str());
+    struct group* gr = getgrnam(config_->security.run_as_group.c_str());
+    
+    if (!pw) {
+        logger_->warn("User not found: " + config_->security.run_as_user + ", skipping privilege drop");
+        return;
+    }
+    
+    if (!gr) {
+        logger_->warn("Group not found: " + config_->security.run_as_group + ", skipping privilege drop");
+        return;
+    }
+    
+    // Set group ID first (requires root)
+    if (setgid(gr->gr_gid) != 0) {
+        logger_->error("Failed to set group ID: " + std::string(strerror(errno)));
+        return;
+    }
+    
+    // Set user ID (requires root)
+    if (setuid(pw->pw_uid) != 0) {
+        logger_->error("Failed to set user ID: " + std::string(strerror(errno)));
+        return;
+    }
+    
+    logger_->info("Dropped privileges to user: " + config_->security.run_as_user + 
+                  ", group: " + config_->security.run_as_group);
+#else
+    // Privilege dropping not supported on Windows
+    (void)config_;
+    logger_->warn("Privilege dropping not supported on Windows");
+#endif
 }
 
 } // namespace simple_sftpd
