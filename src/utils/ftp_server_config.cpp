@@ -127,6 +127,16 @@ bool FTPServerConfig::loadFromFile(const std::string& filename) {
                 security.ssl_cert_file = value;
             } else if (key == "ssl_key_file" || key == "private_key_file") {
                 security.ssl_key_file = value;
+            } else if (key == "chroot_enabled") {
+                security.chroot_enabled = (value == "true" || value == "1");
+            } else if (key == "chroot_directory") {
+                security.chroot_directory = value;
+            } else if (key == "drop_privileges") {
+                security.drop_privileges = (value == "true" || value == "1");
+            } else if (key == "run_as_user") {
+                security.run_as_user = value;
+            } else if (key == "run_as_group") {
+                security.run_as_group = value;
             }
         } else if (current_section == "rate_limit") {
             if (key == "enabled") {

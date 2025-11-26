@@ -48,6 +48,11 @@ struct SecurityConfig {
     bool allow_anonymous = false;
     std::string anonymous_user = "anonymous";
     std::string anonymous_password = "anonymous@";
+    bool chroot_enabled = false;
+    std::string chroot_directory = "/var/ftp";
+    bool drop_privileges = false;
+    std::string run_as_user = "ftp";
+    std::string run_as_group = "ftp";
 };
 
 struct RateLimitConfig {
