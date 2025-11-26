@@ -123,6 +123,10 @@ bool FTPServerConfig::loadFromFile(const std::string& filename) {
                 security.require_ssl = (value == "true" || value == "1");
             } else if (key == "allow_anonymous") {
                 security.allow_anonymous = (value == "true" || value == "1");
+            } else if (key == "ssl_cert_file" || key == "certificate_file") {
+                security.ssl_cert_file = value;
+            } else if (key == "ssl_key_file" || key == "private_key_file") {
+                security.ssl_key_file = value;
             }
         } else if (current_section == "rate_limit") {
             if (key == "enabled") {

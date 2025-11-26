@@ -19,6 +19,7 @@
 #include "simple-sftpd/ftp_user_manager.hpp"
 #include "simple-sftpd/ftp_user.hpp"
 #include "simple-sftpd/ftp_server_config.hpp"
+#include "simple-sftpd/ssl_context.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -38,7 +39,8 @@ namespace simple_sftpd {
 FTPConnection::FTPConnection(int socket, std::shared_ptr<Logger> logger, std::shared_ptr<FTPServerConfig> config)
     : socket_(socket), logger_(logger), config_(config), active_(false),
       authenticated_(false), current_user_(nullptr), current_directory_("/"),
-      passive_listen_socket_(-1), data_socket_(-1), transfer_type_("A") {
+      ssl_enabled_(false), ssl_active_(false), ssl_(nullptr), data_ssl_(nullptr),
+      passive_listen_socket_(-1), data_socket_(-1), transfer_type_("A"), protection_level_("C") {
     user_manager_ = std::make_shared<FTPUserManager>(logger_);
     
     // Add default test user for development/testing
@@ -72,6 +74,19 @@ void FTPConnection::stop() {
     }
     
     active_ = false;
+    
+    // Cleanup SSL
+    if (ssl_context_ && ssl_) {
+        ssl_context_->shutdownSSL(ssl_);
+        ssl_context_->freeSSL(ssl_);
+        ssl_ = nullptr;
+    }
+    if (ssl_context_ && data_ssl_) {
+        ssl_context_->shutdownSSL(data_ssl_);
+        ssl_context_->freeSSL(data_ssl_);
+        data_ssl_ = nullptr;
+    }
+    
     closeDataSocket();
     if (socket_ >= 0) {
         close(socket_);
@@ -128,7 +143,18 @@ void FTPConnection::handleClient() {
             sendResponse("215 UNIX Type: L8");
         } else if (command == "FEAT") {
             sendResponse("211-Features:");
+            if (ssl_enabled_) {
+                sendResponse(" AUTH TLS");
+                sendResponse(" PBSZ");
+                sendResponse(" PROT");
+            }
             sendResponse("211 End");
+        } else if (command == "AUTH") {
+            handleAUTH(argument);
+        } else if (command == "PBSZ") {
+            handlePBSZ(argument);
+        } else if (command == "PROT") {
+            handlePROT(argument);
         } else if (authenticated_) {
             // Commands that require authentication
             if (command == "PWD" || command == "XPWD") {
@@ -170,7 +196,13 @@ void FTPConnection::sendResponse(const std::string& response) {
     }
     
     std::string full_response = response + "\r\n";
-    ssize_t sent = send(socket_, full_response.c_str(), full_response.length(), 0);
+    ssize_t sent;
+    
+    if (ssl_active_ && ssl_ && ssl_context_) {
+        sent = ssl_context_->writeSSL(ssl_, full_response.c_str(), full_response.length());
+    } else {
+        sent = send(socket_, full_response.c_str(), full_response.length(), 0);
+    }
     
     if (sent < 0) {
         logger_->error("Failed to send response: " + std::string(strerror(errno)));
@@ -182,14 +214,20 @@ void FTPConnection::sendResponse(const std::string& response) {
 
 std::string FTPConnection::readLine() {
     if (socket_ < 0) {
-    return "";
-}
+        return "";
+    }
 
     std::string line;
     char buffer[1];
     
     while (active_) {
-        ssize_t received = recv(socket_, buffer, 1, 0);
+        ssize_t received;
+        
+        if (ssl_active_ && ssl_ && ssl_context_) {
+            received = ssl_context_->readSSL(ssl_, buffer, 1);
+        } else {
+            received = recv(socket_, buffer, 1, 0);
+        }
         
         if (received <= 0) {
             if (received == 0) {
@@ -731,6 +769,95 @@ std::string FTPConnection::formatPassiveResponse(int port) {
     int p2 = port % 256;
     
     return "227 Entering Passive Mode (" + ip + "," + std::to_string(p1) + "," + std::to_string(p2) + ")";
+}
+
+// SSL/TLS Command Handlers
+void FTPConnection::handleAUTH(const std::string& method) {
+    std::string method_upper = method;
+    std::transform(method_upper.begin(), method_upper.end(), method_upper.begin(), ::toupper);
+    
+    if (method_upper == "TLS" || method_upper == "SSL") {
+        if (!ssl_enabled_ || !ssl_context_) {
+            sendResponse("534 SSL/TLS not available");
+            return;
+        }
+        
+        if (ssl_active_) {
+            sendResponse("534 SSL/TLS already active");
+            return;
+        }
+        
+        sendResponse("234 AUTH TLS successful");
+        
+        // Upgrade connection to SSL
+        if (!upgradeToSSL()) {
+            logger_->error("Failed to upgrade connection to SSL");
+            active_ = false;
+        } else {
+            ssl_active_ = true;
+            logger_->info("Connection upgraded to SSL/TLS");
+        }
+    } else {
+        sendResponse("504 Unsupported AUTH method");
+    }
+}
+
+void FTPConnection::handlePBSZ(const std::string& size) {
+    (void)size; // PBSZ size parameter is ignored for TLS
+    if (!ssl_active_) {
+        sendResponse("503 PBSZ command only valid in secure mode");
+        return;
+    }
+    
+    // PBSZ (Protection Buffer Size) - always 0 for TLS
+    sendResponse("200 PBSZ=0");
+}
+
+void FTPConnection::handlePROT(const std::string& level) {
+    if (!ssl_active_) {
+        sendResponse("503 PROT command only valid in secure mode");
+        return;
+    }
+    
+    std::string level_upper = level;
+    std::transform(level_upper.begin(), level_upper.end(), level_upper.begin(), ::toupper);
+    
+    if (level_upper == "C" || level_upper == "CLEAR") {
+        protection_level_ = "C";
+        sendResponse("200 Protection level set to Clear");
+    } else if (level_upper == "P" || level_upper == "PRIVATE") {
+        protection_level_ = "P";
+        sendResponse("200 Protection level set to Private");
+    } else if (level_upper == "S" || level_upper == "SAFE") {
+        protection_level_ = "S";
+        sendResponse("200 Protection level set to Safe");
+    } else if (level_upper == "E" || level_upper == "CONFIDENTIAL") {
+        protection_level_ = "E";
+        sendResponse("200 Protection level set to Confidential");
+    } else {
+        sendResponse("504 Unsupported protection level");
+    }
+}
+
+bool FTPConnection::upgradeToSSL() {
+    if (!ssl_context_ || !ssl_enabled_) {
+        return false;
+    }
+    
+    ssl_ = ssl_context_->createSSL(socket_);
+    if (!ssl_) {
+        logger_->error("Failed to create SSL connection: " + ssl_context_->getLastError());
+        return false;
+    }
+    
+    if (!ssl_context_->acceptSSL(ssl_)) {
+        logger_->error("SSL handshake failed: " + ssl_context_->getLastError());
+        ssl_context_->freeSSL(ssl_);
+        ssl_ = nullptr;
+        return false;
+    }
+    
+    return true;
 }
 
 } // namespace simple_sftpd

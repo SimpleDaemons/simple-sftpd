@@ -28,6 +28,7 @@ class Logger;
 class FTPServerConfig;
 class FTPUserManager;
 class FTPUser;
+class SSLContext;
 
 class FTPConnection {
 public:
@@ -58,6 +59,9 @@ private:
     void handleDELE(const std::string& filename);
     void handleMKD(const std::string& dirname);
     void handleRMD(const std::string& dirname);
+    void handleAUTH(const std::string& method);
+    void handlePBSZ(const std::string& size);
+    void handlePROT(const std::string& level);
     
     // Data Connection Management
     int createPassiveDataSocket();
@@ -71,10 +75,16 @@ private:
     bool hasPermission(const std::string& operation, const std::string& path);
     bool isPathWithinHome(const std::string& path);
 
+    // SSL/TLS Support
+    bool initializeSSL();
+    bool upgradeToSSL();
+    void* getSSL() const { return ssl_; }
+
     int socket_;
     std::shared_ptr<Logger> logger_;
     std::shared_ptr<FTPServerConfig> config_;
     std::shared_ptr<FTPUserManager> user_manager_;
+    std::shared_ptr<SSLContext> ssl_context_;
     
     std::atomic<bool> active_;
     std::thread client_thread_;
@@ -84,11 +94,18 @@ private:
     std::shared_ptr<FTPUser> current_user_;
     std::string current_directory_;
     
+    // SSL/TLS state
+    bool ssl_enabled_;
+    bool ssl_active_;
+    void* ssl_;  // SSL* pointer (void* to avoid OpenSSL dependency in header)
+    void* data_ssl_;  // SSL* for data connection
+    
     // Data connection state
     int passive_listen_socket_;
     int data_socket_;
     std::mutex data_socket_mutex_;
     std::string transfer_type_;  // "A" for ASCII, "I" for binary
+    std::string protection_level_;  // "C" for clear, "P" for private (encrypted)
 };
 
 } // namespace simple_sftpd
