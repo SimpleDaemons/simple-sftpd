@@ -500,6 +500,12 @@ void FTPConnection::handleRETR(const std::string& filename) {
         return;
     }
     
+    // Seek to resume position if set
+    if (resume_position_ > 0) {
+        file.seekg(resume_position_);
+        logger_->debug("Resuming transfer from position: " + std::to_string(resume_position_));
+    }
+    
     // Transfer file
     char buffer[8192];
     size_t total_bytes = 0;
@@ -518,6 +524,7 @@ void FTPConnection::handleRETR(const std::string& filename) {
     
     file.close();
     close(data_fd);
+    resume_position_ = 0; // Reset resume position after transfer
     logger_->info("File transfer complete: " + filename + " (" + std::to_string(total_bytes) + " bytes)");
     sendResponse("226 Transfer complete");
 }
@@ -550,8 +557,21 @@ void FTPConnection::handleSTOR(const std::string& filename) {
         std::filesystem::create_directories(file_path.parent_path());
     }
     
-    // Open file for writing
-    std::ofstream file(filepath, std::ios::binary);
+    // Open file for writing (with resume support)
+    std::ofstream file;
+    if (resume_position_ > 0 && std::filesystem::exists(filepath)) {
+        // Resume transfer - open in append mode from resume position
+        file.open(filepath, std::ios::binary | std::ios::in | std::ios::out);
+        if (file.is_open()) {
+            file.seekp(resume_position_);
+            logger_->debug("Resuming upload from position: " + std::to_string(resume_position_));
+        }
+    }
+    
+    if (!file.is_open()) {
+        file.open(filepath, std::ios::binary | std::ios::out);
+    }
+    
     if (!file.is_open()) {
         close(data_fd);
         sendResponse("550 Failed to create file");
@@ -572,6 +592,7 @@ void FTPConnection::handleSTOR(const std::string& filename) {
     
     file.close();
     close(data_fd);
+    resume_position_ = 0; // Reset resume position after transfer
     logger_->info("File upload complete: " + filename + " (" + std::to_string(total_bytes) + " bytes)");
     sendResponse("226 Transfer complete");
 }
@@ -919,6 +940,155 @@ bool FTPConnection::upgradeToSSL() {
     }
     
     return true;
+}
+
+void FTPConnection::applyChroot() {
+#ifndef _WIN32
+    if (config_->security.chroot_enabled && !config_->security.chroot_directory.empty()) {
+        std::string chroot_dir = config_->security.chroot_directory;
+        
+        // Ensure chroot directory exists
+        if (!std::filesystem::exists(chroot_dir)) {
+            logger_->warn("Chroot directory does not exist: " + chroot_dir);
+            return;
+        }
+        
+        // Apply chroot
+        if (chroot(chroot_dir.c_str()) != 0) {
+            logger_->error("Failed to apply chroot: " + std::string(strerror(errno)));
+        } else {
+            logger_->info("Chroot applied to: " + chroot_dir);
+            // Update current directory to be relative to chroot
+            if (current_directory_.find(chroot_dir) == 0) {
+                current_directory_ = current_directory_.substr(chroot_dir.length());
+                if (current_directory_.empty() || current_directory_[0] != '/') {
+                    current_directory_ = "/" + current_directory_;
+                }
+            } else {
+                current_directory_ = "/";
+            }
+        }
+    }
+#else
+    // Chroot not supported on Windows
+    (void)config_;
+    logger_->warn("Chroot not supported on Windows");
+#endif
+}
+
+void FTPConnection::handleREST(const std::string& position) {
+    try {
+        resume_position_ = std::stoull(position);
+        sendResponse("350 Restarting at " + position + ". Send STOR or RETR to initiate transfer");
+        logger_->debug("Resume position set to: " + position);
+    } catch (...) {
+        sendResponse("501 Invalid restart position");
+    }
+}
+
+void FTPConnection::handleAPPE(const std::string& filename) {
+    if (!hasPermission("write", filename)) {
+        sendResponse("550 Permission denied");
+        return;
+    }
+    
+    std::string filepath = resolvePath(filename);
+    
+    if (!validatePath(filepath)) {
+        sendResponse("550 Invalid path");
+        return;
+    }
+    
+    sendResponse("150 Opening data connection for append");
+    
+    int data_fd = acceptDataConnection();
+    if (data_fd < 0) {
+        sendResponse("425 Can't open data connection");
+        return;
+    }
+    
+    std::ofstream file;
+    if (std::filesystem::exists(filepath)) {
+        file.open(filepath, std::ios::binary | std::ios::app);
+    } else {
+        file.open(filepath, std::ios::binary | std::ios::out);
+    }
+    
+    if (!file.is_open()) {
+        close(data_fd);
+        sendResponse("550 Failed to open file for append");
+        return;
+    }
+    
+    char buffer[8192];
+    ssize_t received;
+    while ((received = recv(data_fd, buffer, sizeof(buffer), 0)) > 0) {
+        file.write(buffer, received);
+    }
+    
+    file.close();
+    close(data_fd);
+    resume_position_ = 0; // Reset resume position
+    sendResponse("226 Transfer complete");
+}
+
+void FTPConnection::handleRNFR(const std::string& filename) {
+    if (!hasPermission("write", filename)) {
+        sendResponse("550 Permission denied");
+        return;
+    }
+    
+    std::string filepath = resolvePath(filename);
+    
+    if (!validatePath(filepath)) {
+        sendResponse("550 Invalid path");
+        return;
+    }
+    
+    if (!std::filesystem::exists(filepath)) {
+        sendResponse("550 File or directory not found");
+        return;
+    }
+    
+    rename_from_path_ = filepath;
+    sendResponse("350 File or directory exists, ready for destination name");
+}
+
+void FTPConnection::handleRNTO(const std::string& filename) {
+    if (rename_from_path_.empty()) {
+        sendResponse("503 RNFR required first");
+        return;
+    }
+    
+    if (!hasPermission("write", filename)) {
+        sendResponse("550 Permission denied");
+        rename_from_path_.clear();
+        return;
+    }
+    
+    std::string filepath = resolvePath(filename);
+    
+    if (!validatePath(filepath)) {
+        sendResponse("550 Invalid path");
+        rename_from_path_.clear();
+        return;
+    }
+    
+    if (std::filesystem::exists(filepath)) {
+        sendResponse("553 File already exists");
+        rename_from_path_.clear();
+        return;
+    }
+    
+    try {
+        std::filesystem::rename(rename_from_path_, filepath);
+        sendResponse("250 Rename successful");
+        logger_->info("Renamed: " + rename_from_path_ + " -> " + filepath);
+        rename_from_path_.clear();
+    } catch (const std::exception& e) {
+        sendResponse("550 Rename failed: " + std::string(e.what()));
+        rename_from_path_.clear();
+    }
 }
 
 } // namespace simple_sftpd
