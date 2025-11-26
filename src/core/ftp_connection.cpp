@@ -611,6 +611,7 @@ void FTPConnection::handleSTOR(const std::string& filename) {
     close(data_fd);
     resume_position_ = 0; // Reset resume position after transfer
     logger_->info("File upload complete: " + filename + " (" + std::to_string(total_bytes) + " bytes)");
+    logger_->info("[AUDIT] FILE_UPLOAD user=" + username_ + " file=" + filename + " size=" + std::to_string(total_bytes));
     sendResponse("226 Transfer complete");
 }
 
@@ -653,6 +654,7 @@ void FTPConnection::handleMKD(const std::string& dirname) {
     
     if (std::filesystem::create_directory(dirpath)) {
         sendResponse("257 \"" + dirpath + "\" created");
+        logger_->info("[AUDIT] DIR_CREATE user=" + username_ + " dir=" + dirname);
     } else {
         sendResponse("550 Failed to create directory");
     }
@@ -674,6 +676,7 @@ void FTPConnection::handleRMD(const std::string& dirname) {
     if (std::filesystem::exists(dirpath) && std::filesystem::is_directory(dirpath)) {
         if (std::filesystem::remove(dirpath)) {
             sendResponse("250 RMD command successful");
+            logger_->info("[AUDIT] DIR_DELETE user=" + username_ + " dir=" + dirname);
         } else {
             sendResponse("550 Failed to remove directory");
         }
@@ -1101,6 +1104,7 @@ void FTPConnection::handleRNTO(const std::string& filename) {
         std::filesystem::rename(rename_from_path_, filepath);
         sendResponse("250 Rename successful");
         logger_->info("Renamed: " + rename_from_path_ + " -> " + filepath);
+        logger_->info("[AUDIT] FILE_RENAME user=" + username_ + " from=" + rename_from_path_ + " to=" + filepath);
         rename_from_path_.clear();
     } catch (const std::exception& e) {
         sendResponse("550 Rename failed: " + std::string(e.what()));
