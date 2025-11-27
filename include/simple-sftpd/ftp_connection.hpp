@@ -73,6 +73,7 @@ private:
     // Data Connection Management
     int createPassiveDataSocket();
     int acceptDataConnection();
+    int connectActiveDataSocket();
     void closeDataSocket();
     std::string formatPassiveResponse(int port);
     

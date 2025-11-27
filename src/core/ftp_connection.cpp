@@ -36,6 +36,10 @@
 #include <fstream>
 #include <dirent.h>
 #include <errno.h>
+#include <chrono>
+#ifndef _WIN32
+#include <pwd.h>
+#endif
 
 namespace simple_sftpd {
 
@@ -304,8 +308,38 @@ void FTPConnection::handlePASS(const std::string& password) {
         return;
     }
     
+    bool login_success = false;
     current_user_ = user_manager_->getUser(username_);
     if (current_user_ && current_user_->authenticate(password)) {
+        login_success = true;
+    } else if (pam_auth_ && pam_auth_->isAvailable()) {
+        if (pam_auth_->authenticate(username_, password)) {
+            std::string home_directory;
+#ifndef _WIN32
+            struct passwd* pw = getpwnam(username_.c_str());
+            if (pw && pw->pw_dir) {
+                home_directory = pw->pw_dir;
+            }
+#endif
+            if (home_directory.empty()) {
+                if (current_user_) {
+                    home_directory = current_user_->getHomeDirectory();
+                } else if (!config_->security.chroot_directory.empty()) {
+                    home_directory = config_->security.chroot_directory;
+                } else {
+                    home_directory = "/tmp";
+                }
+            }
+            
+            current_user_ = std::make_shared<FTPUser>(username_, password, home_directory);
+            login_success = true;
+            logger_->info("PAM authentication successful for user: " + username_);
+        } else {
+            logger_->warn("PAM authentication failed for user: " + username_);
+        }
+    }
+    
+    if (login_success && current_user_) {
         authenticated_ = true;
         current_directory_ = current_user_->getHomeDirectory();
         // Ensure current directory is within home
@@ -832,6 +866,10 @@ int FTPConnection::createPassiveDataSocket() {
 int FTPConnection::acceptDataConnection() {
     std::lock_guard<std::mutex> lock(data_socket_mutex_);
     
+    if (active_mode_enabled_) {
+        return connectActiveDataSocket();
+    }
+    
     if (passive_listen_socket_ < 0) {
         logger_->error("No passive socket available");
         return -1;
@@ -870,6 +908,59 @@ int FTPConnection::acceptDataConnection() {
     fcntl(passive_listen_socket_, F_SETFL, flags);
     
     logger_->debug("Data connection accepted from " + std::string(inet_ntoa(client_addr.sin_addr)));
+    return data_socket_;
+}
+
+int FTPConnection::connectActiveDataSocket() {
+    if (active_mode_ip_.empty() || active_mode_port_ <= 0) {
+        logger_->error("Active mode parameters not set");
+        return -1;
+    }
+    
+    data_socket_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (data_socket_ < 0) {
+        logger_->error("Failed to create active mode socket: " + std::string(strerror(errno)));
+        return -1;
+    }
+    
+    struct sockaddr_in addr;
+    std::memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(active_mode_port_);
+    
+    if (inet_pton(AF_INET, active_mode_ip_.c_str(), &addr.sin_addr) <= 0) {
+        logger_->error("Invalid active mode IP: " + active_mode_ip_);
+        close(data_socket_);
+        data_socket_ = -1;
+        active_mode_enabled_ = false;
+        active_mode_ip_.clear();
+        active_mode_port_ = 0;
+        return -1;
+    }
+    
+    // Set connect timeout (10 seconds)
+    struct timeval timeout;
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+    setsockopt(data_socket_, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    setsockopt(data_socket_, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+    
+    if (connect(data_socket_, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+        logger_->error("Failed to connect to active mode target " + active_mode_ip_ + ":" +
+                       std::to_string(active_mode_port_) + " - " + std::string(strerror(errno)));
+        close(data_socket_);
+        data_socket_ = -1;
+        active_mode_enabled_ = false;
+        active_mode_ip_.clear();
+        active_mode_port_ = 0;
+        return -1;
+    }
+    
+    logger_->debug("Active mode data connection established to " + active_mode_ip_ + ":" +
+                   std::to_string(active_mode_port_));
+    active_mode_enabled_ = false;
+    active_mode_ip_.clear();
+    active_mode_port_ = 0;
     return data_socket_;
 }
 

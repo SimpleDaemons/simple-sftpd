@@ -108,6 +108,9 @@ bool FTPServer::start() {
         return false;
     }
     
+    // Drop privileges if configured (after binding to privileged port)
+    dropPrivileges();
+    
     // Start connection manager
     if (!connection_manager_->start()) {
         logger_->error("Failed to start connection manager");
