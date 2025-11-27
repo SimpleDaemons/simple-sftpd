@@ -21,6 +21,7 @@
 #include "simple-sftpd/ftp_server_config.hpp"
 #include "simple-sftpd/ssl_context.hpp"
 #include "simple-sftpd/file_cache.hpp"
+#include "simple-sftpd/pam_auth.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

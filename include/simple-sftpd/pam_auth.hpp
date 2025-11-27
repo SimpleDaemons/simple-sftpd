@@ -51,7 +51,7 @@ private:
     std::shared_ptr<Logger> logger_;
     bool pam_available_;
     
-    void* pam_handle_; // pam_handle_t* (void* to avoid PAM dependency in header)
+    [[maybe_unused]] void* pam_handle_; // pam_handle_t* (void* to avoid PAM dependency in header)
 };
 
 } // namespace simple_sftpd

@@ -30,6 +30,7 @@ class FTPUserManager;
 class FTPUser;
 class SSLContext;
 class FileCache;
+class PAMAuth;
 
 class FTPConnection {
 public:
