@@ -18,8 +18,10 @@
 #include "simple-sftpd/logger.hpp"
 
 #ifndef _WIN32
+#ifdef __linux__
 #include <security/pam_appl.h>
 #include <security/pam_misc.h>
+#endif
 #include <unistd.h>
 #endif
 

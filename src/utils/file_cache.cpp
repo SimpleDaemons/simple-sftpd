@@ -17,6 +17,8 @@
 #include "simple-sftpd/file_cache.hpp"
 #include "simple-sftpd/logger.hpp"
 #include <algorithm>
+#include <vector>
+#include <chrono>
 
 namespace simple_sftpd {
 
