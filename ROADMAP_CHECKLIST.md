@@ -45,10 +45,10 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ USER, PASS, QUIT, PWD, CWD, LIST, RETR, STOR, DELE, MKD, RMD, SIZE, TYPE, NOOP, SYST, FEAT
   - ✅ Proper FTP response codes
   - ✅ Command authentication checks
-- [ ] **Active Mode Support** - Client-initiated data connections (v0.2.0)
-  - ❌ PORT command not implemented
-  - ❌ Active mode data socket setup
-  - ❌ Client connection handling
+- [x] **Active Mode Support** - Client-initiated data connections (v0.2.0)
+  - ✅ PORT command implemented (`FTPConnection::handlePORT`)
+  - ✅ Active mode data socket setup via `connectActiveDataSocket()`
+  - ✅ Client connection handling for PORT data transfers
 - [x] **Passive Mode Support** - Server-initiated data connections (v0.1.0)
   - ✅ PASV command fully implemented
   - ✅ Actual passive socket creation
@@ -60,10 +60,10 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Actual file data transmission
   - ⚠️ No transfer progress tracking (v0.2.0)
   - ✅ Transfer error recovery implemented
-- [ ] **File Transfer Operations** - Append, resume (v0.2.0)
-  - ❌ APPE command not implemented
-  - ❌ REST command not implemented
-  - ❌ Transfer resume functionality missing
+- [x] **File Transfer Operations** - Append, resume (v0.2.0)
+  - ✅ APPE command implemented with append data path
+  - ✅ REST command implemented to store resume offsets
+  - ✅ Transfer resume functionality wired into RETR and STOR
 - [x] **Directory Operations** - List, create, remove, navigate (v0.1.0)
   - ✅ LIST uses data connection properly
   - ✅ CWD command works correctly
@@ -74,18 +74,18 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ DELE command implemented
   - ✅ File existence checking
   - ✅ Error handling for missing files
-- [ ] **File Management** - Rename (v0.2.0)
-  - ❌ RNFR/RNTO commands not implemented
+- [x] **File Management** - Rename (v0.2.0)
+  - ✅ RNFR/RNTO command pair implemented with filesystem rename
 - [x] **File Management** - Permissions (v0.1.0)
   - ✅ Permission checking implemented
   - ✅ Read/write/list permission enforcement
   - ✅ User-based permission system
 
 ### Security & Authentication
-- [ ] **SSL/TLS Support** - FTPS implementation with OpenSSL (v0.2.0)
-  - ❌ OpenSSL integration not started
-  - ❌ TLS handshake not implemented
-  - ❌ Certificate validation missing
+- [x] **SSL/TLS Support** - FTPS implementation with OpenSSL (v0.2.0)
+  - ✅ OpenSSL integration implemented via `SSLContext`
+  - ✅ TLS handshake implemented through `upgradeToSSL()`
+  - ✅ Certificate validation and client-auth support
   - ✅ Configuration structure exists
 - [x] **Basic Authentication** - Username/password authentication (v0.1.0)
   - ✅ USER command implemented
@@ -106,18 +106,18 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Write permission checking
   - ✅ List permission checking
   - ✅ Permission-based command restrictions
-- [ ] **Directory Restrictions** - Chroot and path limitations (v0.2.0)
-  - ❌ Chroot implementation missing
-  - ❌ Path restriction enforcement missing
+- [x] **Directory Restrictions** - Chroot and path limitations (v0.2.0)
+  - ✅ Chroot implementation via `FTPConnection::applyChroot`
+  - ✅ Path restriction enforcement through `validatePath()` / `isPathWithinHome()`
   - ✅ Configuration options exist
 - [x] **Path Validation** - Prevent directory traversal attacks (v0.1.0)
   - ✅ Path traversal protection implemented
   - ✅ Validation against "../" attacks
   - ✅ Home directory boundary checking
   - ✅ resolvePath() with security hardening
-- [ ] **Privilege Dropping** - Security hardening (v0.2.0)
-  - ❌ No setuid/setgid implementation
-  - ❌ No privilege dropping after bind
+- [x] **Privilege Dropping** - Security hardening (v0.2.0)
+  - ✅ setuid/setgid implementation in `FTPServer::dropPrivileges`
+  - ✅ Privileges dropped after socket bind and before connection handling
   - ✅ Configuration options exist
 
 ### Configuration & Management
