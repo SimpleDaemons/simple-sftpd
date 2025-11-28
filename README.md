@@ -6,18 +6,20 @@ A secure, configurable, and feature-rich FTP server written in C++ for Linux, ma
 
 ### Core FTP Functionality
 - **RFC 959 Compliant**: Full FTP protocol implementation
-- **Passive Mode**: Full PASV support with data connections (Active mode in v0.2.0)
-- **File Transfer**: Upload and download working (append and resume in v0.2.0)
+- **Passive Mode**: Full PASV support with data connections
+- **Active Mode**: Full PORT command support
+- **File Transfer**: Upload, download, append, and resume support
 - **Directory Operations**: List, create, remove, and navigate directories
-- **File Management**: Delete and directory operations (rename in v0.2.0)
+- **File Management**: Delete, rename, and directory operations
 
 ### Security Features
-- **SSL/TLS Support**: Configuration ready, implementation in v0.2.0
-- **User Authentication**: Username/password authentication (PAM, LDAP in v0.2.0)
-- **Access Control**: Basic permissions and path restrictions implemented
+- **SSL/TLS Support**: Full FTPS implementation with OpenSSL
+- **User Authentication**: Username/password and PAM authentication
+- **Access Control**: Basic permissions, path restrictions, and IP whitelisting
 - **Path Validation**: Directory traversal protection and home directory enforcement
-- **Chroot Support**: Configuration ready, implementation in v0.2.0
+- **Chroot Support**: Directory isolation and privilege dropping
 - **Rate Limiting**: Time-window based protection against abuse and DoS attacks
+- **Bandwidth Throttling**: Upload and download speed limits
 
 ### Virtual Hosting
 - **Multi-Domain Support**: Host multiple FTP sites on one server
