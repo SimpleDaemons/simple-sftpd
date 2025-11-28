@@ -1,0 +1,17 @@
+[Unit]
+Description=Simple Secure FTP Daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/simple-sftpd --config /usr/local/etc/simple-sftpd/simple-sftpd.conf
+Restart=always
+RestartSec=10
+User=simple-sftpd
+Group=simple-sftpd
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
