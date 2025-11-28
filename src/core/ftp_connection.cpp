@@ -37,6 +37,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <chrono>
+#include <thread>
 #ifndef _WIN32
 #include <pwd.h>
 #endif
@@ -565,11 +566,28 @@ void FTPConnection::handleRETR(const std::string& filename) {
         logger_->debug("Resuming transfer from position: " + std::to_string(resume_position_));
     }
     
-    // Transfer file
+    // Transfer file with bandwidth throttling
     char buffer[8192];
     size_t total_bytes = 0;
+    auto start_time = std::chrono::steady_clock::now();
+    int max_rate = config_->rate_limit.max_transfer_rate;
+    
     while (file.read(buffer, sizeof(buffer)) || file.gcount() > 0) {
         size_t bytes_read = file.gcount();
+        
+        // Bandwidth throttling for downloads
+        if (max_rate > 0) {
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time).count();
+            if (elapsed > 0) {
+                size_t allowed_bytes = (max_rate * elapsed) / 1000;
+                if (total_bytes + bytes_read > allowed_bytes) {
+                    size_t delay_ms = ((total_bytes + bytes_read - allowed_bytes) * 1000) / max_rate;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
+                }
+            }
+        }
+        
         ssize_t sent = send(data_fd, buffer, bytes_read, 0);
         if (sent < 0) {
             logger_->error("Error sending file data: " + std::string(strerror(errno)));
