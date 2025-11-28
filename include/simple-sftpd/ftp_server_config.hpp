@@ -75,6 +75,11 @@ public:
     bool loadFromFile(const std::string& filename);
     bool validate();
     
+    // Format-specific loaders
+    bool loadFromINI(const std::string& filename);
+    bool loadFromJSON(const std::string& filename);
+    bool loadFromYAML(const std::string& filename);
+    
     const std::vector<std::string>& getErrors() const { return errors_; }
     const std::vector<std::string>& getWarnings() const { return warnings_; }
 

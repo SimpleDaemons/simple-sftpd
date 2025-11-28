@@ -38,6 +38,7 @@ endif()
 if(ENABLE_JSON)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(JSONCPP REQUIRED jsoncpp)
+    add_definitions(-DENABLE_JSON)
 endif()
 
 if(ENABLE_COMPRESSION)
