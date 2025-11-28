@@ -127,8 +127,9 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Configuration validation
   - ✅ Error and warning collection
   - ✅ Default value handling
-  - ❌ JSON parser not implemented (v0.2.0)
-  - ❌ YAML parser not implemented (v0.2.0)
+  - ✅ JSON parser implemented (v0.2.0)
+  - ✅ YAML parser implemented (v0.2.0)
+  - ✅ Automatic format detection by file extension
   - ✅ JSON/YAML config examples exist
 - [x] **Logging System** - Comprehensive logging with STANDARD/JSON/EXTENDED formats (v0.1.0)
   - ✅ Logger class fully implemented
