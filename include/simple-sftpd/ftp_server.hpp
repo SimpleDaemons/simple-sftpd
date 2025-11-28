@@ -30,6 +30,7 @@ class FTPConnectionManager;
 class IPAccessControl;
 class PerformanceMonitor;
 class FileCache;
+class FTPRateLimiter;
 
 class FTPServer {
 public:
@@ -51,6 +52,7 @@ private:
     std::shared_ptr<IPAccessControl> ip_access_control_;
     std::shared_ptr<PerformanceMonitor> performance_monitor_;
     std::shared_ptr<FileCache> file_cache_;
+    std::shared_ptr<FTPRateLimiter> rate_limiter_;
     
     std::atomic<bool> running_;
     std::thread server_thread_;

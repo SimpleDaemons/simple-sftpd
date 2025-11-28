@@ -24,6 +24,7 @@
 #include "simple-sftpd/ip_access_control.hpp"
 #include "simple-sftpd/performance_monitor.hpp"
 #include "simple-sftpd/file_cache.hpp"
+#include "simple-sftpd/ftp_rate_limiter.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -51,6 +52,13 @@ FTPServer::FTPServer(std::shared_ptr<FTPServerConfig> config)
     ip_access_control_ = std::make_shared<IPAccessControl>(logger_);
     performance_monitor_ = std::make_shared<PerformanceMonitor>(logger_);
     file_cache_ = std::make_shared<FileCache>(logger_, 1000, std::chrono::seconds(60));
+    
+    // Initialize rate limiter if enabled
+    if (config->rate_limit.enabled) {
+        rate_limiter_ = std::make_shared<FTPRateLimiter>(logger_);
+        rate_limiter_->setRateLimit(config->rate_limit.max_requests_per_minute);
+        rate_limiter_->setConnectionLimit(config->rate_limit.max_connections_per_ip);
+    }
 }
 
 FTPServer::~FTPServer() {
@@ -175,6 +183,18 @@ void FTPServer::serverLoop() {
                 logger_->warn("Connection rejected from blocked IP: " + std::string(client_ip));
                 close(client_socket);
                 continue;
+            }
+            
+            // Check rate limiting
+            if (rate_limiter_ && !rate_limiter_->isAllowed(client_ip)) {
+                logger_->warn("Connection rejected due to rate limit: " + std::string(client_ip));
+                close(client_socket);
+                continue;
+            }
+            
+            // Record request for rate limiting
+            if (rate_limiter_) {
+                rate_limiter_->recordRequest(client_ip);
             }
             
             // Check connection limit

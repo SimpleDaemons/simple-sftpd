@@ -152,12 +152,13 @@ This audit examines the actual implementation status of features in simple-sftpd
 - Code: `ftp_server.cpp:171` checks IP access
 
 #### Rate Limiting
-**Status:** ⚠️ **PARTIALLY IMPLEMENTED** (70% complete)
+**Status:** ✅ **FULLY IMPLEMENTED** (95% complete)
 - `FTPRateLimiter` class exists and works
 - Rate limiting for connections implemented
 - **Bandwidth throttling** - ✅ Implemented in `handleSTOR()` (uploads)
-- **Missing:** Bandwidth throttling for downloads (`handleRETR()`)
-- **Missing:** Rate limiter not integrated into connection acceptance (only structure exists)
+- **Bandwidth throttling** - ✅ Implemented in `handleRETR()` (downloads)
+- **Rate limiter integration** - ✅ Integrated into connection acceptance in `FTPServer`
+- **Completion:** 95% - Fully functional, could add per-user rate limits
 
 ---
 
