@@ -91,6 +91,15 @@ if(ENABLE_SSL)
     target_compile_definitions(simple-sftpd-tests PRIVATE SIMPLE_SFTPD_SSL_ENABLED)
 endif()
 
+# Link JSON if enabled
+if(ENABLE_JSON)
+    target_link_libraries(simple-sftpd-tests PRIVATE ${JSONCPP_LIBRARIES})
+    target_include_directories(simple-sftpd-tests PRIVATE ${JSONCPP_INCLUDE_DIRS})
+    target_compile_definitions(simple-sftpd-tests PRIVATE ENABLE_JSON)
+    target_compile_options(simple-sftpd-tests PRIVATE ${JSONCPP_CFLAGS_OTHER})
+    target_link_directories(simple-sftpd-tests PRIVATE ${JSONCPP_LIBRARY_DIRS})
+endif()
+
 # Add source files for testing (without main.cpp)
 target_sources(simple-sftpd-tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/core/ftp_user.cpp
