@@ -349,7 +349,7 @@ This audit examines the actual implementation status of features in simple-sftpd
 - **Virtual Hosting:** 20% ❌
 - **Testing:** 40% ⚠️
 
-**Overall v0.1.0:** ~85% complete (accurate estimate)
+**Overall v0.1.0:** ~87% complete (improved from 85%)
 
 ### Version 0.2.0 Features
 - **PAM Integration:** Needs ~2-3 hours
