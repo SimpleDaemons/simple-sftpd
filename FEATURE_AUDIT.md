@@ -48,13 +48,13 @@ This audit examines the actual implementation status of features in simple-sftpd
 - **Passive Mode (PASV)** - ✅ Fully implemented
   - Code: `handlePASV()`, `createPassiveDataSocket()`, `acceptDataConnection()`
   - Status: Fully working with proper socket handling
-- **Active Mode (PORT)** - ⚠️ PARTIALLY IMPLEMENTED
-  - Code: `handlePORT()` exists and parses command correctly
-  - **ISSUE:** Active mode connection logic is NOT implemented
-  - `acceptDataConnection()` only handles passive mode
-  - No `createActiveDataConnection()` or `connectToClient()` function
-  - Status: Command accepted but data transfers won't work in active mode
-  - **Completion:** ~40% - parsing works, connection logic missing
+- **Active Mode (PORT)** - ✅ FULLY IMPLEMENTED
+  - Code: `handlePORT()` fully implemented
+  - `connectActiveDataSocket()` - Connects to client-specified address/port
+  - `acceptDataConnection()` - Handles both passive and active modes
+  - Active mode state tracking and cleanup
+  - Status: Fully working for data transfers
+  - **Completion:** 100% - Active mode fully functional
 
 ---
 
