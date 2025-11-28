@@ -4,9 +4,9 @@ This document provides a detailed checklist for tracking progress on the simple-
 
 ## 📊 Overall Progress
 
-**Current Version:** 0.1.0-alpha
-**Overall Progress:** 85% Complete
-**Status:** ✅ **CORE FUNCTIONALITY COMPLETE**
+**Current Version:** 0.1.0
+**Overall Progress:** 87% Complete
+**Status:** ✅ **RELEASED** - v0.1.0 Foundation Release
 
 **Honest Assessment:** We have a working FTP server with core functionality implemented. File transfers work through passive mode data connections, all basic FTP commands are functional, CLI management is complete, and we have a comprehensive test suite. The server is nearly ready for v0.1.0 release.
 
@@ -15,7 +15,7 @@ This document provides a detailed checklist for tracking progress on the simple-
 ## 🎯 Version 0.1.0 - Foundation Release
 
 **Target:** Q1 2025 (Revised from Q4 2024)
-**Status:** ✅ **COMPLETE** (Implementation done, testing pending)
+**Status:** ✅ **RELEASED** - v0.1.0 released on 2025-11-27
 **Progress:** 90% (27/30 items - remaining items require testing environments)
 
 ### Network & Connection Management
