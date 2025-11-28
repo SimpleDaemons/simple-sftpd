@@ -583,9 +583,10 @@ bool handleVirtualCommand(const std::vector<std::string>& args) {
 /**
  * @brief Handle SSL management commands
  * @param args Command arguments
+ * @param config_file Configuration file path
  * @return true if successful, false otherwise
  */
-bool handleSslCommand(const std::vector<std::string>& args) {
+bool handleSslCommand(const std::vector<std::string>& args, const std::string& config_file) {
     if (args.empty()) {
         std::cerr << "Error: ssl command requires a subcommand" << std::endl;
         return false;
@@ -594,18 +595,79 @@ bool handleSslCommand(const std::vector<std::string>& args) {
     std::string subcommand = args[0];
     
     if (subcommand == "status") {
-        std::cout << "SSL Status:" << std::endl;
-        std::cout << "  SSL/TLS support: Not yet implemented (planned for v0.2.0)" << std::endl;
-        std::cout << "  Use tools/setup-ssl.sh for certificate generation" << std::endl;
+        std::cout << "SSL/TLS Status:" << std::endl;
+        
+        // Check build-time SSL support
+        #ifdef SIMPLE_SFTPD_SSL_ENABLED
+        std::cout << "  Build support: ✅ Enabled (OpenSSL available)" << std::endl;
+        #else
+        std::cout << "  Build support: ❌ Disabled (OpenSSL not available)" << std::endl;
+        std::cout << "  Note: Rebuild with OpenSSL to enable SSL/TLS support" << std::endl;
+        return true;
+        #endif
+        
+        // Load configuration to check runtime status
+        auto config = std::make_shared<FTPServerConfig>();
+        bool config_loaded = false;
+        
+        if (!config_file.empty() && std::filesystem::exists(config_file)) {
+            config_loaded = config->loadFromFile(config_file);
+        }
+        
+        if (config_loaded) {
+            bool ssl_configured = !config->security.ssl_cert_file.empty() && 
+                                  !config->security.ssl_key_file.empty();
+            
+            std::cout << "  Configuration: " << (ssl_configured ? "✅ Configured" : "⚠️  Not configured") << std::endl;
+            
+            if (ssl_configured) {
+                std::cout << "  Certificate: " << config->security.ssl_cert_file << std::endl;
+                std::cout << "  Private Key: " << config->security.ssl_key_file << std::endl;
+                
+                // Check if files exist
+                bool cert_exists = std::filesystem::exists(config->security.ssl_cert_file);
+                bool key_exists = std::filesystem::exists(config->security.ssl_key_file);
+                
+                std::cout << "  Certificate file: " << (cert_exists ? "✅ Found" : "❌ Not found") << std::endl;
+                std::cout << "  Private key file: " << (key_exists ? "✅ Found" : "❌ Not found") << std::endl;
+                
+                if (cert_exists && key_exists) {
+                    std::cout << "  Status: ✅ Ready for SSL/TLS connections" << std::endl;
+                } else {
+                    std::cout << "  Status: ⚠️  Configuration incomplete (files missing)" << std::endl;
+                }
+                
+                if (config->security.require_ssl) {
+                    std::cout << "  Mode: Required (all connections must use SSL)" << std::endl;
+                } else {
+                    std::cout << "  Mode: Optional (AUTH TLS available)" << std::endl;
+                }
+            } else {
+                std::cout << "  Status: ⚠️  SSL/TLS not configured" << std::endl;
+                std::cout << "  To enable SSL/TLS, configure ssl_cert_file and ssl_key_file" << std::endl;
+            }
+        } else {
+            std::cout << "  Configuration: ⚠️  Could not load config file" << std::endl;
+            if (!config_file.empty()) {
+                std::cout << "  Config file: " << config_file << std::endl;
+            }
+            std::cout << "  Note: SSL/TLS is implemented and ready to use" << std::endl;
+            std::cout << "  Configure ssl_cert_file and ssl_key_file in your config to enable" << std::endl;
+        }
+        
+        std::cout << std::endl << "  Certificate generation:" << std::endl;
+        std::cout << "    Use: tools/setup-ssl.sh --hostname <hostname>" << std::endl;
+        
         return true;
     } else if (subcommand == "generate") {
         std::cout << "SSL certificate generation:" << std::endl;
         std::cout << "  Please use: tools/setup-ssl.sh --hostname <hostname>" << std::endl;
-        std::cout << "  Full SSL management coming in v0.2.0" << std::endl;
-        return false;
+        std::cout << "  This will generate a self-signed certificate for testing" << std::endl;
+        std::cout << "  For production, use certificates from a trusted CA" << std::endl;
+        return true;
     } else {
-        std::cout << "SSL management not yet fully implemented in v0.1.0" << std::endl;
-        std::cout << "This feature is planned for v0.2.0" << std::endl;
+        std::cout << "Unknown SSL subcommand: " << subcommand << std::endl;
+        std::cout << "Available subcommands: status, generate" << std::endl;
         return false;
     }
 }
@@ -762,7 +824,7 @@ int main(int argc, char* argv[]) {
 
     // Handle SSL management
     if (command == "ssl") {
-        return handleSslCommand(args) ? 0 : 1;
+        return handleSslCommand(args, config_file) ? 0 : 1;
     }
 
     // Setup signal handlers for server commands
