@@ -15,7 +15,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-sftpd/server_config.hpp"
+#include "simple-sftpd/config/server_config.hpp"
 #include <fstream>
 #include <filesystem>
 

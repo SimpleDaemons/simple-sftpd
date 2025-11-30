@@ -15,7 +15,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-sftpd/rate_limiter.hpp"
+#include "simple-sftpd/security/rate_limiter.hpp"
 #include "simple-sftpd/utils/logger.hpp"
 #include <thread>
 #include <chrono>

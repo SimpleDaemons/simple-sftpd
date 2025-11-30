@@ -15,10 +15,10 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-sftpd/connection_manager.hpp"
-#include "simple-sftpd/server_config.hpp"
+#include "simple-sftpd/core/connection_manager.hpp"
+#include "simple-sftpd/config/server_config.hpp"
 #include "simple-sftpd/utils/logger.hpp"
-#include "simple-sftpd/connection.hpp"
+#include "simple-sftpd/core/connection.hpp"
 #include <memory>
 
 using namespace simple_sftpd;
