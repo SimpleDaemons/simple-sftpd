@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_server_config.hpp"
+#include "simple-sftpd/config/server_config.hpp"
 #include <fstream>
 #include <iostream>
 #include <sstream>

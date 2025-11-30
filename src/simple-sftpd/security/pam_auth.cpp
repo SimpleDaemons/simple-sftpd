@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/pam_auth.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/security/pam_auth.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 
 #ifndef _WIN32
 #ifdef __linux__

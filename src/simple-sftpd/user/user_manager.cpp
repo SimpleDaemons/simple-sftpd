@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_user_manager.hpp"
-#include "simple-sftpd/ftp_user.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/user/user_manager.hpp"
+#include "simple-sftpd/user/user.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 
 namespace simple_sftpd {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_virtual_host.hpp"
+#include "simple-sftpd/virtual_host/virtual_host.hpp"
 
 namespace simple_sftpd {
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ssl_context.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/security/ssl_context.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <fstream>
 #include <cstring>
 

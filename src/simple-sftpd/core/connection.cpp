@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_connection.hpp"
-#include "simple-sftpd/logger.hpp"
-#include "simple-sftpd/ftp_user_manager.hpp"
-#include "simple-sftpd/ftp_user.hpp"
-#include "simple-sftpd/ftp_server_config.hpp"
-#include "simple-sftpd/ssl_context.hpp"
-#include "simple-sftpd/file_cache.hpp"
-#include "simple-sftpd/pam_auth.hpp"
+#include "simple-sftpd/core/connection.hpp"
+#include "simple-sftpd/utils/logger.hpp"
+#include "simple-sftpd/user/user_manager.hpp"
+#include "simple-sftpd/user/user.hpp"
+#include "simple-sftpd/config/server_config.hpp"
+#include "simple-sftpd/security/ssl_context.hpp"
+#include "simple-sftpd/utils/file_cache.hpp"
+#include "simple-sftpd/security/pam_auth.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

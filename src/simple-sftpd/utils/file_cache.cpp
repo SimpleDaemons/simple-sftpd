@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/file_cache.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/utils/file_cache.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <algorithm>
 #include <vector>
 #include <chrono>

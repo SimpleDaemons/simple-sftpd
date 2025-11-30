@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_virtual_host_manager.hpp"
-#include "simple-sftpd/ftp_virtual_host.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/virtual_host/virtual_host_manager.hpp"
+#include "simple-sftpd/virtual_host/virtual_host.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <vector>
 #include <string>
 

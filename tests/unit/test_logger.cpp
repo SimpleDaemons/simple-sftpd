@@ -15,7 +15,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <fstream>
 #include <filesystem>
 #include <sstream>

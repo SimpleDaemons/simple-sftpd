@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <iostream>
 #include <sstream>
 #include <iomanip>

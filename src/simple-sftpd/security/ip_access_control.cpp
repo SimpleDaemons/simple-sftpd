@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ip_access_control.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/security/ip_access_control.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <sstream>
 #include <algorithm>
 

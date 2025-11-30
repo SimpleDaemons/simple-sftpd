@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_rate_limiter.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/security/rate_limiter.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <chrono>
 
 namespace simple_sftpd {
