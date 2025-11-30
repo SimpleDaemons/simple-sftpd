@@ -102,21 +102,21 @@ endif()
 
 # Add source files for testing (without main.cpp)
 target_sources(simple-sftpd-tests PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/core/ftp_user.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/core/ftp_user_manager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/core/ftp_rate_limiter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/core/ftp_connection_manager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/core/ftp_connection.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/core/ftp_server.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/ftp_server_config.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/logger.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/ssl_context.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/ip_access_control.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/performance_monitor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/file_cache.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/compression.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/pam_auth.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/vulnerability_scanner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/user/user.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/user/user_manager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/security/rate_limiter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/core/connection_manager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/core/connection.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/core/server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/config/server_config.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/utils/logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/security/ssl_context.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/security/ip_access_control.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/utils/performance_monitor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/utils/file_cache.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/utils/compression.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/security/pam_auth.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/simple-sftpd/utils/vulnerability_scanner.cpp
 )
 
 # Compiler options
