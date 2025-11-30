@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  simple-sftpd:
+    image: simple-sftpd:latest
+    container_name: simple-sftpd
+    ports:
+      - "21:21/tcp"
+    volumes:
+      - ./config:/etc/simple-sftpd:ro
+      - ./data:/var/lib/simple-sftpd
+      - ./logs:/var/log/simple-sftpd
+    environment:
+      - SIMPLE-SFTPD_CONFIG=/etc/simple-sftpd/simple-sftpd.conf
+      - SIMPLE-SFTPD_LOG_LEVEL=info
+      - SIMPLE-SFTPD_BIND_ADDRESS=0.0.0.0
+      - SIMPLE-SFTPD_BIND_PORT=21
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "21"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - simple-sftpd-network
+
+networks:
+  simple-sftpd-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16
