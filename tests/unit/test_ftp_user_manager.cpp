@@ -15,8 +15,8 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-sftpd/user_manager.hpp"
-#include "simple-sftpd/user.hpp"
+#include "simple-sftpd/user/user_manager.hpp"
+#include "simple-sftpd/user/user.hpp"
 #include "simple-sftpd/utils/logger.hpp"
 #include <memory>
 
