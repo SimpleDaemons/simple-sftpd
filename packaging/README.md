@@ -1,394 +1,179 @@
-# Packaging Guide
+# Packaging Templates
 
-This directory contains packaging configurations for building distribution packages for multiple platforms and package managers.
+This directory contains templates for creating installers and packages for {PROJECT_NAME} across different platforms.
 
-## 📦 Supported Package Formats
+## Directory Structure
 
-### Linux
-- **RPM** - Red Hat, CentOS, Fedora, RHEL, SUSE
-- **DEB** - Debian, Ubuntu, Linux Mint
-- **Generic** - Source tarballs, manual installation
+```
+packaging/
+├── macos/
+│   ├── pkg/                    # macOS PackageMaker (PKG) installer
+│   │   ├── Distribution.xml     # Package distribution configuration
+│   │   ├── PackageInfo.xml      # Package metadata
+│   │   └── scripts/
+│   │       └── postinstall      # Post-installation script
+│   └── dmg/                     # macOS Disk Image (DMG)
+│       └── create-dmg.sh        # DMG creation script
+├── windows/
+│   ├── nsis/                    # NSIS installer
+│   │   └── installer.nsi        # NSIS installer script
+│   └── msi/                     # Windows Installer (MSI)
+│       └── installer.wxs        # WiX installer script
+├── linux/
+│   ├── deb/                     # Debian/Ubuntu packages
+│   │   ├── control              # Debian control file
+│   │   └── postinst             # Post-installation script with license
+│   └── rpm/                     # Red Hat/CentOS packages
+│       └── {PROJECT_NAME}.spec  # RPM spec file with license
+├── assets/
+│   ├── icons/                   # Installer icons and graphics
+│   │   ├── {PROJECT_NAME}.ico   # Windows icon
+│   │   ├── {PROJECT_NAME}.icns  # macOS icon
+│   │   ├── header.bmp           # NSIS header image
+│   │   ├── wizard.bmp           # NSIS wizard image
+│   │   ├── background.png       # PKG background
+│   │   └── dmg-background.png   # DMG background
+│   ├── welcome.html             # Welcome page for PKG
+│   ├── readme.html              # Read me page
+│   └── conclusion.html          # Installation complete page
+└── licenses/
+    ├── LICENSE.txt              # Plain text license
+    └── LICENSE.rtf               # Rich text license for Windows
+```
+
+## Features
+
+### License Acceptance
+- **macOS PKG**: License displayed and must be accepted
+- **Windows NSIS/MSI**: License page with acceptance required
+- **Linux DEB/RPM**: License displayed during installation with acceptance prompt
+
+### Custom Icons and Graphics
+- Windows: `.ico` files for application and installer
+- macOS: `.icns` files for application, PNG for backgrounds
+- Custom header/wizard images for NSIS installers
+- DMG background images
+
+### Platform-Specific Features
+
+#### macOS PKG
+- Modern installer with welcome/readme/conclusion pages
+- License acceptance
+- Post-installation scripts
+- Service user creation
+- LaunchDaemon integration
+
+#### macOS DMG
+- Custom background image
+- Applications symlink
+- License and README included
+- Compressed format (UDZO)
+
+#### Windows NSIS
+- Modern UI with custom graphics
+- License acceptance page
+- Component selection
+- Start Menu shortcuts
+- Windows Service installation
+- Uninstaller included
+
+#### Windows MSI
+- WiX-based installer
+- License acceptance
+- Service installation
+- Registry entries
+- Upgrade support
+
+#### Linux DEB
+- License acceptance during installation
+- Service user creation
+- Systemd integration
+- Configuration file installation
+
+#### Linux RPM
+- License acceptance in %pre section
+- Service user creation
+- Systemd integration
+- Proper file placement
+
+## Usage
+
+### Building Packages
+
+#### macOS PKG
+```bash
+# Build the project first
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+
+# Create package
+cpack -G PackageMaker
+```
+
+#### macOS DMG
+```bash
+# After creating PKG
+cd packaging/macos/dmg
+./create-dmg.sh 1.0.0
+```
+
+#### Windows NSIS
+```bash
+# Build NSIS installer
+makensis packaging/windows/nsis/installer.nsi
+```
+
+#### Windows MSI
+```bash
+# Build with WiX
+candle packaging/windows/msi/installer.wxs
+light installer.wixobj
+```
+
+#### Linux DEB
+```bash
+# Build Debian package
+dpkg-buildpackage -us -uc
+```
+
+#### Linux RPM
+```bash
+# Build RPM package
+rpmbuild -ba packaging/linux/rpm/{PROJECT_NAME}.spec
+```
+
+## Template Variables
+
+Replace these placeholders in templates:
+- `{PROJECT_NAME}` - Project name (e.g., simple-dhcpd)
+- `{PROJECT_USER}` - Service user name (e.g., dhcpdev)
+- `{PROJECT_GROUP}` - Service group name
+- `{PROTOCOL}` - Protocol name (e.g., DHCP, NTP)
+- `${VERSION}` - Version number (set during build)
+
+## Icon Requirements
 
 ### Windows
-- **NSIS Installer** - Windows executable installer (.exe)
-- **MSI** - Windows Installer package (planned)
-- **Chocolatey** - Windows package manager (planned)
+- **Application Icon**: 256x256, `.ico` format
+- **Header Image**: 150x57, `.bmp` format
+- **Wizard Image**: 164x314, `.bmp` format
 
 ### macOS
-- **Homebrew** - macOS package manager (planned)
-- **DMG** - macOS disk image installer (planned)
+- **Application Icon**: 512x512, `.icns` format
+- **Background**: 620x418, `.png` format
+- **DMG Background**: 658x498, `.png` format
 
-## 🏗️ Building Packages
+## License Files
 
-### Prerequisites
+- **LICENSE.txt**: Plain text license (for all platforms)
+- **LICENSE.rtf**: Rich text format license (for Windows MSI)
 
-#### For RPM Packages
-```bash
-# CentOS/RHEL/Fedora
-sudo yum install rpm-build rpmdevtools
-# or
-sudo dnf install rpm-build rpmdevtools
+## Notes
 
-# Ubuntu/Debian
-sudo apt install rpm rpm-build
-```
+- All scripts must be executable (`chmod +x`)
+- License files must be present in `packaging/licenses/`
+- Icon files must be present in `packaging/assets/icons/`
+- Update GUIDs in MSI/WiX templates with unique values
+- Test installers on clean systems before distribution
 
-#### For DEB Packages
-```bash
-# Ubuntu/Debian
-sudo apt install build-essential devscripts debhelper dh-make
-
-# CentOS/RHEL/Fedora
-sudo yum install rpm-build rpmdevtools
-# or
-sudo dnf install rpm-build rpmdevtools
-```
-
-#### For Windows Installers
-```bash
-# Install NSIS (Nullsoft Scriptable Install System)
-# Download from: https://nsis.sourceforge.io/Download
-# or use Chocolatey: choco install nsis
-
-# Install NSSM (Non-Sucking Service Manager)
-# Download from: https://nssm.cc/
-```
-
-### Building RPM Packages
-
-#### 1. Setup RPM Build Environment
-```bash
-# Create RPM build structure
-rpmdev-setuptree
-
-# Copy source to RPM build directory
-cp simple-sftpd-0.1.0.tar.gz ~/rpmbuild/SOURCES/
-cp packaging/rpm/simple-sftpd.spec ~/rpmbuild/SPECS/
-```
-
-#### 2. Build RPM Package
-```bash
-# Build the package
-rpmbuild -ba ~/rpmbuild/SPECS/simple-sftpd.spec
-
-# The package will be created in ~/rpmbuild/RPMS/
-```
-
-#### 3. Install RPM Package
-```bash
-# Install the package
-sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/simple-sftpd-0.1.0-1.el8.x86_64.rpm
-
-# Or upgrade existing installation
-sudo rpm -Uvh ~/rpmbuild/RPMS/x86_64/simple-sftpd-0.1.0-1.el8.x86_64.rpm
-```
-
-### Building DEB Packages
-
-#### 1. Setup DEB Build Environment
-```bash
-# Create package directory
-mkdir simple-sftpd-0.1.0
-cd simple-sftpd-0.1.0
-
-# Copy source files
-cp -r ../src ../include ../cmake ../deployment ../etc ../docs ./
-cp ../CMakeLists.txt ../LICENSE ../README.md ./
-
-# Copy Debian packaging files
-cp -r ../packaging/deb/debian ./
-```
-
-#### 2. Build DEB Package
-```bash
-# Build the package
-debuild -b -us -uc
-
-# The package will be created in the parent directory
-```
-
-#### 3. Install DEB Package
-```bash
-# Install the package
-sudo dpkg -i ../simple-sftpd_0.1.0_amd64.deb
-
-# Fix dependencies if needed
-sudo apt-get install -f
-```
-
-### Building Windows Installers
-
-#### 1. Prepare Windows Build
-```bash
-# Cross-compile for Windows (if building on Linux/macOS)
-# Or build natively on Windows
-
-# Ensure all required files are present:
-# - simple-sftpd.exe
-# - simple-sftpd-site.exe
-# - simple-sftpd-module.exe
-# - *.dll files
-# - deployment/ directory
-# - etc/windows/ directory
-# - docs/ directory
-# - nssm.exe
-# - LICENSE file
-```
-
-#### 2. Build NSIS Installer
-```bash
-# Run NSIS compiler
-makensis packaging/windows/installer.nsi
-
-# The installer will be created as simple-sftpd-0.1.0-windows-x64.exe
-```
-
-#### 3. Install on Windows
-- Run the installer as Administrator
-- Follow the installation wizard
-- The service will be automatically installed and started
-
-## 📁 Package Contents
-
-### RPM Package Structure
-```
-simple-sftpd-0.1.0-1.el8.x86_64.rpm
-├── /usr/sbin/simple-sftpd
-├── /usr/sbin/simple-sftpd-site
-├── /usr/sbin/simple-sftpd-module
-├── /usr/lib64/libsimple-sftpd.so
-├── /usr/include/simple-sftpd/
-├── /etc/simple-sftpd/
-├── /etc/systemd/system/simple-sftpd.service
-├── /etc/rc.d/init.d/simple-sftpd
-├── /var/ftp/
-├── /var/log/simple-sftpd/
-└── /var/lib/simple-sftpd/
-```
-
-### DEB Package Structure
-```
-simple-sftpd_0.1.0_amd64.deb
-├── /usr/sbin/simple-sftpd
-├── /usr/sbin/simple-sftpd-site
-├── /usr/sbin/simple-sftpd-module
-├── /usr/lib/x86_64-linux-gnu/libsimple-sftpd.so
-├── /usr/include/simple-sftpd/
-├── /etc/simple-sftpd/
-├── /etc/systemd/system/simple-sftpd.service
-├── /etc/init.d/simple-sftpd
-├── /var/ftp/
-├── /var/log/simple-sftpd/
-└── /var/lib/simple-sftpd/
-```
-
-### Windows Installer Structure
-```
-simple-sftpd-0.1.0-windows-x64.exe
-├── C:\Program Files\simple-sftpd\
-│   ├── simple-sftpd.exe
-│   ├── simple-sftpd-site.exe
-│   ├── simple-sftpd-module.exe
-│   ├── *.dll
-│   ├── etc\deployment\
-│   ├── etc\windows\
-│   ├── docs\
-│   ├── logs\
-│   ├── var\
-│   └── ssl\
-└── Windows Service: simple-sftpd
-```
-
-## 🔧 Package Configuration
-
-### Service Management
-
-#### systemd (Modern Linux)
-```bash
-# Enable and start service
-sudo systemctl enable simple-sftpd
-sudo systemctl start simple-sftpd
-
-# Check status
-sudo systemctl status simple-sftpd
-
-# Reload configuration
-sudo systemctl reload simple-sftpd
-```
-
-#### SysV init (Traditional Linux)
-```bash
-# Start service
-sudo /etc/init.d/simple-sftpd start
-
-# Check status
-sudo /etc/init.d/simple-sftpd status
-
-# Reload configuration
-sudo /etc/init.d/simple-sftpd reload
-```
-
-#### Windows Service
-```bash
-# Start service
-net start simple-sftpd
-
-# Stop service
-net stop simple-sftpd
-
-# Check status
-sc query simple-sftpd
-```
-
-### Configuration Management
-
-#### Enable/Disable Sites
-```bash
-# Enable site
-sudo simple-sftpd-site enable example.com
-
-# Disable site
-sudo simple-sftpd-site disable example.com
-
-# List sites
-simple-sftpd-site list
-```
-
-#### Enable/Disable Modules
-```bash
-# Enable module
-sudo simple-sftpd-module enable ssl
-
-# Disable module
-sudo simple-sftpd-module disable rate_limit
-
-# List modules
-simple-sftpd-module list
-```
-
-## 🚀 Quick Package Installation
-
-### Ubuntu/Debian
-```bash
-# Add repository (when available)
-# sudo apt-add-repository ppa:simple-sftpd/stable
-# sudo apt update
-
-# Install package
-sudo apt install simple-sftpd
-
-# Start service
-sudo systemctl start simple-sftpd
-sudo systemctl enable simple-sftpd
-```
-
-### CentOS/RHEL/Fedora
-```bash
-# Install package
-sudo yum install simple-sftpd
-# or
-sudo dnf install simple-sftpd
-
-# Start service
-sudo systemctl start simple-sftpd
-sudo systemctl enable simple-sftpd
-```
-
-### Windows
-```bash
-# Download and run installer as Administrator
-# The service will be automatically installed and started
-```
-
-## 📊 Package Verification
-
-### Verify Package Contents
-```bash
-# RPM
-rpm -qlp simple-sftpd-0.1.0-1.el8.x86_64.rpm
-
-# DEB
-dpkg -c simple-sftpd_0.1.0_amd64.deb
-
-# Windows
-# Use NSIS installer to view contents
-```
-
-### Verify Installation
-```bash
-# Check if service is running
-sudo systemctl status simple-sftpd
-
-# Check configuration
-simple-sftpd --test-config --config /etc/simple-sftpd/deployment/simple-sftpd.conf
-
-# Check ports
-sudo netstat -tlnp | grep :21
-sudo netstat -tlnp | grep :990
-```
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-#### Package Installation Fails
-```bash
-# Check dependencies
-sudo apt-get install -f  # Debian/Ubuntu
-sudo yum check  # CentOS/RHEL
-
-# Check package integrity
-rpm -K package.rpm
-dpkg -I package.deb
-```
-
-#### Service Won't Start
-```bash
-# Check logs
-sudo journalctl -u simple-sftpd -f  # systemd
-sudo tail -f /var/log/simple-sftpd/simple-sftpd.log
-
-# Check configuration
-simple-sftpd --test-config --config /etc/simple-sftpd/deployment/simple-sftpd.conf
-
-# Check permissions
-sudo ls -la /etc/simple-sftpd/
-sudo ls -la /var/log/simple-sftpd/
-```
-
-#### Port Conflicts
-```bash
-# Check what's using the ports
-sudo netstat -tlnp | grep :21
-sudo netstat -tlnp | grep :990
-
-# Stop conflicting services
-sudo systemctl stop vsftpd
-sudo systemctl stop pure-ftpd
-```
-
-## 📚 Additional Resources
-
-### Package Manager Documentation
-- [RPM Packaging Guide](https://rpm-packaging-guide.github.io/)
-- [Debian Policy Manual](https://www.debian.org/doc/debian-policy/)
-- [NSIS Documentation](https://nsis.sourceforge.io/Docs/)
-
-### Distribution-Specific Guides
-- [Fedora Packaging Guidelines](https://docs.fedoraproject.org/en-US/packaging-guidelines/)
-- [Ubuntu Packaging Guide](https://packaging.ubuntu.com/html/)
-- [CentOS Packaging Guidelines](https://wiki.centos.org/HowTos/PackageManagement/)
-
-### Community Support
-- [GitHub Issues](https://github.com/simple-sftpd/simple-sftpd/issues)
-- [Community Forum](https://community.simple-sftpd.org)
-- [Discord Server](https://discord.gg/simple-sftpd)
-
----
-
-**Next Steps**: 
-1. Choose your target platform and package format
-2. Install the required build tools
-3. Build and test the package
-4. Install and verify the package
-5. Configure and customize simple-sftpd for your needs
