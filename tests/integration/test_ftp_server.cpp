@@ -15,9 +15,9 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-sftpd/ftp_server.hpp"
-#include "simple-sftpd/ftp_server_config.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/server.hpp"
+#include "simple-sftpd/server_config.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <memory>
 #include <thread>
 #include <chrono>

@@ -15,7 +15,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-sftpd/ftp_user.hpp"
+#include "simple-sftpd/user.hpp"
 
 using namespace simple_sftpd;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_user.hpp"
+#include "simple-sftpd/user/user.hpp"
 
 namespace simple_sftpd {
 

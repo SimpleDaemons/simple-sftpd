@@ -24,13 +24,14 @@
 
 namespace simple_sftpd {
 
-class FTPServerConfig;
-class Logger;
-class FTPConnectionManager;
-class IPAccessControl;
-class PerformanceMonitor;
-class FileCache;
-class FTPRateLimiter;
+// Forward declarations
+namespace config { class FTPServerConfig; }
+namespace utils { class Logger; }
+namespace core { class FTPConnectionManager; }
+namespace security { class IPAccessControl; }
+namespace utils { class PerformanceMonitor; }
+namespace utils { class FileCache; }
+namespace security { class FTPRateLimiter; }
 
 class FTPServer {
 public:

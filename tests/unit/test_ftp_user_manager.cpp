@@ -15,9 +15,9 @@
  */
 
 #include <gtest/gtest.h>
-#include "simple-sftpd/ftp_user_manager.hpp"
-#include "simple-sftpd/ftp_user.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/user_manager.hpp"
+#include "simple-sftpd/user.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <memory>
 
 using namespace simple_sftpd;

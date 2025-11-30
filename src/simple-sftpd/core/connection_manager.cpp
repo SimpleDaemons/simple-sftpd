@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_connection_manager.hpp"
-#include "simple-sftpd/ftp_connection.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/core/connection_manager.hpp"
+#include "simple-sftpd/core/connection.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <atomic>
 #include <algorithm>
 

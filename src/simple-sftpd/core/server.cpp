@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/ftp_server.hpp"
-#include "simple-sftpd/logger.hpp"
-#include "simple-sftpd/ftp_connection_manager.hpp"
-#include "simple-sftpd/ftp_connection.hpp"
-#include "simple-sftpd/ftp_server_config.hpp"
-#include "simple-sftpd/ftp_user_manager.hpp"
-#include "simple-sftpd/ftp_user.hpp"
-#include "simple-sftpd/ip_access_control.hpp"
-#include "simple-sftpd/performance_monitor.hpp"
-#include "simple-sftpd/file_cache.hpp"
-#include "simple-sftpd/ftp_rate_limiter.hpp"
+#include "simple-sftpd/core/server.hpp"
+#include "simple-sftpd/utils/logger.hpp"
+#include "simple-sftpd/core/connection_manager.hpp"
+#include "simple-sftpd/core/connection.hpp"
+#include "simple-sftpd/config/server_config.hpp"
+#include "simple-sftpd/user/user_manager.hpp"
+#include "simple-sftpd/user/user.hpp"
+#include "simple-sftpd/security/ip_access_control.hpp"
+#include "simple-sftpd/utils/performance_monitor.hpp"
+#include "simple-sftpd/utils/file_cache.hpp"
+#include "simple-sftpd/security/rate_limiter.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

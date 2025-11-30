@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/performance_monitor.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/utils/performance_monitor.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 
 namespace simple_sftpd {
 

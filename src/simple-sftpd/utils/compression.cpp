@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "simple-sftpd/compression.hpp"
-#include "simple-sftpd/logger.hpp"
+#include "simple-sftpd/utils/compression.hpp"
+#include "simple-sftpd/utils/logger.hpp"
 #include <zlib.h>
 #include <bzlib.h>
 

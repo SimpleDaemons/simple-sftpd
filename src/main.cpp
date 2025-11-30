@@ -14,11 +14,11 @@
 #include <thread>
 #include <chrono>
 #include <atomic>
-#include "simple-sftpd/ftp_server.hpp"
-#include "simple-sftpd/ftp_server_config.hpp"
-#include "simple-sftpd/logger.hpp"
-#include "simple-sftpd/ftp_user_manager.hpp"
-#include "simple-sftpd/ftp_user.hpp"
+#include "simple-sftpd/core/server.hpp"
+#include "simple-sftpd/config/server_config.hpp"
+#include "simple-sftpd/utils/logger.hpp"
+#include "simple-sftpd/user/user_manager.hpp"
+#include "simple-sftpd/user/user.hpp"
 
 using namespace simple_sftpd;
 
