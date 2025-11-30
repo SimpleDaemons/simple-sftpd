@@ -270,7 +270,7 @@ This document summarizes the major improvements and feature completions made in 
 - [FEATURE_AUDIT.md](FEATURE_AUDIT.md) - Detailed feature status
 - [ROADMAP_CHECKLIST.md](ROADMAP_CHECKLIST.md) - Roadmap tracking
 - [PROJECT_STATUS.md](PROJECT_STATUS.md) - Overall project status
-- [ROADMAP.md](ROADMAP.md) - Future roadmap
+- [ROADMAP.md](../ROADMAP.md) - Future roadmap
 
 ---
 
