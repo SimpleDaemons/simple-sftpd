@@ -1,0 +1,15 @@
+#!/bin/bash
+# Pre-removal script for simple-sftpd
+
+set -e
+
+PROJECT_NAME="simple-sftpd"
+
+if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
+    # Stop service before removal
+    systemctl stop "$simple-sftpd" 2>/dev/null || true
+    systemctl disable "$simple-sftpd" 2>/dev/null || true
+fi
+
+exit 0
+
