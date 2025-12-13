@@ -12,10 +12,10 @@ graph TB
 
     subgraph "FTP Server"
         Server[simple-sftpd<br/>Main Process]
-        Config[/etc/simple-sftpd/<br/>Configuration]
-        UserDB[/etc/simple-sftpd/users<br/>User Database]
-        Logs[/var/log/simple-sftpd/<br/>Access/Transfer Logs]
-        DataDir[/var/ftp<br/>Data Directory]
+        Config[Configuration<br/>/etc/simple-sftpd/]
+        UserDB[User Database<br/>/etc/simple-sftpd/users]
+        Logs[Access/Transfer Logs<br/>/var/log/simple-sftpd/]
+        DataDir[Data Directory<br/>/var/ftp]
     end
 
     subgraph "System Services"
@@ -93,13 +93,13 @@ graph TB
     subgraph "Domain 1"
         Client1_1[Client 1.1]
         Client1_2[Client 1.2]
-        DataDir1[/var/ftp/example1<br/>Domain 1 Data]
+        DataDir1[Domain 1 Data<br/>/var/ftp/example1]
     end
 
     subgraph "Domain 2"
         Client2_1[Client 2.1]
         Client2_2[Client 2.2]
-        DataDir2[/var/ftp/example2<br/>Domain 2 Data]
+        DataDir2[Domain 2 Data<br/>/var/ftp/example2]
     end
 
     Client1_1 --> VirtualHost1
