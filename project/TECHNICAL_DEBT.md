@@ -1,8 +1,14 @@
 # Simple Secure FTP Daemon - Technical Debt
 
-**Date:** December 2024  
-**Current Version:** 0.1.0  
-**Purpose:** Track technical debt, known issues, and areas requiring improvement
+**Date:** January 2025  
+**Current Version:** Production v0.1.0  
+**Purpose:** Track technical debt, known issues, and areas requiring improvement  
+**Product Version:** Production Version (Apache 2.0)
+
+**Product Versions:**
+- **🏭 Production Version (Apache 2.0):** ✅ In Development - Technical debt tracked here
+- **🏢 Enterprise Version (BSL 1.1):** ⏳ Planned - No technical debt yet
+- **🏛️ Datacenter Version (BSL 1.1):** ⏳ Planned - No technical debt yet
 
 ---
 
@@ -334,6 +340,7 @@ This document tracks technical debt, known issues, code quality improvements, an
 
 ---
 
-*Last Updated: December 2024*  
-*Next Review: After test coverage expansion*
+*Last Updated: January 2025*  
+*Next Review: After Production v0.1.0 release*  
+*Focus: Production Version (Apache 2.0)*
 
