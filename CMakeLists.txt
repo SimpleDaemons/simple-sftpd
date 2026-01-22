@@ -52,12 +52,19 @@ endif()
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# Source files
-file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c")
+# Source files - exclude src/core/ to avoid duplicates with src/simple-sftpd/
+file(GLOB_RECURSE SOURCES 
+    "src/simple-sftpd/*.cpp"
+    "src/production/*.cpp"
+    "src/*.c"
+)
 file(GLOB_RECURSE HEADERS "include/*.hpp" "include/*.h")
 
+# Main entry point
+set(MAIN_SOURCE "main/production.cpp")
+
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_executable(${PROJECT_NAME} ${SOURCES} ${MAIN_SOURCE} ${HEADERS})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} Threads::Threads)

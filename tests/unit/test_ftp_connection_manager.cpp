@@ -43,7 +43,7 @@ protected:
 };
 
 TEST_F(FTPConnectionManagerTest, Constructor) {
-    EXPECT_EQ(manager_->getConnectionCount(), 0);
+    EXPECT_EQ(manager_->getConnectionCount(), 0U);
 }
 
 TEST_F(FTPConnectionManagerTest, StartStop) {
@@ -54,7 +54,7 @@ TEST_F(FTPConnectionManagerTest, StartStop) {
 }
 
 TEST_F(FTPConnectionManagerTest, GetConnectionCountEmpty) {
-    EXPECT_EQ(manager_->getConnectionCount(), 0);
+    EXPECT_EQ(manager_->getConnectionCount(), 0U);
 }
 
 TEST_F(FTPConnectionManagerTest, GetConnectionsEmpty) {

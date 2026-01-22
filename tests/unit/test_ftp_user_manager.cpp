@@ -87,23 +87,23 @@ TEST_F(FTPUserManagerTest, ListUsers) {
     manager_->addUser(std::make_shared<FTPUser>("user3", "pass3", "/home/user3"));
     
     auto usernames = manager_->listUsers();
-    EXPECT_EQ(usernames.size(), 3);
+    EXPECT_EQ(usernames.size(), 3U);
 }
 
 TEST_F(FTPUserManagerTest, UserCount) {
     auto usernames = manager_->listUsers();
-    EXPECT_EQ(usernames.size(), 0);
+    EXPECT_EQ(usernames.size(), 0U);
     
     manager_->addUser(std::make_shared<FTPUser>("user1", "pass1", "/home/user1"));
     usernames = manager_->listUsers();
-    EXPECT_EQ(usernames.size(), 1);
+    EXPECT_EQ(usernames.size(), 1U);
     
     manager_->addUser(std::make_shared<FTPUser>("user2", "pass2", "/home/user2"));
     usernames = manager_->listUsers();
-    EXPECT_EQ(usernames.size(), 2);
+    EXPECT_EQ(usernames.size(), 2U);
     
     manager_->removeUser("user1");
     usernames = manager_->listUsers();
-    EXPECT_EQ(usernames.size(), 1);
+    EXPECT_EQ(usernames.size(), 1U);
 }
 
