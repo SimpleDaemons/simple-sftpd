@@ -1,124 +1,211 @@
-# simple-sftpd Documentation
+# Simple Secure FTP Daemon Documentation
 
-Welcome to the comprehensive documentation for **Simple-Secure FTP Daemon (simple-sftpd)**, a secure, configurable, and feature-rich FTP server written in C++.
+Welcome to the Simple Secure FTP Daemon documentation. This guide will help you understand, configure, and deploy the Simple Secure FTP Daemon effectively.
 
-## 📚 Documentation Overview
+## Product Versions
 
-This documentation is organized into several sections to help you find the information you need quickly and efficiently.
+Simple Secure FTP Daemon is available in three versions, each designed for different deployment scenarios:
 
-### 🚀 Getting Started
-- **[Installation Guide](installation/README.md)** - Complete installation instructions for all platforms
-- **[Quick Start Guide](getting-started/README.md)** - Get up and running in minutes
-- **[Configuration Basics](configuration/README.md)** - Essential configuration concepts
+### 🏭 Production Version
+**License:** Apache 2.0  
+**Status:** ✅ In Development  
+**Target:** Small to medium deployments, single-server installations
 
-### 👥 User Guides
-- **[User Guide](user-guide/README.md)** - Complete user manual and reference
-- **[Examples](examples/README.md)** - Practical examples and use cases
-- **[Troubleshooting](user-guide/troubleshooting.md)** - Common issues and solutions
+- Complete FTP protocol implementation (RFC 959)
+- FTPS support (SSL/TLS)
+- Basic security features (authentication, ACLs)
+- Multi-format configuration (JSON, YAML, INI)
+- Hot reload configuration
+- Cross-platform support
 
-### 🔧 Development & API
-- **[Development Guide](development/README.md)** - Building from source and contributing
-- **[API Reference](api/README.md)** - Complete API documentation
-- **[Architecture](development/architecture.md)** - System design and architecture
+**Documentation:** [Production Version Documentation](production/README.md)
 
-### 📖 Reference Materials
-- **[Configuration Reference](configuration/reference.md)** - Complete configuration options
-- **[Command Line Reference](user-guide/commands.md)** - All available commands
-- **[Security Guide](user-guide/security.md)** - Security best practices
+### 🏢 Enterprise Version
+**License:** BSL 1.1 (Business Source License 1.1)  
+**Status:** 📋 Planned  
+**Target:** Large deployments, multi-server environments, enterprise integrations
 
-## 🎯 Quick Navigation
+- All Production Version features included
+- Web management interface
+- REST API for management
+- SNMP integration
+- Advanced authentication and authorization (RBAC, ACLs)
+- Advanced security (rate limiting, DDoS protection)
+- High availability and clustering
+- Advanced monitoring and observability
+- Plugin architecture
 
-| What You Need | Start Here |
-|---------------|------------|
-| **Install simple-sftpd** | [Installation Guide](installation/README.md) |
-| **Configure the server** | [Configuration Guide](configuration/README.md) |
-| **Learn basic usage** | [Quick Start](getting-started/README.md) |
-| **Find examples** | [Examples](examples/README.md) |
-| **Troubleshoot issues** | [Troubleshooting](user-guide/troubleshooting.md) |
-| **Build from source** | [Development Guide](development/README.md) |
-| **API reference** | [API Documentation](api/README.md) |
+**Documentation:** [Enterprise Version Documentation](enterprise/README.md)
 
-## 🌟 Key Features
+### 🏛️ Datacenter Version
+**License:** BSL 1.1 (Business Source License 1.1)  
+**Status:** 📋 Planned  
+**Target:** Large-scale datacenter deployments, cloud environments, multi-site operations
 
-### 🔒 Security First
-- **SSL/TLS encryption** for secure file transfers (v0.2.0)
-- **User authentication** with username/password (PAM, LDAP in v0.2.0)
-- **Access control** and path restrictions (implemented)
-- **Path validation** and directory traversal protection (implemented)
-- **Chroot isolation** for enhanced security (v0.2.0)
+- All Enterprise Version features included
+- Horizontal scaling support
+- Multi-site synchronization
+- Cloud service integrations
+- Advanced performance optimizations
+- Multi-tenant support
+- Advanced analytics
 
-### 🚀 High Performance
-- **Multi-threaded architecture** for concurrent connections
-- **Connection management** with thread-safe tracking
-- **Rate limiting** to prevent abuse (implemented)
-- **Optimized I/O** with sendfile and memory mapping (v0.2.0)
-
-### 🏗️ Enterprise Ready
-- **Virtual hosting** for multiple domains
-- **Comprehensive logging** with rotation
-- **Monitoring and metrics** for production use
-- **Service integration** (systemd, launchd, Windows)
-
-### 🔧 Developer Friendly
-- **Modern C++17** codebase
-- **Comprehensive testing** with Google Test (46 tests passing)
-- **Cross-platform** support (Linux, macOS, Windows)
-- **Extensible architecture** for custom features
-- **Complete CLI** for server management
-
-## 📋 Prerequisites
-
-Before using simple-sftpd, ensure you have:
-
-- **C++17 Compiler**: GCC 7+, Clang 5+, or MSVC 2017+
-- **CMake 3.16+**: Build system
-- **OpenSSL**: SSL/TLS support
-- **jsoncpp**: JSON configuration parsing
-
-## 🚀 Quick Start
-
-```bash
-# Install from source
-git clone https://github.com/simple-sftpd/simple-sftpd.git
-cd simple-sftpd
-make install-dev
-make build
-make install
-
-# Or install from packages
-sudo apt install simple-sftpd  # Ubuntu/Debian
-brew install simple-sftpd      # macOS
-```
-
-## 📖 Documentation Versions
-
-- **Current Version**: v0.1.0-alpha (85% complete)
-- **Documentation**: Always up-to-date with latest release
-- **API**: Covers all public interfaces
-- **Examples**: Tested and verified
-- **Status**: Core functionality complete, ready for final testing
-
-## 🤝 Contributing to Documentation
-
-We welcome contributions to improve this documentation:
-
-1. **Report Issues**: Found an error or unclear section?
-2. **Suggest Improvements**: Have ideas for better organization?
-3. **Submit Fixes**: Correct typos or add missing information
-4. **Add Examples**: Share your use cases and configurations
-
-See our [Contributing Guide](development/contributing.md) for details.
-
-## 📞 Support & Community
-
-- **Documentation Issues**: [GitHub Issues](https://github.com/simple-sftpd/simple-sftpd/issues)
-- **Questions**: [GitHub Discussions](https://github.com/simple-sftpd/simple-sftpd/discussions)
-- **Security Issues**: [Security Policy](https://github.com/simple-sftpd/simple-sftpd/security/policy)
-
-## 📄 License
-
-This documentation is licensed under the [Apache License, Version 2.0](LICENSE).
+**Documentation:** [Datacenter Version Documentation](datacenter/README.md)
 
 ---
 
-**Ready to get started?** Begin with the [Installation Guide](installation/README.md) or jump to [Quick Start](getting-started/README.md) if you're already familiar with FTP servers.
+## Documentation Structure
+
+### 📚 Shared Documentation
+Common documentation applicable to all versions:
+
+- **[Getting Started](shared/getting-started/)** - Installation and quick start guides
+- **[Configuration](shared/configuration/)** - Configuration reference and examples
+- **[Diagrams](shared/diagrams/)** - Architecture and flow diagrams
+- **[User Guide](shared/user-guide/)** - User documentation
+- **[Examples](shared/examples/)** - Usage examples
+- **[API Reference](shared/api/)** - API documentation
+
+### 🏭 Production Version Documentation
+- **[Production Guide](production/README.md)** - Complete Production Version documentation
+- **[Installation](production/installation.md)** - Production installation guide
+- **[Configuration](production/configuration.md)** - Production configuration reference
+- **[Deployment](production/deployment.md)** - Production deployment guide
+- **[Security](production/security.md)** - Production security best practices
+- **[Performance](production/performance.md)** - Production performance tuning
+- **[Operations](production/operations.md)** - Production operations guide
+
+### 🏢 Enterprise Version Documentation
+- **[Enterprise Guide](enterprise/README.md)** - Complete Enterprise Version documentation
+- **[Installation](enterprise/installation.md)** - Enterprise installation guide
+- **[Management Interface](enterprise/management.md)** - Web UI and REST API
+- **[High Availability](enterprise/high-availability.md)** - HA setup and configuration
+- **[Integrations](enterprise/integrations.md)** - SNMP and other integrations
+- **[Security](enterprise/security.md)** - Advanced security features
+- **[Operations](enterprise/operations.md)** - Enterprise operations guide
+
+### 🏛️ Datacenter Version Documentation
+- **[Datacenter Guide](datacenter/README.md)** - Complete Datacenter Version documentation
+- **[Installation](datacenter/installation.md)** - Datacenter installation guide
+- **[Multi-Site Setup](datacenter/multi-site.md)** - Multi-site configuration
+- **[Cloud Deployment](datacenter/cloud.md)** - Cloud deployment guides
+- **[Scaling](datacenter/scaling.md)** - Horizontal scaling and load balancing
+- **[Monitoring](datacenter/monitoring.md)** - Advanced monitoring and analytics
+
+### 👨‍💻 Developer Documentation
+Documentation for developers and contributors:
+
+- **[Developer Guide](development/README.md)** - Complete developer documentation
+- **[Build Guide](development/BUILD_GUIDE.md)** - Build commands and reference
+- **[Setup Guide](development/SETUP.md)** - Development environment setup
+
+---
+
+## Quick Start
+
+### Production Version
+1. [Install Simple Secure FTP Daemon](shared/getting-started/README.md)
+2. [Quick Start Guide](shared/getting-started/quick-start.md)
+3. [Production Configuration](production/configuration.md)
+4. [Production Deployment](production/deployment.md)
+
+### Enterprise Version
+1. [Install Simple Secure FTP Daemon](shared/getting-started/README.md)
+2. [Enterprise Setup](enterprise/README.md)
+3. [Management Interface](enterprise/management.md)
+4. [High Availability](enterprise/high-availability.md)
+
+### Datacenter Version
+1. [Install Simple Secure FTP Daemon](shared/getting-started/README.md)
+2. [Datacenter Setup](datacenter/README.md)
+3. [Multi-Site Configuration](datacenter/multi-site.md)
+4. [Scaling Guide](datacenter/scaling.md)
+
+---
+
+## Version Comparison
+
+| Feature | Production | Enterprise | Datacenter |
+|---------|-----------|------------|------------|
+| **License** | Apache 2.0 | BSL 1.1 | BSL 1.1 |
+| **FTP Protocol** | ✅ Complete | ✅ Complete | ✅ Complete |
+| **FTPS (SSL/TLS)** | ✅ | ✅ | ✅ |
+| **Basic Security** | ✅ | ✅ | ✅ |
+| **Multi-Format Config** | ✅ | ✅ | ✅ |
+| **Hot Reload** | ✅ | ✅ | ✅ |
+| **Web Management** | ❌ | ✅ | ✅ |
+| **REST API** | ❌ | ✅ | ✅ |
+| **SNMP Integration** | ❌ | ✅ | ✅ |
+| **Authentication/RBAC** | ✅ Basic | ✅ Advanced | ✅ Advanced |
+| **Rate Limiting** | ✅ Basic | ✅ Advanced | ✅ Advanced |
+| **High Availability** | ❌ | ✅ | ✅ |
+| **Clustering** | ❌ | ✅ | ✅ |
+| **Horizontal Scaling** | ❌ | ❌ | ✅ |
+| **Multi-Site Sync** | ❌ | ❌ | ✅ |
+| **Cloud Integration** | ❌ | ❌ | ✅ |
+| **Plugin System** | ❌ | ✅ | ✅ |
+| **Multi-Tenant** | ❌ | ❌ | ✅ |
+
+---
+
+## Documentation by Topic
+
+### Getting Started
+- [Installation Guide](shared/getting-started/README.md) - Install on Linux, macOS, Windows
+- [Quick Start](shared/getting-started/quick-start.md) - Get running in minutes
+- [First Steps](shared/getting-started/first-steps.md) - Basic configuration
+
+### Configuration
+- [Configuration Reference](shared/configuration/README.md) - Complete configuration guide
+- [Production Configuration](production/configuration.md) - Production-specific configuration
+- [Enterprise Configuration](enterprise/configuration.md) - Enterprise-specific configuration
+- [Datacenter Configuration](datacenter/configuration.md) - Datacenter-specific configuration
+
+### Deployment
+- [Production Deployment](production/deployment.md) - Production deployment guide
+- [Enterprise Deployment](enterprise/deployment.md) - Enterprise deployment guide
+- [Datacenter Deployment](datacenter/deployment.md) - Datacenter deployment guide
+- [Docker Deployment](shared/deployment/docker.md) - Containerized deployment
+- [High Availability](enterprise/high-availability.md) - HA setup (Enterprise+)
+
+### Operations
+- [Production Operations](production/operations.md) - Production operations guide
+- [Monitoring](shared/deployment/monitoring.md) - Monitoring setup
+- [Backup Procedures](shared/deployment/backup-procedures.md) - Backup and restore
+- [Maintenance](shared/deployment/maintenance-procedures.md) - Maintenance procedures
+
+### Security
+- [Production Security](production/security.md) - Production security best practices
+- [Enterprise Security](enterprise/security.md) - Advanced security features
+- [Security Best Practices](shared/user-guide/security-best-practices.md) - General security guide
+
+### Performance
+- [Production Performance](production/performance.md) - Production performance tuning
+- [Enterprise Performance](enterprise/performance.md) - Enterprise performance optimization
+- [Datacenter Performance](datacenter/performance.md) - Datacenter scaling and optimization
+
+### Troubleshooting
+- [Common Issues](shared/troubleshooting/README.md) - Troubleshooting guide
+- [Debugging](shared/troubleshooting/debugging.md) - Debugging techniques
+- [Performance Issues](shared/troubleshooting/performance.md) - Performance troubleshooting
+
+---
+
+## Contributing to Documentation
+
+We welcome contributions to improve this documentation. Please see our [Contributing Guide](../CONTRIBUTING.md) for details on how to contribute.
+
+## Feedback
+
+If you find any issues with the documentation or have suggestions for improvement, please:
+
+1. Open an issue on [GitHub](https://github.com/SimpleDaemons/simple-sftpd/issues)
+2. Submit a pull request with your improvements
+3. Contact us at docs@simpledaemons.com
+
+---
+
+**Last Updated:** December 2024  
+**Production Version:** In Development  
+**Enterprise Version:** Planned  
+**Datacenter Version:** Planned
