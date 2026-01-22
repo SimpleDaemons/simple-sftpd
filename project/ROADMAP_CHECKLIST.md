@@ -1,24 +1,36 @@
 # Simple Secure FTP Daemon (simple-sftpd) - Roadmap Checklist
 
-This document provides a detailed checklist for tracking progress on the simple-sftpd development roadmap.
+This document provides a detailed checklist for tracking progress on the simple-sftpd development roadmap, organized by product version: **Production**, **Enterprise**, and **Datacenter**.
 
 ## 📊 Overall Progress
 
-**Current Version:** 0.1.0
-**Overall Progress:** 87% Complete
-**Status:** ✅ **RELEASED** - v0.1.0 Foundation Release
+**Current Version:** 0.1.0 (Production)  
+**Overall Progress:** 87% Complete (Production Version)  
+**Status:** ✅ **RELEASED** - v0.1.0 Foundation Release (Production)
+
+**Product Versions:**
+- 🏭 **Production** (Apache 2.0): ✅ In Development - 87% Complete
+- 🏢 **Enterprise** (BSL 1.1): ⏳ Planned - 0% Complete
+- 🏛️ **Datacenter** (BSL 1.1): ⏳ Planned - 0% Complete
 
 **Honest Assessment:** We have a working FTP server with core functionality implemented. File transfers work through passive mode data connections, all basic FTP commands are functional, CLI management is complete, and we have a comprehensive test suite. The server is nearly ready for v0.1.0 release.
 
 ---
 
-## 🎯 Version 0.1.0 - Foundation Release
+## 🏭 Production Version (Apache 2.0)
 
-**Target:** Q1 2025 (Revised from Q4 2024)
-**Status:** ✅ **RELEASED** - v0.1.0 released on 2025-11-27
+**License:** Apache 2.0  
+**Target:** Small to medium deployments, single-server installations  
+**Status:** ✅ In Development  
+**Current Progress:** 87% Complete
+
+### Version 0.1.0 - Foundation Release
+
+**Target:** Q1 2025 (Revised from Q4 2024)  
+**Status:** ✅ **RELEASED** - v0.1.0 released on 2025-11-27  
 **Progress:** 90% (27/30 items - remaining items require testing environments)
 
-### Network & Connection Management
+#### Network & Connection Management
 - [x] **Socket Server** - TCP server implementation (v0.1.0)
   - ✅ Socket creation and binding
   - ✅ Listen on configured port
@@ -39,7 +51,7 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Proper thread cleanup
   - ⚠️ Could benefit from thread pool (v0.2.0)
 
-### Core Protocol Implementation
+#### Core Protocol Implementation
 - [x] **FTP Protocol (RFC 959)** - Basic FTP protocol implementation with core commands (v0.1.0)
   - ✅ Command parsing and routing
   - ✅ USER, PASS, QUIT, PWD, CWD, LIST, RETR, STOR, DELE, MKD, RMD, SIZE, TYPE, NOOP, SYST, FEAT
@@ -81,7 +93,7 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Read/write/list permission enforcement
   - ✅ User-based permission system
 
-### Security & Authentication
+#### Security & Authentication
 - [x] **SSL/TLS Support** - FTPS implementation with OpenSSL (v0.2.0)
   - ✅ OpenSSL integration implemented via `SSLContext`
   - ✅ TLS handshake implemented through `upgradeToSSL()`
@@ -120,7 +132,7 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Privileges dropped after socket bind and before connection handling
   - ✅ Configuration options exist
 
-### Configuration & Management
+#### Configuration & Management
 - [x] **Configuration System** - INI configuration parsing (v0.1.0)
   - ✅ FTPServerConfig class implemented
   - ✅ INI file parser working
@@ -140,11 +152,12 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Console and file output
   - ✅ Thread-safe logging
   - ✅ Timestamp with millisecond precision
-- [ ] **Statistics Collection** - Usage and performance metrics (v0.2.0)
-  - ❌ Connection statistics not collected
-  - ❌ Transfer statistics not collected
-  - ❌ Performance metrics missing
-  - ❌ No statistics API
+- [x] **Statistics Collection** - Usage and performance metrics (v0.2.0)
+  - ✅ PerformanceMonitor class implemented
+  - ✅ Connection statistics tracking
+  - ✅ Transfer statistics tracking
+  - ✅ Request and error counting
+  - ✅ Average transfer rate calculation
 - [x] **Service Integration** - systemd, launchd, Windows services (v0.1.0)
   - ✅ systemd service file created
   - ✅ launchd plist file created
@@ -164,7 +177,7 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Server control CLI implemented (start, stop, restart, status, reload, test)
   - ✅ PID file management
 
-### Build & Deployment
+#### Build & Deployment
 - [x] **CMake Build System** - Cross-platform build configuration (v0.1.0)
   - ✅ Modern CMake configuration
   - ✅ C++17 standard enforcement
@@ -198,7 +211,7 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ⚠️ Linux build needs verification (requires Linux environment)
   - ⚠️ Windows build needs verification (requires Windows environment)
 
-### Documentation & Testing
+#### Documentation & Testing
 - [x] **API Documentation** - Complete header documentation (v0.1.0)
   - ✅ Comprehensive header comments
   - ✅ Class documentation
@@ -234,25 +247,18 @@ This document provides a detailed checklist for tracking progress on the simple-
 
 ---
 
-## 🚀 Version 0.2.0 - Security & Performance
+### Version 0.2.0 - Security & Performance (Production)
 
-**Target:** Q2 2025 (Revised from Q1 2025)
-**Status:** ✅ **COMPLETE**
+**Target:** Q2 2025 (Revised from Q1 2025)  
+**Status:** ✅ **COMPLETE**  
 **Progress:** 100% (20/20 items)
 
-### Security Enhancements
-- [x] **SSL/TLS Support** - FTPS implementation with OpenSSL (v0.2.0)
-  - ✅ SSLContext class with OpenSSL integration
-  - ✅ AUTH TLS command support
-  - ✅ PBSZ and PROT commands for protection levels
-  - ✅ SSL-enabled control channel
-  - ⚠️ Data channel encryption pending (v0.2.1)
+#### Security Enhancements
 - [x] **PAM Integration** - Pluggable Authentication Modules (v0.2.0)
   - ✅ PAMAuth class implemented
   - ✅ PAM authentication integration
   - ✅ Fallback to local authentication
   - ✅ Linux PAM support
-- [ ] **LDAP/Active Directory** - Enterprise authentication (v0.3.0)
 - [x] **Certificate Authentication** - X.509 certificate support (v0.2.0)
   - ✅ Client certificate verification
   - ✅ SSL_VERIFY_PEER configuration
@@ -265,14 +271,6 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ Integration into server connection handling
 - [x] **Rate Limiting** - Connection and transfer rate limits (v0.1.0)
 - [x] **DoS Protection** - Attack prevention mechanisms (v0.1.0)
-- [x] **Chroot Support** - Directory restrictions (v0.2.0)
-  - ✅ Chroot implementation after authentication
-  - ✅ Configuration support
-  - ✅ Path normalization relative to chroot
-- [x] **Privilege Dropping** - Security hardening (v0.2.0)
-  - ✅ setuid/setgid after socket bind
-  - ✅ Configuration support for user/group
-  - ✅ Security hardening for production
 - [x] **Audit Logging** - Security event logging (v0.2.0)
   - ✅ Login success/failure logging
   - ✅ File operation audit logs
@@ -285,63 +283,39 @@ This document provides a detailed checklist for tracking progress on the simple-
   - ✅ File permission checking
   - ✅ SSL configuration validation
 
-### Performance Improvements
-- [x] **Active Mode Support** - Client-initiated data connections (v0.2.0)
-  - ✅ PORT command implementation
-  - ✅ Active mode data connections
-  - ✅ Dual-mode support (passive and active)
-- [ ] **Connection Pooling** - Optimized connection management (v0.2.0)
-- [ ] **Memory-mapped I/O** - Efficient large file handling (v0.2.0)
-- [ ] **Compression Support** - gzip, bzip2 compression (v0.2.0)
+#### Performance Improvements
 - [x] **Bandwidth Throttling** - QoS and traffic shaping (v0.2.0)
   - ✅ Transfer rate limiting for downloads
   - ✅ Transfer rate limiting for uploads
   - ✅ Per-connection and per-user rate limits
   - ✅ Time-based throttling implementation
-- [x] **File Transfer Resume** - Resume interrupted transfers (v0.2.0)
-  - ✅ REST command implementation
-  - ✅ Resume support in RETR and STOR
-  - ✅ Position tracking and file seeking
-- [x] **File Transfer Append** - Append to existing files (v0.2.0)
-  - ✅ APPE command implementation
-  - ✅ Append mode file uploads
-- [x] **Rename Operations** - File and directory renaming (v0.2.0)
-  - ✅ RNFR/RNTO command implementation
-  - ✅ Two-phase rename protocol
-  - ✅ File and directory rename support
-- [ ] **Load Balancing** - Multiple server instances (v0.3.0)
-- [ ] **Clustering Support** - Distributed deployment (v0.3.0)
 - [x] **Caching System** - Intelligent file caching (v0.2.0)
   - ✅ FileCache class with metadata caching
   - ✅ TTL-based expiration
   - ✅ LRU eviction policy
   - ✅ Cache hit/miss statistics
   - ✅ Integration ready for file operations
-- [x] **Performance Monitoring** - Real-time performance metrics (v0.2.0)
-  - ✅ PerformanceMonitor class implemented
-  - ✅ Connection statistics tracking
-  - ✅ Transfer statistics tracking
-  - ✅ Request and error counting
-  - ✅ Average transfer rate calculation
-
-### Advanced Features
 - [x] **IPv6 Support** - Full IPv6 compatibility (v0.2.0)
   - ✅ IPv6 dual-stack support
   - ✅ IPV6_V6ONLY disabled for dual-stack
   - ✅ IPv6 socket support
-- [ ] **SFTP Protocol** - SSH File Transfer Protocol (v0.3.0)
-- [ ] **Webhook Support** - Event notifications (v0.3.0)
-- [ ] **Plugin System** - Custom extension framework (v0.3.0)
+
+#### Advanced Features (Production)
+- [ ] **Connection Pooling** - Optimized connection management (v0.2.0)
+- [ ] **Memory-mapped I/O** - Efficient large file handling (v0.2.0)
+- [ ] **Compression Support** - gzip, bzip2 compression (v0.2.0)
+  - ✅ Compression class implemented (90% complete)
+  - ❌ Not yet integrated into file transfer operations
 
 ---
 
-## 🌐 Version 0.3.0 - Virtual Hosting & Advanced Features
+### Version 0.3.0 - Virtual Hosting (Production)
 
-**Target:** Q2 2025
-**Status:** ⏳ **PLANNED**
-**Progress:** 0% (0/18 items)
+**Target:** Q2 2025  
+**Status:** ⏳ **PLANNED**  
+**Progress:** 20% (structure only)
 
-### Virtual Hosting
+#### Virtual Hosting
 - [ ] **Multi-domain Support** - Multiple FTP sites on one server
 - [ ] **Per-host Configuration** - Individual settings per domain
 - [ ] **SSL Certificate Management** - Separate certificates per host
@@ -349,70 +323,339 @@ This document provides a detailed checklist for tracking progress on the simple-
 - [ ] **Dynamic Configuration** - Runtime host management
 - [ ] **Custom Error Pages** - Branded error responses
 
-### Advanced User Management
+#### Advanced User Management (Production)
 - [ ] **Group Management** - User groups and inheritance
 - [ ] **Quota System** - Storage and bandwidth limits
 - [ ] **Session Management** - Concurrent session limits
 - [ ] **Guest Accounts** - Temporary access accounts
-- [ ] **Two-Factor Authentication** - TOTP, SMS, email
-- [ ] **OAuth2 Integration** - Modern authentication
+- [ ] **Persistent User Storage** - Database/file-based user management
 
-### Management Interface
+---
+
+## 🏢 Enterprise Version (BSL 1.1)
+
+**License:** Business Source License 1.1  
+**Target:** Large deployments, multi-server environments, enterprise integrations  
+**Status:** ⏳ Planned  
+**Current Progress:** 0% Complete
+
+**Includes:** All Production Version features plus Enterprise-specific features below.
+
+---
+
+### Enterprise v0.1.0 - Foundation & Management Interface
+
+**Target:** Q3 2025  
+**Status:** ⏳ **PLANNED**  
+**Progress:** 0% (0/15 items)
+
+#### Management Interface
 - [ ] **Web Administration** - Browser-based management
+  - [ ] Dashboard with server status
+  - [ ] Real-time connection monitoring
+  - [ ] Configuration management UI
+  - [ ] User management interface
+  - [ ] Log viewer with filtering
+  - [ ] Statistics and analytics dashboard
 - [ ] **REST API** - Programmatic management interface
+  - [ ] Server control endpoints (start, stop, restart, status)
+  - [ ] User management endpoints (CRUD operations)
+  - [ ] Configuration management endpoints
+  - [ ] Statistics and monitoring endpoints
+  - [ ] Authentication and authorization
+  - [ ] API documentation (OpenAPI/Swagger)
 - [ ] **Real-time Monitoring** - Live statistics and status
+  - [ ] WebSocket support for real-time updates
+  - [ ] Live connection monitoring
+  - [ ] Real-time transfer statistics
+  - [ ] Performance metrics streaming
 - [ ] **Configuration Management** - Web-based config editor
+  - [ ] Visual configuration editor
+  - [ ] Configuration validation
+  - [ ] Hot reload support
+  - [ ] Configuration versioning
 - [ ] **User Management Interface** - Web-based user admin
-- [ ] **Log Viewer** - Web-based log viewing
-
-### Integration Features
-- [ ] **Database Integration** - User and config storage
-- [ ] **Message Queue Support** - Asynchronous processing
-- [ ] **File Versioning** - Version control integration
+  - [ ] User CRUD operations via web UI
+  - [ ] Permission management
+  - [ ] Group management
+  - [ ] Bulk user operations
 
 ---
 
-## ☁️ Version 0.4.0 - Enterprise & Cloud
+### Enterprise v0.2.0 - High Availability & Clustering
 
-**Target:** Q3 2025
-**Status:** ⏳ **PLANNED**
-**Progress:** 0% (0/16 items)
+**Target:** Q3 2025  
+**Status:** ⏳ **PLANNED**  
+**Progress:** 0% (0/12 items)
 
-### Enterprise Features
+#### High Availability
 - [ ] **High Availability** - Failover and redundancy
-- [ ] **Distributed Storage** - Multiple storage backends
-- [ ] **Cloud Storage Integration** - S3, Azure, GCP support
-- [ ] **Advanced Monitoring** - Comprehensive alerting
-- [ ] **Compliance Reporting** - SOX, HIPAA, GDPR support
-- [ ] **Backup Integration** - Automated backup systems
+  - [ ] Active-passive failover
+  - [ ] Health checking and monitoring
+  - [ ] Automatic failover
+  - [ ] State synchronization
+  - [ ] Virtual IP management
+- [ ] **Clustering Support** - Distributed deployment
+  - [ ] Multi-node cluster support
+  - [ ] Cluster coordination
+  - [ ] Shared state management
+  - [ ] Load distribution
+  - [ ] Cluster health monitoring
 
-### Cloud Integration
-- [ ] **Kubernetes Deployment** - K8s operators and manifests
-- [ ] **Auto-scaling** - Dynamic resource allocation
-- [ ] **Cloud Load Balancing** - Cloud-native load balancing
-- [ ] **Infrastructure as Code** - Terraform, CloudFormation
-- [ ] **CI/CD Integration** - Pipeline automation
-- [ ] **Cloud Monitoring** - CloudWatch, Azure Monitor, GCP
+#### Enterprise Authentication
+- [ ] **LDAP/Active Directory** - Enterprise authentication
+  - [ ] LDAP authentication integration
+  - [ ] Active Directory integration
+  - [ ] Group membership support
+  - [ ] Attribute mapping
+- [ ] **Two-Factor Authentication** - TOTP, SMS, email
+  - [ ] TOTP support
+  - [ ] SMS-based 2FA
+  - [ ] Email-based 2FA
+  - [ ] Backup codes
+- [ ] **OAuth2 Integration** - Modern authentication
+  - [ ] OAuth2 provider support
+  - [ ] SAML support
+  - [ ] SSO integration
 
-### Advanced Security
-- [ ] **Zero Trust Architecture** - Modern security model
-- [ ] **Encryption at Rest** - Data encryption
-- [ ] **Key Management** - Centralized key management
-- [ ] **Security Scanning** - Automated vulnerability assessment
-- [ ] **Compliance Automation** - Automated compliance checks
-
-### Performance & Scalability
-- [ ] **Microservices Architecture** - Service decomposition
-- [ ] **Event-driven Architecture** - Asynchronous processing
-- [ ] **Caching Layer** - Distributed caching
-- [ ] **Database Optimization** - Performance tuning
+#### Enterprise Security
+- [ ] **Advanced RBAC** - Role-based access control
+  - [ ] Role definitions
+  - [ ] Permission inheritance
+  - [ ] Fine-grained permissions
+- [ ] **Advanced Rate Limiting** - Enterprise-grade protection
+  - [ ] Per-user rate limits
+  - [ ] Per-group rate limits
+  - [ ] Adaptive rate limiting
+  - [ ] DDoS protection
 
 ---
 
-## 🏆 Version 1.0.0 - Production Ready
+### Enterprise v0.3.0 - Integrations & Advanced Features
 
-**Target:** Q4 2025
-**Status:** ⏳ **PLANNED**
+**Target:** Q4 2025  
+**Status:** ⏳ **PLANNED**  
+**Progress:** 0% (0/10 items)
+
+#### Enterprise Integrations
+- [ ] **SNMP Integration** - Network management protocol
+  - [ ] SNMP agent implementation
+  - [ ] MIB definitions
+  - [ ] Performance metrics export
+  - [ ] Trap notifications
+- [ ] **Database Integration** - User and config storage
+  - [ ] PostgreSQL support
+  - [ ] MySQL/MariaDB support
+  - [ ] User persistence
+  - [ ] Configuration persistence
+- [ ] **Message Queue Support** - Asynchronous processing
+  - [ ] RabbitMQ integration
+  - [ ] Redis integration
+  - [ ] Event publishing
+  - [ ] Async job processing
+
+#### Advanced Features
+- [ ] **Plugin System** - Custom extension framework
+  - [ ] Plugin API
+  - [ ] Plugin loading mechanism
+  - [ ] Plugin management UI
+  - [ ] Plugin marketplace
+- [ ] **Webhook Support** - Event notifications
+  - [ ] Event system
+  - [ ] Webhook configuration
+  - [ ] Retry logic
+  - [ ] Webhook management UI
+- [ ] **File Versioning** - Version control integration
+  - [ ] File version tracking
+  - [ ] Version history
+  - [ ] Rollback support
+
+---
+
+## 🏛️ Datacenter Version (BSL 1.1)
+
+**License:** Business Source License 1.1  
+**Target:** Large-scale datacenter deployments, cloud environments, multi-site operations  
+**Status:** ⏳ Planned  
+**Current Progress:** 0% Complete
+
+**Includes:** All Enterprise Version features plus Datacenter-specific features below.
+
+---
+
+### Datacenter v0.1.0 - Horizontal Scaling & Multi-Site
+
+**Target:** Q4 2025  
+**Status:** ⏳ **PLANNED**  
+**Progress:** 0% (0/12 items)
+
+#### Horizontal Scaling
+- [ ] **Horizontal Scaling Support** - Scale across multiple servers
+  - [ ] Load balancer integration
+  - [ ] Session affinity
+  - [ ] Shared state management
+  - [ ] Auto-scaling support
+  - [ ] Health checking
+- [ ] **Load Balancing** - Multiple server instances
+  - [ ] Internal load balancing
+  - [ ] Connection distribution
+  - [ ] Health-based routing
+  - [ ] Weighted distribution
+
+#### Multi-Site Operations
+- [ ] **Multi-site Synchronization** - Cross-site data sync
+  - [ ] Site-to-site replication
+  - [ ] Conflict resolution
+  - [ ] Sync scheduling
+  - [ ] Bandwidth management
+- [ ] **Multi-site Configuration** - Centralized management
+  - [ ] Site management UI
+  - [ ] Centralized configuration
+  - [ ] Site-specific overrides
+  - [ ] Sync status monitoring
+
+---
+
+### Datacenter v0.2.0 - Cloud Integration
+
+**Target:** Q1 2026  
+**Status:** ⏳ **PLANNED**  
+**Progress:** 0% (0/15 items)
+
+#### Cloud Storage Integration
+- [ ] **Cloud Storage Integration** - S3, Azure, GCP support
+  - [ ] AWS S3 integration
+  - [ ] Azure Blob Storage integration
+  - [ ] Google Cloud Storage integration
+  - [ ] Hybrid storage support
+  - [ ] Storage tiering
+- [ ] **Distributed Storage** - Multiple storage backends
+  - [ ] Storage abstraction layer
+  - [ ] Multi-backend support
+  - [ ] Storage migration
+  - [ ] Storage monitoring
+
+#### Cloud Deployment
+- [ ] **Kubernetes Deployment** - K8s operators and manifests
+  - [ ] Kubernetes operator
+  - [ ] Helm charts
+  - [ ] StatefulSet support
+  - [ ] Service mesh integration
+- [ ] **Auto-scaling** - Dynamic resource allocation
+  - [ ] Horizontal Pod Autoscaler (HPA)
+  - [ ] Vertical Pod Autoscaler (VPA)
+  - [ ] Custom metrics
+  - [ ] Scaling policies
+- [ ] **Cloud Load Balancing** - Cloud-native load balancing
+  - [ ] AWS ALB/NLB integration
+  - [ ] Azure Load Balancer integration
+  - [ ] GCP Load Balancer integration
+  - [ ] Health check integration
+
+#### Infrastructure as Code
+- [ ] **Infrastructure as Code** - Terraform, CloudFormation
+  - [ ] Terraform modules
+  - [ ] AWS CloudFormation templates
+  - [ ] Azure Resource Manager templates
+  - [ ] GCP Deployment Manager templates
+
+---
+
+### Datacenter v0.3.0 - Advanced Analytics & Multi-Tenancy
+
+**Target:** Q2 2026  
+**Status:** ⏳ **PLANNED**  
+**Progress:** 0% (0/12 items)
+
+#### Multi-Tenancy
+- [ ] **Multi-tenant Support** - Isolated tenant environments
+  - [ ] Tenant isolation
+  - [ ] Per-tenant resource limits
+  - [ ] Tenant management UI
+  - [ ] Tenant billing integration
+- [ ] **Resource Quotas** - Advanced quota management
+  - [ ] Per-tenant quotas
+  - [ ] Hierarchical quotas
+  - [ ] Quota enforcement
+  - [ ] Quota monitoring
+
+#### Advanced Analytics
+- [ ] **Advanced Analytics** - Comprehensive reporting
+  - [ ] Usage analytics
+  - [ ] Performance analytics
+  - [ ] Cost analytics
+  - [ ] Predictive analytics
+- [ ] **Compliance Reporting** - SOX, HIPAA, GDPR support
+  - [ ] Audit trail generation
+  - [ ] Compliance reports
+  - [ ] Data retention policies
+  - [ ] Compliance automation
+
+#### Advanced Monitoring
+- [ ] **Cloud Monitoring** - CloudWatch, Azure Monitor, GCP
+  - [ ] AWS CloudWatch integration
+  - [ ] Azure Monitor integration
+  - [ ] GCP Monitoring integration
+  - [ ] Custom metrics export
+- [ ] **Advanced Alerting** - Comprehensive alerting
+  - [ ] Multi-channel alerts
+  - [ ] Alert escalation
+  - [ ] Alert correlation
+  - [ ] Alert management UI
+
+---
+
+### Datacenter v0.4.0 - Enterprise Architecture
+
+**Target:** Q3 2026  
+**Status:** ⏳ **PLANNED**  
+**Progress:** 0% (0/10 items)
+
+#### Architecture
+- [ ] **Microservices Architecture** - Service decomposition
+  - [ ] Service separation
+  - [ ] Service communication
+  - [ ] Service discovery
+  - [ ] Service mesh integration
+- [ ] **Event-driven Architecture** - Asynchronous processing
+  - [ ] Event bus
+  - [ ] Event sourcing
+  - [ ] CQRS support
+  - [ ] Event replay
+
+#### Advanced Features
+- [ ] **Caching Layer** - Distributed caching
+  - [ ] Redis cluster support
+  - [ ] Cache invalidation
+  - [ ] Cache warming
+  - [ ] Cache analytics
+- [ ] **Database Optimization** - Performance tuning
+  - [ ] Query optimization
+  - [ ] Connection pooling
+  - [ ] Read replicas
+  - [ ] Database sharding
+
+#### Security
+- [ ] **Zero Trust Architecture** - Modern security model
+  - [ ] Identity verification
+  - [ ] Device verification
+  - [ ] Network segmentation
+  - [ ] Continuous monitoring
+- [ ] **Encryption at Rest** - Data encryption
+  - [ ] Transparent encryption
+  - [ ] Key rotation
+  - [ ] Encryption monitoring
+- [ ] **Key Management** - Centralized key management
+  - [ ] KMS integration
+  - [ ] Key rotation
+  - [ ] Key access control
+
+---
+
+## 🏆 Version 1.0.0 - Production Ready (All Versions)
+
+**Target:** Q4 2026  
+**Status:** ⏳ **PLANNED**  
 **Progress:** 0% (0/12 items)
 
 ### Quality Assurance
@@ -441,7 +684,7 @@ This document provides a detailed checklist for tracking progress on the simple-
 
 ---
 
-## 🛠️ Technical Debt & Improvements
+## 🛠️ Technical Debt & Improvements (All Versions)
 
 ### Code Quality
 - [ ] **Code Review Process** - Automated code review
@@ -499,15 +742,18 @@ This document provides a detailed checklist for tracking progress on the simple-
 
 ## 🎯 Milestone Summary
 
-| Version | Target Date | Status | Progress | Key Features |
-|---------|-------------|--------|----------|--------------|
-| 0.1.0 | Q1 2025 | 🔄 In Progress | 60% | Foundation, Core FTP, Data Connections (BLOCKING) |
-| 0.2.0 | Q2 2025 | ⏳ Planned | 0% | SSL/TLS, Advanced Security, Performance |
-| 0.3.0 | Q3 2025 | ⏳ Planned | 0% | Virtual Hosting, Web Interface |
-| 0.4.0 | Q4 2025 | ⏳ Planned | 0% | Enterprise, Cloud Integration |
-| 1.0.0 | Q1 2026 | ⏳ Planned | 0% | Production Ready, Commercial Support |
-
-**Note:** Version 0.1.0 target revised from Q4 2024 to Q1 2025 due to critical missing functionality (data connections and file transfers).
+| Product Version | Version | Target Date | Status | Progress | Key Features |
+|----------------|---------|-------------|--------|----------|--------------|
+| **Production** | 0.1.0 | Q1 2025 | ✅ Released | 90% | Foundation, Core FTP, Data Connections |
+| **Production** | 0.2.0 | Q2 2025 | ✅ Complete | 100% | SSL/TLS, Advanced Security, Performance |
+| **Production** | 0.3.0 | Q2 2025 | ⏳ Planned | 20% | Virtual Hosting |
+| **Enterprise** | 0.1.0 | Q3 2025 | ⏳ Planned | 0% | Web UI, REST API, Management Interface |
+| **Enterprise** | 0.2.0 | Q3 2025 | ⏳ Planned | 0% | High Availability, Clustering |
+| **Enterprise** | 0.3.0 | Q4 2025 | ⏳ Planned | 0% | SNMP, Integrations, Plugins |
+| **Datacenter** | 0.1.0 | Q4 2025 | ⏳ Planned | 0% | Horizontal Scaling, Multi-Site |
+| **Datacenter** | 0.2.0 | Q1 2026 | ⏳ Planned | 0% | Cloud Integration, Kubernetes |
+| **Datacenter** | 0.3.0 | Q2 2026 | ⏳ Planned | 0% | Multi-Tenancy, Advanced Analytics |
+| **All** | 1.0.0 | Q4 2026 | ⏳ Planned | 0% | Production Ready, Commercial Support |
 
 ---
 
@@ -525,38 +771,18 @@ This document provides a detailed checklist for tracking progress on the simple-
   - 🟡 Important - Should have for release
   - 🟢 Nice to have - Could have for release
 
+- **Product Version Differentiation:**
+  - **Production (Apache 2.0)**: Basic FTP server, CLI management, single-server deployments
+  - **Enterprise (BSL 1.1)**: All Production features + Web UI, REST API, SNMP, HA, clustering, advanced security
+  - **Datacenter (BSL 1.1)**: All Enterprise features + Horizontal scaling, multi-site sync, cloud integrations, multi-tenant
+
 - **Dependencies:** Some features depend on others being completed first
 
 - **Timeline:** All dates are estimates and subject to change based on priorities and resources
 
 ---
 
-## ⚠️ Critical Blockers for v0.1.0 Release
-
-1. **Data Connection Implementation** - Cannot release without actual file transfers
-   - Passive mode data socket setup and handling
-   - Active mode data socket setup (can defer to v0.2.0)
-   - Proper data channel communication
-
-2. **File Transfer Implementation** - Core functionality
-   - RETR (download) through data connection
-   - STOR (upload) through data connection
-   - Proper error handling and cleanup
-
-3. **LIST Command Fix** - Must use data connection
-   - Currently sends through control connection (wrong)
-   - Needs proper data channel implementation
-
-4. **Basic Testing** - Quality assurance
-   - Unit tests for core functionality
-   - Integration tests for file transfers
-   - At least 60% code coverage
-
-**Estimated Time to Complete Blockers:** 6-8 weeks
-
----
-
-*Last Updated: December 2024*  
-*Next Review: January 2025*  
+*Last Updated: January 2025*  
+*Next Review: February 2025*  
 *Maintained by: SimpleDaemons Development Team*  
 *See [PROGRESS_REPORT.md](PROGRESS_REPORT.md) for detailed honest assessment*
